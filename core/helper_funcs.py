@@ -5,7 +5,7 @@ from datetime import datetime
 
 def write_df_to_csv(df, folder_path, suffix=''):
     """Save a DataFrame to a CSV file."""
-    today_date = datetime.today().strftime('%y-%m-%d_%H-%M-%S')
+    today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
     if suffix:
         filename = f"df_{today_date}_{suffix}.csv"
     else:
