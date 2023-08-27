@@ -4,10 +4,15 @@ import time
 import config_springer  # file containing API key
 
 
-api_key = config_springer.API_KEY
-base_url = "https://api.springernature.com/metadata/json"
+BASE_URL = "https://api.springernature.com/metadata/json"
 WAIT_TIME = 1  # wait time between requests
 
+api_key = config_springer.API_KEY
+journal_ids = {'synthese': '11229'}
+
+# Journal IDs allow restricting searches to a particular journal.
+# Example:
+# >>> query_str = f"journalid:{journal_ids['synthese']} AND language:en"
 
 def get_number_results(query_str):
     """Return the total number of results for a given query."""
@@ -17,7 +22,7 @@ def get_number_results(query_str):
         's': 1,   # Return results
         "api_key": api_key
     }
-    response = requests.get(base_url, params=params)
+    response = requests.get(BASE_URL, params=params)
     data = response.json()
     num_results = int(data['result'][0]['total'])
     return num_results
@@ -31,7 +36,7 @@ def make_request(query_str, start, records_per_page):
         's': start,
         "api_key": api_key
     }
-    response = requests.get(base_url, params=params)
+    response = requests.get(BASE_URL, params=params)
     data = response.json()
     return data
 
@@ -51,7 +56,7 @@ def get_responses(query_str, records_per_page):
 def download_responses(query_str, records_per_page=50):
     """Download all responses for a given query and save them as a
     JSON file. Example:
-    > download_responses("journalid:11229 AND language:en")
+    >>> download_responses("journalid:11229 AND language:en")
     """
     all_data = get_responses(query_str, records_per_page)
     fname = query_str + '.json'
@@ -59,7 +64,3 @@ def download_responses(query_str, records_per_page=50):
         json.dump(all_data, f)
 
 
-journalids = {'synthese': 11229}
-query_str = "journalid:" + str(journalids['synthese']) + ' AND language:en'
-
-download_responses(query_str)
