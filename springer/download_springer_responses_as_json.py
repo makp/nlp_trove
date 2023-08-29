@@ -9,9 +9,6 @@ WAIT_TIME = 1  # wait time between requests
 
 api_key = data_processing.config_springer.API_KEY
 
-# Journal IDs allow restricting searches to a particular journal
-journal_ids = {'synthese': '11229'}
-
 
 def get_number_results(query_str):
     """Return the total number of results for a given query."""
@@ -58,8 +55,8 @@ def download_responses(query_str, records_per_page=50):
     >>> download_responses("journalid:11229 AND language:en")
     """
     all_data = get_responses(query_str, records_per_page)
-    fname = query_str + '.json'
+    fname = query_str.replace(" ", "_") + '.json'
     with open(fname, 'w') as f:
         json.dump(all_data, f)
 
-    return fname.replace(" ", "_")
+    return fname
