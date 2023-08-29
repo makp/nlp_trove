@@ -1,4 +1,0 @@
-
-* Workflow - Springer API
-1. Make a query and save responses as a JSON file.
-2. Extract DOI links and other information from the JSON file and store it as a Pandas DataFrame.
