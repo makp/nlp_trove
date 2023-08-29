@@ -1,18 +1,17 @@
 import requests
 import json
 import time
-import config_springer  # file containing API key
+import data_processing.config_springer
 
 
 BASE_URL = "https://api.springernature.com/metadata/json"
 WAIT_TIME = 1  # wait time between requests
 
-api_key = config_springer.API_KEY
+api_key = data_processing.config_springer.API_KEY
+
+# Journal IDs allow restricting searches to a particular journal
 journal_ids = {'synthese': '11229'}
 
-# Journal IDs allow restricting searches to a particular journal.
-# Example:
-# >>> query_str = f"journalid:{journal_ids['synthese']} AND language:en"
 
 def get_number_results(query_str):
     """Return the total number of results for a given query."""
