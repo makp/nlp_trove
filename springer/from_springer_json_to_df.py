@@ -12,9 +12,7 @@ def convert_record_to_dict(record):
         "title": record.get('title', None),
         "abstract": record.get("abstract", None),
         "publicationDate": record.get("publicationDate", None),
-        "doi": record.get("doi", None),
-        "doi_url": record["url"][0]["value"] if record.get("url", None)
-        else None
+        "doi": record.get("doi", None)
         }
     return record_dict
 
