@@ -62,4 +62,4 @@ def download_responses(query_str, records_per_page=50):
     with open(fname, 'w') as f:
         json.dump(all_data, f)
 
-
+    return fname
