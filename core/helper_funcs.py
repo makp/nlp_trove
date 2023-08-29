@@ -3,6 +3,26 @@ import pandas as pd
 from datetime import datetime
 
 
+def get_all_files_in_directory(dir_path, extension=None):
+    """
+    Get all files in the specified directory.
+
+    Args:
+    - dir_path (str): Path to the directory
+    - extension (str, optional): The file extension to filter by.
+
+    Returns:
+    - list: A list of filenames
+    """
+    with os.scandir(dir_path) as entries:
+        if extension:
+            out = [entry.name for entry in entries if entry.is_file()
+                   and entry.name.endswith(extension)]
+        else:
+            out = [entry.name for entry in entries if entry.is_file()]
+        return out
+
+
 def write_df_to_csv(df, folder_path, suffix=''):
     """Save a DataFrame to a CSV file."""
     today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
