@@ -4,7 +4,7 @@ import os
 import hashlib
 
 
-def download_pdf_from_url(url, headers=None, output_dir=''):
+def download_pdf_from_url(url, output_dir='', headers=None):
     if headers is None:
         headers = {}
     try:
@@ -13,7 +13,11 @@ def download_pdf_from_url(url, headers=None, output_dir=''):
 
         content_type = response.headers.get("content-type", '')
         if 'application/pdf' not in content_type:
-            # print(f"The URL: {url} was redirected to an unexpected page.")
+            with open("redirected_urls_pdf_url.txt", "a") as f:
+                f.write(url + "\n")
+            return None
+
+        if response.content[:5] != b'%PDF-':
             with open("redirected_urls_pdf_url.txt", "a") as f:
                 f.write(url + "\n")
             return None
