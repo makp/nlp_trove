@@ -31,3 +31,10 @@ def are_jstor_articles_in_main_df(df, df_jstor,
         missing_articles = len(df_jstor) - len(merged_df)
         print(f"{missing_articles} articles not present in the main DataFrame")
         return False
+
+
+def only_in_df_jstor(df, df_jstor, column='title'):
+    merged_df = pd.merge(df, df_jstor, on=column, how='outer',
+                         indicator="origin")
+    only_in_df_jstor = merged_df[merged_df['origin'] == "right_only"]
+    return only_in_df_jstor.drop('origin', axis=1)
