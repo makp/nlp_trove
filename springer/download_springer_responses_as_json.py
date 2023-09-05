@@ -24,7 +24,7 @@ def get_number_results(query_str):
     return int(data['result'][0]['total'])
 
 
-def make_request(query_str, start):
+def fetch_single_response(query_str, start):
     """Make a single request to the API and return the response data."""
     params = {
         "q": query_str,
@@ -36,23 +36,23 @@ def make_request(query_str, start):
     return response.json()
 
 
-def get_responses(query_str):
+def fetch_all_responses(query_str):
     """Return all response data for a given query."""
     total_records = get_number_results(query_str)
     all_data = []
     for start in range(1, total_records + 1, COUNT_PER_REQUEST):
-        data = make_request(query_str, start)
+        data = fetch_single_response(query_str, start)
         all_data.append(data)
         time.sleep(WAIT_TIME)
     return all_data
 
 
-def download_responses(query_str, records_per_page=50):
+def download_responses(query_str):
     """Download all responses for a given query and save them as a
     JSON file. Example:
     >>> download_responses("journalid:11229 AND language:en")
     """
-    all_data = get_responses(query_str)
+    all_data = fetch_all_responses(query_str)
     fname = query_str.replace(" ", "_") + '.json'
     with open(fname, 'w') as f:
         json.dump(all_data, f)
