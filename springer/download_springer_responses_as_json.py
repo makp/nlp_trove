@@ -6,6 +6,7 @@ import data_processing.config_springer
 
 BASE_URL = "https://api.springernature.com/metadata/json"
 WAIT_TIME = 1  # wait time between requests
+COUNT_PER_REQUEST = 50
 
 api_key = data_processing.config_springer.API_KEY
 
@@ -14,36 +15,33 @@ def get_number_results(query_str):
     """Return the total number of results for a given query."""
     params = {
         "q": query_str,
-        "p": 1,   # Number of results per request
-        's': 1,   # Return results
+        "p": 1,   # Num of results per request
+        's': 1,   # Start index
         "api_key": api_key
     }
     response = requests.get(BASE_URL, params=params)
     data = response.json()
-    num_results = int(data['result'][0]['total'])
-    return num_results
+    return int(data['result'][0]['total'])
 
 
-def make_request(query_str, start, records_per_page):
+def make_request(query_str, start):
     """Make a single request to the API and return the response data."""
     params = {
         "q": query_str,
-        "p": records_per_page,
+        "p": COUNT_PER_REQUEST,
         's': start,
         "api_key": api_key
     }
     response = requests.get(BASE_URL, params=params)
-    data = response.json()
-    return data
+    return response.json()
 
 
-def get_responses(query_str, records_per_page):
+def get_responses(query_str):
     """Return all response data for a given query."""
     total_records = get_number_results(query_str)
     all_data = []
-    for i in range(0, total_records, records_per_page):
-        start = i + 1
-        data = make_request(query_str, start, records_per_page)
+    for start in range(1, total_records + 1, COUNT_PER_REQUEST):
+        data = make_request(query_str, start)
         all_data.append(data)
         time.sleep(WAIT_TIME)
     return all_data
@@ -54,7 +52,7 @@ def download_responses(query_str, records_per_page=50):
     JSON file. Example:
     >>> download_responses("journalid:11229 AND language:en")
     """
-    all_data = get_responses(query_str, records_per_page)
+    all_data = get_responses(query_str)
     fname = query_str.replace(" ", "_") + '.json'
     with open(fname, 'w') as f:
         json.dump(all_data, f)
