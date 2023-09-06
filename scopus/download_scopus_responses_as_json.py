@@ -79,12 +79,6 @@ def fetch_all_articles(query_str, cursor='*'):
         print(f"Number of articles fetched: {num_fetched_articles}")
 
         time.sleep(WAIT_TIME)
-
-    # for idx in range(start, num_results, COUNT_PER_REQUEST):
-    #     all_articles.extend(fetch_batch_of_articles(query_str, idx))
-    #     print(idx)
-    #     time.sleep(WAIT_TIME)
-
     return all_articles
 
 
