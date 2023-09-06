@@ -43,21 +43,23 @@ def fetch_single_request(params):
     return response.json()
 
 
-def fetch_batch_of_articles(query_str, start):
+def fetch_batch_of_articles(query_str, cursor='*'):
     """Return a batch of articles for a given query."""
     params = {
         "query": query_str,
         "count": COUNT_PER_REQUEST,
-        "start": start
+        "cursor": cursor
     }
 
     response_dic = fetch_single_request(params)
+    next_cursor = response_dic.get('search-results', {}).get('cursor', {}).get('@next', None)
+
     if response_dic:
-        return response_dic.get("search-results", {}).get("entry", [])
+        return response_dic.get("search-results", {}).get("entry", []), next_cursor
     return []
 
 
-def fetch_all_articles(query_str, start=0):
+def fetch_all_articles(query_str, cursor='*'):
     """Return all articles for a given query."""
     all_articles = []
     num_results = get_number_results(query_str)
@@ -67,10 +69,22 @@ def fetch_all_articles(query_str, start=0):
         print("Error: Could not get number of results")
         return []
 
-    for idx in range(start, num_results, COUNT_PER_REQUEST):
-        all_articles.extend(fetch_batch_of_articles(query_str, idx))
-        print(idx)
+    next_cursor = cursor
+    while num_results > 0:
+        batch_articles, next_cursor = fetch_batch_of_articles(query_str, next_cursor)
+        all_articles.extend(batch_articles)
+        print(f"Number of articles fetched: {len(all_articles)}")
+
+        if next_cursor is None:
+            break
+
+        num_results -= COUNT_PER_REQUEST
         time.sleep(WAIT_TIME)
+
+    # for idx in range(start, num_results, COUNT_PER_REQUEST):
+    #     all_articles.extend(fetch_batch_of_articles(query_str, idx))
+    #     print(idx)
+    #     time.sleep(WAIT_TIME)
 
     return all_articles
 
