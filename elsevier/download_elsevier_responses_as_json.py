@@ -52,11 +52,11 @@ def fetch_batch_of_articles(query_str, cursor='*'):
     }
 
     response_dic = fetch_single_request(params)
-    next_cursor = response_dic.get('search-results', {}).get('cursor', {}).get('@next', None)
-
+    
     if response_dic:
+        next_cursor = response_dic.get('search-results', {}).get('cursor', {}).get('@next', None)
         return response_dic.get("search-results", {}).get("entry", []), next_cursor
-    return []
+    return [], None
 
 
 def fetch_all_articles(query_str, cursor='*'):
