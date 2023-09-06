@@ -5,8 +5,8 @@ import data_processing.config_elsevier
 
 
 BASE_URL = "http://api.elsevier.com/content/search/scopus?"
-WAIT_TIME = 20  # wait time between requests in seconds
-COUNT_PER_REQUEST = 25
+WAIT_TIME = 1  # wait time between requests in seconds
+COUNT_PER_REQUEST = 200
 HEADERS = {
     "Accept": "application/json",
     "X-ELS-APIKey": data_processing.config_elsevier.API_KEY
@@ -70,15 +70,14 @@ def fetch_all_articles(query_str, cursor='*'):
         return []
 
     next_cursor = cursor
-    while num_results > 0:
+    num_fetched_articles = 0
+    while num_fetched_articles < num_results:
         batch_articles, next_cursor = fetch_batch_of_articles(query_str, next_cursor)
         all_articles.extend(batch_articles)
-        print(f"Number of articles fetched: {len(all_articles)}")
 
-        if next_cursor is None:
-            break
+        num_fetched_articles = len(all_articles)
+        print(f"Number of articles fetched: {num_fetched_articles}")
 
-        num_results -= COUNT_PER_REQUEST
         time.sleep(WAIT_TIME)
 
     # for idx in range(start, num_results, COUNT_PER_REQUEST):
@@ -89,11 +88,11 @@ def fetch_all_articles(query_str, cursor='*'):
     return all_articles
 
 
-def download_responses(query_str, start=0):
+def download_responses(query_str, cursor='*'):
     """Download all responses for a given query and save them as a
     JSON file.
     """
-    all_data = fetch_all_articles(query_str, start)
+    all_data = fetch_all_articles(query_str, cursor)
     with open('out.json', 'w') as f:
         json.dump(all_data, f)
 
