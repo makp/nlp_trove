@@ -13,11 +13,11 @@ def save_df(df, folder_path, extension='csv', suffix=''):
     full_path = os.path.join(folder_path, filename)
 
     method_map = {
-        'csv': 'to_csv',
-        'pkl': 'to_pickle',
+        'csv': ('to_csv', 'index=False'),
+        'pkl': ('to_pickle', None),
     }
-    method_name = method_map[extension]
-    getattr(df, method_name)(full_path, index=False)
+    method_name, kwargs = method_map[extension]
+    getattr(df, method_name)(full_path, kwargs)
     return full_path
 
 
