@@ -3,35 +3,21 @@ import pandas as pd
 from datetime import datetime
 
 
-def get_all_files_in_directory(dir_path, extension=None):
-    """
-    Get all files in the specified directory.
-
-    Args:
-    - dir_path (str): Path to the directory
-    - extension (str, optional): The file extension to filter by.
-
-    Returns:
-    - list: A list of filenames
-    """
-    with os.scandir(dir_path) as entries:
-        if extension:
-            out = [entry.name for entry in entries if entry.is_file()
-                   and entry.name.endswith(extension)]
-        else:
-            out = [entry.name for entry in entries if entry.is_file()]
-        return out
-
-
-def write_df_to_csv(df, folder_path, suffix=''):
-    """Save a DataFrame to a CSV file."""
+def save_df(df, folder_path, extension='csv', suffix=''):
+    """Save a DataFrame to a file."""
     today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
     if suffix:
-        filename = f"df_{today_date}_{suffix}.csv"
+        filename = f"df_{today_date}_{suffix}.{extension}"
     else:
-        filename = f"df_{today_date}.csv"
+        filename = f"df_{today_date}.{extension}"
     full_path = os.path.join(folder_path, filename)
-    df.to_csv(full_path, index=False)
+
+    method_map = {
+        'csv': 'to_csv',
+        'pkl': 'to_pickle',
+    }
+    method_name = method_map[extension]
+    getattr(df, method_name)(full_path, index=False)
     return full_path
 
 
@@ -56,32 +42,6 @@ def clean_non_pdf_files(pdf_path, df, column_name='pdf_filename'):
             print(f"Removed non-PDF file: {filepath}")
             df.at[index, column_name] = None
     return df
-
-
-def delete_non_pdf_files(folder_path):
-    """
-    Delete all files in a specified folder that are not PDF files.
-
-    Parameters:
-    - folder_path (str): The path to the folder containing the files to check.
-
-    Returns:
-    - int: The number of files deleted.
-    """
-    deleted_files_count = 0
-    files_in_folder = os.listdir(folder_path)
-
-    for filename in files_in_folder:
-        filepath = os.path.join(folder_path, filename)
-
-        # Check if it's a file (not a directory)
-        if os.path.isfile(filepath):
-            if not is_pdf(filepath):
-                os.remove(filepath)
-                deleted_files_count += 1
-                print(f"Deleted: {filepath}")
-
-    return deleted_files_count
 
 
 def find_unique_duplicates(df, column_name):
@@ -121,3 +81,49 @@ def set_duplicates_to_none(df, column_name):
     df.loc[df[column_name].isin(duplicate_values), column_name] = None
 
     return num_modified
+
+
+def get_all_files_in_directory(dir_path, extension=None):
+    """
+    Get all files in the specified directory.
+
+    Args:
+    - dir_path (str): Path to the directory
+    - extension (str, optional): The file extension to filter by.
+
+    Returns:
+    - list: A list of filenames
+    """
+    with os.scandir(dir_path) as entries:
+        if extension:
+            out = [entry.name for entry in entries if entry.is_file()
+                   and entry.name.endswith(extension)]
+        else:
+            out = [entry.name for entry in entries if entry.is_file()]
+        return out
+
+
+def delete_non_pdf_files(folder_path):
+    """
+    Delete all files in a specified folder that are not PDF files.
+
+    Parameters:
+    - folder_path (str): The path to the folder containing the files to check.
+
+    Returns:
+    - int: The number of files deleted.
+    """
+    deleted_files_count = 0
+    files_in_folder = os.listdir(folder_path)
+
+    for filename in files_in_folder:
+        filepath = os.path.join(folder_path, filename)
+
+        # Check if it's a file (not a directory)
+        if os.path.isfile(filepath):
+            if not is_pdf(filepath):
+                os.remove(filepath)
+                deleted_files_count += 1
+                print(f"Deleted: {filepath}")
+
+    return deleted_files_count
