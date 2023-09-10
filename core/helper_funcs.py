@@ -28,7 +28,27 @@ def is_pdf(filepath):
     return header == b"%PDF-"
 
 
-def clean_non_pdf_files(pdf_path, df, column_name='pdf_filename'):
+def remove_nonpdf_files_from_dir_and_df(pdf_path, df,
+                                        column_name='pdf_filename'):
+    """
+    Remove all non-PDF files from a directory and update the
+    corresponding DataFrame.
+
+    This function iterates over each row in the given DataFrame,
+    checks whether the file referenced in the specified column is a
+    PDF, and removes it from both the directory and DataFrame if it is
+    not.
+
+    Parameters:
+    - pdf_directory (str): The directory where the PDF files are
+      located.
+    - df (DataFrame): The DataFrame containing filenames to check.
+    - column_name (str, optional): The name of the DataFrame column
+      containing filenames. Defaults to 'pdf_filename'.
+
+    Returns:
+    - DataFrame: The updated DataFrame with non-PDF filenames set to None.
+    """
     for index, row in df.iterrows():
         filename = row[column_name]
 
