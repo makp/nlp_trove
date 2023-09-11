@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 
-def save_df(df, folder_path, extension='csv', suffix=''):
+def save_df(df, folder_path, suffix='', extension='pkl'):
     """Save a DataFrame to a file."""
     today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
     if suffix:
