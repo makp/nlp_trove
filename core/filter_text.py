@@ -1,5 +1,6 @@
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
+import re
 
 
 def detect_language(text):
@@ -16,8 +17,9 @@ def is_english(text):
     return lang == 'en'
 
 
-def has_min_words(text, min_words):
+def get_number_of_words(text):
+    """Count the number of words in a string."""
     if not isinstance(text, str):
-        return False
-    num_words = len(text.split())
-    return num_words >= min_words
+        return 0
+    words = re.findall(r'\b\w+\b', text)
+    return len(words)
