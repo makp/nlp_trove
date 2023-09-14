@@ -1,4 +1,6 @@
 import os
+import pandas as pd
+import PyPDF2
 from core.helper_funcs import is_pdf
 
 
@@ -15,6 +17,23 @@ def list_nonpdf_files_in_folder(folder):
     files_in_folder = [os.path.join(folder, f) for f in os.listdir(folder)]
     nonpdf_files = [f for f in files_in_folder if not is_pdf(f)]
     return nonpdf_files
+
+
+def is_pdf_corrupted(filepath, verbose=False):
+    """Check whether a PDF file is corrupted."""
+    try:
+        with open(filepath, 'rb') as f:
+            reader = PyPDF2.PdfFileReader(f)
+
+            # Perform some operations to provoke an error
+            reader.getNumPages()
+            reader.getPage(0).extract_text()
+
+            return False
+    except Exception as e:
+        if verbose:
+            print(f"File {filepath} may be corrupted. Error: {str(e)}")
+        return True
 
 
 def remove_nonpdf_files_from_dir_and_df(pdf_path, df,
