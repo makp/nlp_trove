@@ -33,12 +33,15 @@ def move_and_rename_pdf(dest_folder):
     return new_name
 
 
-def replace_nan_column_with_filename(row, dest_folder, column='pdf_filename'):
-    if pd.isna(row[column]):
-        success = download_article_from_doi(row['doi_url'])
+def replace_nan_column_with_filename(row, dest_folder,
+                                     pdf_column='pdf_filename',
+                                     doi_column='doi'):
+    if pd.isna(row[pdf_column]):
+        doi_url = f"https://doi.org/{row[doi_column]}"
+        success = download_article_from_doi(doi_url)
         if success:
             return move_and_rename_pdf(dest_folder)
         else:
             return None
     else:
-        return row[column]
+        return row[pdf_column]

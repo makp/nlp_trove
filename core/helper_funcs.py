@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 
-def save_df(df, folder_path, extension='csv', suffix=''):
+def save_df(df, folder_path, suffix='', extension='pkl'):
     """Save a DataFrame to a file."""
     today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
     if suffix:
@@ -13,11 +13,11 @@ def save_df(df, folder_path, extension='csv', suffix=''):
     full_path = os.path.join(folder_path, filename)
 
     method_map = {
-        'csv': 'to_csv',
-        'pkl': 'to_pickle',
+        'csv': ('to_csv', 'index=False'),
+        'pkl': ('to_pickle', None),
     }
-    method_name = method_map[extension]
-    getattr(df, method_name)(full_path, index=False)
+    method_name, kwargs = method_map[extension]
+    getattr(df, method_name)(full_path, kwargs)
     return full_path
 
 
@@ -26,6 +26,25 @@ def is_pdf(filepath):
     with open(filepath, 'rb') as f:
         header = f.read(5)
     return header == b"%PDF-"
+
+
+def calculate_date_range(df, column_name='publicationDate'):
+    """
+    Calculate the date range of a DataFrame.
+
+    Parameters:
+    - df (pd.DataFrame): The DataFrame to calculate the date range of.
+    - column_name (str, optional): The name of the column containing the
+      dates. Defaults to 'publicationDate'.
+
+    Returns:
+    - tuple: A tuple containing the start and end dates of the DataFrame.
+    """
+    DATE_FORMAT = '%Y-%m-%d'
+    series = pd.to_datetime(df[column_name])
+    min_date = series.min()
+    max_date = series.max()
+    return [d.strftime(DATE_FORMAT) for d in (min_date, max_date)]
 
 
 def remove_nonpdf_files_from_dir_and_df(pdf_path, df,
