@@ -35,4 +35,3 @@ def extract_text_from_pdf(row, path_to_pdfs):
 
     full_path = f"{path_to_pdfs}/{filename}"
     return pdf_to_text(full_path)
-
