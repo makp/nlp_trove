@@ -4,10 +4,9 @@ from core.helper_funcs import is_pdf
 
 def list_files_not_in_dataframe(df, folder, column_name='pdf_filename'):
     """List files in a folder that are not in the DataFrame."""
-    files_in_folder = os.listdir(folder)
-    pdfs_in_df = df[column_name].unique()
+    files_in_folder = [os.path.join(folder, f) for f in os.listdir(folder)]
+    pdfs_in_df = [os.path.join(folder, f) for f in df[column_name] if pd.notna(f)]
     files_not_in_df = [f for f in files_in_folder if f not in pdfs_in_df]
-
     return files_not_in_df
 
 
