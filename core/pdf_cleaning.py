@@ -36,37 +36,37 @@ def is_pdf_corrupted(filepath, verbose=False):
         return True
 
 
-def remove_nonpdf_files_from_dir_and_df(pdf_path, df,
-                                        column_name='pdf_filename'):
-    """
-    Remove all non-PDF files from a directory and update the
-    corresponding DataFrame.
+# def remove_nonpdf_files_from_dir_and_df(pdf_path, df,
+#                                         column_name='pdf_filename'):
+#     """
+#     Remove all non-PDF files from a directory and update the
+#     corresponding DataFrame.
 
-    This function iterates over each row in the given DataFrame,
-    checks whether the file referenced in the specified column is a
-    PDF, and removes it from both the directory and DataFrame if it is
-    not.
+#     This function iterates over each row in the given DataFrame,
+#     checks whether the file referenced in the specified column is a
+#     PDF, and removes it from both the directory and DataFrame if it is
+#     not.
 
-    Parameters:
-    - pdf_directory (str): The directory where the PDF files are
-      located.
-    - df (DataFrame): The DataFrame containing filenames to check.
-    - column_name (str, optional): The name of the DataFrame column
-      containing filenames. Defaults to 'pdf_filename'.
+#     Parameters:
+#     - pdf_directory (str): The directory where the PDF files are
+#       located.
+#     - df (DataFrame): The DataFrame containing filenames to check.
+#     - column_name (str, optional): The name of the DataFrame column
+#       containing filenames. Defaults to 'pdf_filename'.
 
-    Returns:
-    - DataFrame: The updated DataFrame with non-PDF filenames set to None.
-    """
-    for index, row in df.iterrows():
-        filename = row[column_name]
+#     Returns:
+#     - DataFrame: The updated DataFrame with non-PDF filenames set to None.
+#     """
+#     for index, row in df.iterrows():
+#         filename = row[column_name]
 
-        if pd.isna(filename):
-            continue
+#         if pd.isna(filename):
+#             continue
 
-        filepath = os.path.join(pdf_path, filename)
+#         filepath = os.path.join(pdf_path, filename)
 
-        if not is_pdf(filepath):
-            os.remove(filepath)
-            print(f"Removed non-PDF file: {filepath}")
-            df.at[index, column_name] = None
-    return df
+#         if not is_pdf(filepath):
+#             os.remove(filepath)
+#             print(f"Removed non-PDF file: {filepath}")
+#             df.at[index, column_name] = None
+#     return df
