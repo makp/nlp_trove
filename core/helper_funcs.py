@@ -51,6 +51,15 @@ def mv_list_of_files_to_dir(file_list, dest_dir):
         os.rename(f, os.path.join(dest_dir, os.path.basename(f)))
 
 
+def del_rows_and_corresponding_pdfs(idx, df, pdf_folder, pdf_column='pdf_filename'):
+    """Delete rows from a DataFrame and the corresponding PDF files."""
+    pdf_filenames = df.loc[idx, pdf_column]
+    pdf_paths = [os.path.join(pdf_folder, f) for f in pdf_filenames]
+    for path in pdf_paths:
+        os.remove(path)
+    df.drop(idx, inplace=True)
+
+
 def calculate_date_range(df, column_name='publicationDate'):
     """
     Calculate the date range of a DataFrame.
