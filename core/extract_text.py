@@ -36,10 +36,3 @@ def extract_text_from_pdf(row, path_to_pdfs):
     full_path = f"{path_to_pdfs}/{filename}"
     return pdf_to_text(full_path)
 
-
-def extract_text_from_html(file_path):
-    with open(file_path, 'r') as f:
-        contents = f.read()
-    soup = BeautifulSoup(contents, 'lxml')
-    text = soup.get_text(separator=' ')
-    return text
