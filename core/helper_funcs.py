@@ -55,9 +55,12 @@ def del_rows_and_corresponding_pdfs(idx, df, pdf_folder, pdf_column='pdf_filenam
     """Delete rows from a DataFrame and the corresponding PDF files."""
     pdf_filenames = df.loc[idx, pdf_column]
     pdf_paths = [os.path.join(pdf_folder, f) for f in pdf_filenames]
-    for path in pdf_paths:
-        os.remove(path)
     df.drop(idx, inplace=True)
+    for path in pdf_paths:
+        if os.path.isfile(path):
+            os.remove(path)
+        else:
+            print(f"File {path} does not exist. Skipping deletion.")
 
 
 def calculate_date_range(df, column_name='publicationDate'):
