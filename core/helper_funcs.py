@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def save_df(df, folder_path, suffix='',
-            extension='pkl', journal_column='journal', journal_name=None):
+            extension='pkl', journal_column='publicationName', journal_name=None):
     """Save a DataFrame to a file."""
     if journal_name:
         journal_name = journal_name
