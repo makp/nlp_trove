@@ -71,14 +71,19 @@ def create_springer_pdf_urls_from_doi(doi):
 
 def generate_df_from_springer_json(json_path):
     """
-    Filter the JSON file to only keep the columns of interest, and
-    clean the `creators` and `genre` fields.
+    Filter the JSON file to only keep the columns of interest, clean
+    the `creators` and `genre` fields, and change the data types of
+    some columns.
     """
     df = read_articles_from_json(json_path)
     df['publicationDate'] = pd.to_datetime(df['publicationDate'])
     df['creators'] = df['creators'].apply(clean_creators)
     df['genre'] = df['genre'].apply(clean_genre)
+    df['startingPage'] = pd.to_numeric(df['startingPage'], errors='coerce')
+    df['endingPage'] = pd.to_numeric(df['endingPage'], errors='coerce')
+    df['num_pages'] = df['endingPage'] - df['startingPage'] + 1
     # df['springer_url'] = df['doi'].apply(create_springer_pdf_urls_from_doi)
+    print("Column data types:")
     for col in df.columns:
         data_type = df[col].apply(type).unique()
         print(f"{col}: {data_type}")
