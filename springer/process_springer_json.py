@@ -50,9 +50,13 @@ def clean_genre(genre):
     """
     Clean the `genre` field.
 
-    The field `genre` can be a string or a list of strings.
+    The field `genre` can be a string or a list of strings. When
+    `genre` is a list, the first element is the general genre, and the
+    second element contains more specific information (e.g., name of
+    the special issue).
     """
     if isinstance(genre, list):
+        # return ', '.join(genre)
         return genre[0]
     else:
         return genre
@@ -71,9 +75,10 @@ def generate_df_from_springer_json(json_path):
     clean the `creators` and `genre` fields.
     """
     df = read_articles_from_json(json_path)
-    df.loc[:, 'creators'] = df['creators'].apply(clean_creators)
-    df.loc[:, 'genre'] = df['genre'].apply(clean_genre)
-    df['springer_url'] = df['doi'].apply(create_springer_pdf_urls_from_doi)
+    df['publicationDate'] = pd.to_datetime(df['publicationDate'])
+    df['creators'] = df['creators'].apply(clean_creators)
+    df['genre'] = df['genre'].apply(clean_genre)
+    # df['springer_url'] = df['doi'].apply(create_springer_pdf_urls_from_doi)
     for col in df.columns:
         data_type = df[col].apply(type).unique()
         print(f"{col}: {data_type}")
