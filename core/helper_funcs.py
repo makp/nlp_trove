@@ -26,7 +26,7 @@ def save_df(df, folder_path, suffix='',
     }
     method_name, kwargs = method_map[extension]
     getattr(df, method_name)(full_path, kwargs)
-    return full_path
+    return print(f"File: {full_path};\nData shape: {df.shape}")
 
 
 def is_pdf(filepath):
