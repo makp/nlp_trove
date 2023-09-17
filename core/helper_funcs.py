@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import hashlib
 from datetime import datetime
+import requests
 
 
 def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
@@ -62,6 +63,20 @@ def del_rows_and_corresponding_pdfs(idx, df, pdf_folder, pdf_column='pdf_filenam
             os.remove(path)
         else:
             print(f"File {path} does not exist. Skipping deletion.")
+
+
+def check_doi_exists(doi):
+    """Check whether a DOI exists."""
+    url = f"https://doi.org/{doi}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.url
+        else:
+            return None
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None
 
 
 def calculate_date_range(df, column_name='publicationDate'):
