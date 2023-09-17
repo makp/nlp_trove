@@ -1,13 +1,13 @@
 import time
 import os
 import hashlib
-import pandas as pd
 from scidownl import scihub_download
 from core.helper_funcs import is_pdf
 
 
-def download_article_from_doi(url):
+def sh_download_article_from_doi(doi):
     out = './out.pdf'
+    url = f"https://doi.org/{doi}"
     scihub_download(url, paper_type="doi", out=out)
     time.sleep(1)
     if not is_pdf(out):
@@ -16,7 +16,7 @@ def download_article_from_doi(url):
     return True
 
 
-def move_and_rename_pdf(dest_folder):
+def sh_move_and_rename_pdf(dest_folder):
     if not os.path.exists("./out.pdf"):
         return None
 
@@ -33,15 +33,9 @@ def move_and_rename_pdf(dest_folder):
     return new_name
 
 
-def replace_nan_column_with_filename(row, dest_folder,
-                                     pdf_column='pdf_filename',
-                                     doi_column='doi'):
-    if pd.isna(row[pdf_column]):
-        doi_url = f"https://doi.org/{row[doi_column]}"
-        success = download_article_from_doi(doi_url)
-        if success:
-            return move_and_rename_pdf(dest_folder)
-        else:
-            return None
+def sh_download_and_rename_pdf(doi, dest_folder):
+    success = sh_download_article_from_doi(doi)
+    if success:
+        return sh_move_and_rename_pdf(dest_folder)
     else:
-        return row[pdf_column]
+        return None
