@@ -4,19 +4,13 @@ import hashlib
 from datetime import datetime
 
 
-def save_df(df, folder_path, suffix='',
-            extension='pkl', journal_column='publicationName', journal_name=None):
+def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
     """Save a DataFrame to a file."""
-    if journal_name:
-        journal_name = journal_name
-    else:
-        journal_name = df[journal_column][0].lower().replace(' ', '-')
-
     today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
     if suffix:
-        filename = f"{journal_name}_{today_date}_{suffix}.{extension}"
+        filename = f"{prefix}_{today_date}_{suffix}.{extension}"
     else:
-        filename = f"{journal_name}_{today_date}.{extension}"
+        filename = f"{prefix}_{today_date}.{extension}"
 
     full_path = os.path.join(folder_path, filename)
 
