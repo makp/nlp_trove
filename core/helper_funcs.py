@@ -47,12 +47,6 @@ def incorporate_pdf_into_database(pdf_path, database_dir, df, row_indx, column_n
     return df.loc[row_indx]
 
 
-def mv_list_of_files_to_dir(file_list, dest_dir):
-    "Move a list of files to a particular directory."
-    for f in file_list:
-        os.rename(f, os.path.join(dest_dir, os.path.basename(f)))
-
-
 def del_rows_and_corresponding_pdfs(idx, df, pdf_folder, pdf_column='pdf_filename'):
     """Delete rows from a DataFrame and the corresponding PDF files."""
     pdf_filenames = df.loc[idx, pdf_column]
