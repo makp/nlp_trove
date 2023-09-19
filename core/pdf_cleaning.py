@@ -24,8 +24,9 @@ def list_nonpdf_files_in_folder(folder):
     return nonpdf_files
 
 
-def is_pdf_corrupted(filepath, verbose=False):
+def is_pdf_corrupted(pdf_filename, pdf_folder, verbose=False):
     """Check whether a PDF file is corrupted."""
+    filepath = os.path.join(pdf_folder, pdf_filename)
     try:
         with open(filepath, 'rb') as f:
             reader = PyPDF2.PdfFileReader(f)

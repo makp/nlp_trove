@@ -25,11 +25,9 @@ def pdf_to_text(filepath):
         return None
 
 
-def extract_text_from_pdf(row, path_to_pdfs):
+def extract_text_from_pdf(filename, path_to_pdfs):
     """Extract text from PDF based on a given DataFrame row and path
     to PDFs."""
-    filename = row['pdf_filename']
-
     if pd.isna(filename):
         return None
 
