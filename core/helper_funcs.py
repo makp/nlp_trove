@@ -73,20 +73,20 @@ def check_doi_exists(doi):
         return None
 
 
-def calculate_date_range(df, column_name='publicationDate'):
-    """
-    Calculate the date range of a DataFrame.
+# def calculate_date_range(df, column_name='publicationDate'):
+#     """
+#     Calculate the date range of a DataFrame.
 
-    Parameters:
-    - df (pd.DataFrame): The DataFrame to calculate the date range of.
-    - column_name (str, optional): The name of the column containing the
-      dates. Defaults to 'publicationDate'.
+#     Parameters:
+#     - df (pd.DataFrame): The DataFrame to calculate the date range of.
+#     - column_name (str, optional): The name of the column containing the
+#       dates. Defaults to 'publicationDate'.
 
-    Returns:
-    - tuple: A tuple containing the start and end dates of the DataFrame.
-    """
-    DATE_FORMAT = '%Y-%m-%d'
-    series = pd.to_datetime(df[column_name])
-    min_date = series.min()
-    max_date = series.max()
-    return [d.strftime(DATE_FORMAT) for d in (min_date, max_date)]
+#     Returns:
+#     - tuple: A tuple containing the start and end dates of the DataFrame.
+#     """
+#     DATE_FORMAT = '%Y-%m-%d'
+#     series = pd.to_datetime(df[column_name])
+#     min_date = series.min()
+#     max_date = series.max()
+#     return [d.strftime(DATE_FORMAT) for d in (min_date, max_date)]
