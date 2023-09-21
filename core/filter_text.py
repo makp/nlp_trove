@@ -20,15 +20,16 @@ def is_english(text):
 
 def detect_language_distribution(text):
     """
-    Detects the language distribution of a given text using the
-    langdetect library.
+    Detect probabilities that the text is written in the languages
+    found in the text.
 
     Args:
-    - text (str): The text to detect the language distribution of.
+    text (str): The text for which to detect the language distribution.
 
     Returns:
-    - lang_prob (dict): A dictionary containing the detected languages
-      as keys and their probabilities as values.
+    dict: A dictionary containing ISO language codes as keys and
+        probabilities as values. The probabilities are rounded to two
+        decimal places.
     """
     langs = detect_langs(text)
     lang_prob = {lang.lang: round(lang.prob, 2) for lang in langs}
