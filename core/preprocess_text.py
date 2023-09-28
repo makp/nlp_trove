@@ -15,7 +15,8 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 # Regex pattern for matching punctuation characters
-PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')  # (r'[^\w\s]+$')
+PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')
+# (r'[^\w\s]+$')
 
 
 class TextPreprocessor:
@@ -160,7 +161,8 @@ class TextPreprocessor:
 
 def is_punct(s):
     """
-    Check if a string is a punctuation character.
+    Check for punctuation characters at the beginning and at end of a
+    string.
 
     Args:
         s (str): The string to check.
@@ -168,4 +170,4 @@ def is_punct(s):
     Returns:
         bool: True if the string is a punctuation character, False otherwise.
     """
-    return PUNCT_RE.match(s) is not None
+    return PUNCT_RE.search(s) is not None
