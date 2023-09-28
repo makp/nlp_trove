@@ -9,43 +9,32 @@ from nltk.stem import WordNetLemmatizer
 from nltk.util import bigrams
 
 
-# Download for the first time
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
-
-# Regex pattern for matching punctuation characters
+# Regex for matching punctuation characters
 PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')
-# (r'[^\w\s]+$')
 
 
 class TextPreprocessor:
     """
     A class used to preprocess text data for NLP tasks.
 
-    Methods
-    -------
-    lowercase_and_tokenize_text(text)
-        Tokenizes and lowercases the given text.
-    remove_punctuation(tokens)
-        Removes punctuation characters from the given list of tokens.
-    remove_stop_words(tokens)
-        Removes stop words from the given list of tokens.
-    lemmatize(tokens)
-        Lemmatizes the given list of tokens.
-    generate_bigrams(tokens)
-        Generates bigrams from the given list of tokens.
-    preprocess_text(text, bigrams=True)
-        Preprocesses the given text by performing the following steps:
-        1. Tokenizes and lowercases the text.
-        2. Removes punctuation characters.
-        3. Removes stop words.
-        4. Lemmatizes.
-        5. Generates bigrams (if bigrams=True).
+    This class performs the following steps:
+    1. Tokenizes and lowercases the text
+    2. Removes punctuation characters
+    3. Removes stop words
+    4. Lemmatizes
+    5. Generates bigrams
     """
     def __init__(self):
         self.lemmatizer = WordNetLemmatizer()
         self.stop_words = set(stopwords.words('english'))
+
+    def download_nltk_data(self):
+        """
+        Downloads required NLTK data for preprocessing.
+        """
+        nltk.download('punkt')
+        nltk.download('stopwords')
+        nltk.download('wordnet')
 
     def lowercase_and_tokenize_text(self, text):
         """
@@ -63,6 +52,13 @@ class TextPreprocessor:
         """
         return word_tokenize(text.lower())
 
+    def is_punct(self, token):
+        """
+        Check for punctuation characters at the beginning and at end of a
+        string.
+        """
+        return PUNCT_RE.search(token) is not None
+
     def remove_punctuation(self, tokens):
         """
         Removes punctuation characters from the given list of tokens.
@@ -77,7 +73,7 @@ class TextPreprocessor:
         list of str
             The list of tokens with punctuation removed.
         """
-        return [token for token in tokens if not is_punct(token)]
+        return [token for token in tokens if not self.is_punct(token)]
 
     def remove_stop_words(self, tokens):
         """
@@ -159,15 +155,3 @@ class TextPreprocessor:
             return tokens
 
 
-def is_punct(s):
-    """
-    Check for punctuation characters at the beginning and at end of a
-    string.
-
-    Args:
-        s (str): The string to check.
-
-    Returns:
-        bool: True if the string is a punctuation character, False otherwise.
-    """
-    return PUNCT_RE.search(s) is not None
