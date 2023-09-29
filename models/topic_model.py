@@ -2,7 +2,7 @@ from gensim import corpora, models
 from gensim.models import CoherenceModel
 
 
-def create_dictionary_and_corpus(docs, max_df=0.5, min_df=25):
+def create_dictionary_and_corpus(docs, max_df=0.9, min_df=25):
     # Create a dictionary
     # Mapping between words and their integer ids
     dictionary = corpora.Dictionary(docs)
@@ -48,12 +48,42 @@ def get_topic_distribution(lda_model, tokens):
 
 
 def compute_coherence(lda_model, docs, dictionary):
-    """Compute and return the coherence of a LDA model"""
+    """
+    Compute and return the coherence of a LDA model.
+    Coherence measures the degree of similarity between high scoring
+    words. The higher the coherence score, the better.
+    """
     coherence_model = CoherenceModel(model=lda_model, texts=docs,
                                      dictionary=dictionary, coherence='c_v')
     return coherence_model.get_coherence()
 
 
 def compute_perplexity(lda_model, corpus):
-    """Compute and return the perplexity of a LDA model"""
+    """
+    Compute and return the perplexity of a LDA model.
+    Perplexity measures how well a probability model predicts a
+    sample. The lower the score, the better.
+    """
     return lda_model.log_perplexity(corpus)
+
+
+def compare_lda_models_different_topics(docs, dictionary, corpus, num_topics_range):
+    """
+    Run LDA models with different number of topics and compare them.
+    Write output to a file.
+    """
+    for num_topics in num_topics_range:
+        # Run LDA model and calculate its coherence and perplexity
+        lda_model = run_lda(dictionary, corpus, num_topics=num_topics)
+        coherence = compute_coherence(lda_model, docs, dictionary)
+        perplexity = compute_perplexity(lda_model, corpus)
+
+        # Append output to a file
+        with open('lda_output.txt', 'a') as f:
+            f.write(f'Number of topics: {num_topics}\n')
+            f.write(f'Coherence: {coherence}\n')
+            f.write(f'Perplexity: {perplexity}\n')
+            f.write('\n')
+            f.close()
+
+    print('Mission accomplished')
