@@ -16,13 +16,6 @@ PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')
 class TextPreprocessor:
     """
     A class used to preprocess text data for NLP tasks.
-
-    This class performs the following steps:
-    1. Tokenizes and lowercases the text
-    2. Removes punctuation characters
-    3. Removes stop words
-    4. Lemmatizes
-    5. Generates bigrams
     """
     def __init__(self):
         self.lemmatizer = WordNetLemmatizer()
@@ -107,6 +100,22 @@ class TextPreprocessor:
         """
         return [self.lemmatizer.lemmatize(token) for token in tokens]
 
+    def remove_single_characters(self, tokens):
+        """
+        Removes single characters from the given list of tokens.
+
+        Parameters
+        ----------
+        tokens : list of str
+            The list of tokens to remove single characters from.
+
+        Returns
+        -------
+        list of str
+            The list of tokens with single characters removed.
+        """
+        return [token for token in tokens if len(token) > 1]
+
     def generate_bigrams(self, tokens):
         """
         Generates bigrams from the given list of tokens.
@@ -128,9 +137,10 @@ class TextPreprocessor:
         Preprocesses the given text by performing the following steps:
         1. Tokenizes and lowercases the text.
         2. Removes punctuation characters.
-        3. Removes stop words.
-        4. Lemmatizes.
-        5. Generates bigrams (if bigrams=True).
+        3. Removes stop words
+        4. Removes single characters.
+        5. Lemmatizes.
+        6. Generates bigrams (if bigrams=True).
 
         Parameters
         ----------
@@ -147,6 +157,7 @@ class TextPreprocessor:
         tokens = self.lowercase_and_tokenize_text(text)
         tokens = self.remove_punctuation(tokens)
         tokens = self.remove_stop_words(tokens)
+        tokens = self.remove_single_characters(tokens)
         tokens = self.lemmatize(tokens)
         if create_bigrams:
             b_tokens = self.generate_bigrams(tokens)
