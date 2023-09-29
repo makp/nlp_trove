@@ -1,10 +1,9 @@
 from gensim import corpora, models
 
 
-def run_lda(docs, num_topics=15, max_df=0.5, min_df=25):
-    "Run LDA model on tokens"
-
-    # Create a mapping between words and their integer ids
+def create_dictionary_and_corpus(docs, max_df=0.5, min_df=25):
+    # Create a dictionary
+    # Mapping between words and their integer ids
     dictionary = corpora.Dictionary(docs)
 
     # Filter out tokens
@@ -12,6 +11,12 @@ def run_lda(docs, num_topics=15, max_df=0.5, min_df=25):
 
     # Create a corpus from documents
     corpus = [dictionary.doc2bow(tokens) for tokens in docs]
+
+    return dictionary, corpus
+
+
+def run_lda(dictionary, corpus, num_topics=15):
+    "Run LDA model on tokens"
 
     # Run the LDA model
     lda_model = models.LdaModel(corpus=corpus,
