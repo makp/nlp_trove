@@ -1,4 +1,5 @@
 from gensim import corpora, models
+from gensim.models import CoherenceModel
 
 
 def create_dictionary_and_corpus(docs, max_df=0.5, min_df=25):
@@ -44,3 +45,15 @@ def get_topic_distribution(lda_model, tokens):
                                 key=lambda x: x[1], reverse=True)
 
     return topic_distribution
+
+
+def compute_coherence(lda_model, docs, dictionary):
+    """Compute and return the coherence of a LDA model"""
+    coherence_model = CoherenceModel(model=lda_model, texts=docs,
+                                     dictionary=dictionary, coherence='c_v')
+    return coherence_model.get_coherence()
+
+
+def compute_perplexity(lda_model, corpus):
+    """Compute and return the perplexity of a LDA model"""
+    return lda_model.log_perplexity(corpus)
