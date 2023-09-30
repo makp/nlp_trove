@@ -102,3 +102,28 @@ def get_topic_distribution_for_doc(lda_model, bow):
 
     return topic_distribution
 
+
+def list_topics_for_bow_sorted(lda_model, bow):
+    """
+    Return the list of topics for a bow vector sorted in descending
+    order of probability.
+    """
+    topic_dist = lda_model.get_document_topics(bow)
+    return sorted(topic_dist, key=lambda x: x[1], reverse=True)
+
+
+def get_top_n_docs_for_topic(lda_model, corpus, topic_id, num_docs=1):
+    """
+    Get the top `num_docs` documents for a given topic.
+    """
+    lst = []
+    for doc_id, bow in enumerate(corpus):
+        topic_dist = lda_model.get_document_topics(bow)
+        for t, p in topic_dist:
+            if t == topic_id:
+                prob = p
+            else:
+                prob = 0
+        lst.append((doc_id, prob))
+    lst = sorted(lst, key=lambda x: x[1], reverse=True)
+    return lst[:num_docs]
