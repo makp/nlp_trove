@@ -70,7 +70,7 @@ def compute_perplexity(lda_model, corpus):
 def compare_lda_models_different_topics(docs,
                                         dictionary,
                                         corpus,
-                                        num_topics_range,
+                                        set_num_topics,
                                         filename='lda_output.csv'):
     """
     Run LDA models with different number of topics and compare them.
@@ -81,7 +81,7 @@ def compare_lda_models_different_topics(docs,
         f.write('')
         f.write('num_topic,coherence,perplexity\n')
 
-    for num_topics in num_topics_range:
+    for num_topics in set_num_topics:
         # Build LDA model and calculate its coherence and perplexity
         lda_model = run_lda(dictionary, corpus, num_topics=num_topics)
         coherence = compute_coherence(lda_model, docs, dictionary)
