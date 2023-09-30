@@ -3,23 +3,30 @@ from gensim.models import CoherenceModel
 
 
 def create_dictionary_and_corpus(docs, min_num=5, max_frac=0.9):
+    """
+    Create a dictionary and corpus from a list of documents, where
+    each document is represented as a list of tokens.
+
+    Dictionaries map tokens to unique integer ids.
+    Corpora are collections of documents represented as bow vectors.
+    Bow vectors are list of (token_id, token_count) tuples
+    """
     # Create a dictionary
-    # Mapping between words and their integer ids
     dictionary = corpora.Dictionary(docs)
 
-    # Filter out tokens
-    # Drop tokens that appear in less than `no_below` number of documents
-    # Drop tokens that appear in more than `no_above` fraction of documents
+    # Filter out certain tokens
+    # Drop tokens that appear in less than `min_num` of documents
+    # Drop tokens that appear in more than `max_frac` of documents
     dictionary.filter_extremes(no_below=min_num, no_above=max_frac)
 
-    # Create a corpus from documents
+    # Create a corpus of bow vectors
     corpus = [dictionary.doc2bow(tokens) for tokens in docs]
 
     return dictionary, corpus
 
 
 def run_lda(dictionary, corpus, num_topics=15):
-    "Run LDA model on tokens"
+    "Build a LDA model."
 
     # Run the LDA model
     lda_model = models.LdaModel(corpus=corpus,
@@ -81,16 +88,13 @@ def compare_lda_models_multiple_k(docs,
     print('Mission accomplished')
 
 
-def get_topic_distribution(lda_model, tokens):
+def get_topic_distribution_for_doc(lda_model, bow):
     """
-    Get the topic distribution of a document.
+    Get the topic distribution for a given document represented as a
+    bow vector.
     """
-
-    # convert the abstract to bag-of-words format
-    bag = lda_model.id2word.doc2bow(tokens)
-
-    # get the topic distribution
-    topic_distribution = lda_model.get_document_topics(bag, minimum_probability=0.1)
+    # Get the topic distribution as a list of (topic_id, prob) tuples
+    topic_distribution = lda_model.get_document_topics(bow)
 
     # Sort the topic distribution in descending order of probability
     topic_distribution = sorted(topic_distribution,
