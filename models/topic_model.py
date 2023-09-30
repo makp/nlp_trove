@@ -19,7 +19,7 @@ def create_dictionary_and_corpus(docs, min_num=5, max_frac=0.9):
     # Drop tokens that appear in more than `max_frac` of documents
     dictionary.filter_extremes(no_below=min_num, no_above=max_frac)
 
-    # Create a corpus of bow vectors
+    # Create a corpora of bow vectors
     corpus = [dictionary.doc2bow(tokens) for tokens in docs]
 
     return dictionary, corpus
@@ -114,16 +114,12 @@ def list_topics_for_bow_sorted(lda_model, bow):
 
 def get_top_n_docs_for_topic(lda_model, corpus, topic_id, num_docs=1):
     """
-    Get the top `num_docs` documents for a given topic.
+    Get the top `num_docs` documents in the corpus for a given topic.
     """
     lst = []
     for doc_id, bow in enumerate(corpus):
-        topic_dist = lda_model.get_document_topics(bow)
-        for t, p in topic_dist:
-            if t == topic_id:
-                prob = p
-            else:
-                prob = 0
+        topic_dist = dict(list_topics_for_bow_sorted(lda_model, bow))
+        prob = topic_dist.get(topic_id, 0)
         lst.append((doc_id, prob))
-    lst = sorted(lst, key=lambda x: x[1], reverse=True)
+    lst.sort(key=lambda x: x[1], reverse=True)
     return lst[:num_docs]
