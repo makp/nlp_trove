@@ -2,13 +2,15 @@ from gensim import corpora, models
 from gensim.models import CoherenceModel
 
 
-def create_dictionary_and_corpus(docs, max_df=0.9, min_df=25):
+def create_dictionary_and_corpus(docs, min_num=5, max_frac=0.9):
     # Create a dictionary
     # Mapping between words and their integer ids
     dictionary = corpora.Dictionary(docs)
 
     # Filter out tokens
-    dictionary.filter_extremes(no_below=min_df, no_above=max_df)
+    # Drop tokens that appear in less than `no_below` number of documents
+    # Drop tokens that appear in more than `no_above` fraction of documents
+    dictionary.filter_extremes(no_below=min_num, no_above=max_frac)
 
     # Create a corpus from documents
     corpus = [dictionary.doc2bow(tokens) for tokens in docs]
@@ -32,21 +34,6 @@ def run_lda(dictionary, corpus, num_topics=15):
     return lda_model
 
 
-def get_topic_distribution(lda_model, tokens):
-
-    # convert the abstract to bag-of-words format
-    bag = lda_model.id2word.doc2bow(tokens)
-
-    # get the topic distribution
-    topic_distribution = lda_model.get_document_topics(bag, minimum_probability=0.1)
-
-    # Sort the topic distribution in descending order of probability
-    topic_distribution = sorted(topic_distribution,
-                                key=lambda x: x[1], reverse=True)
-
-    return topic_distribution
-
-
 def compute_coherence(lda_model, docs, dictionary):
     """
     Compute and return the coherence of a LDA model.
@@ -67,11 +54,11 @@ def compute_perplexity(lda_model, corpus):
     return lda_model.log_perplexity(corpus)
 
 
-def compare_lda_models_different_topics(docs,
-                                        dictionary,
-                                        corpus,
-                                        set_num_topics,
-                                        filename='lda_output.csv'):
+def compare_lda_models_multiple_k(docs,
+                                  dictionary,
+                                  corpus,
+                                  set_num_topics,
+                                  filename='lda_output.csv'):
     """
     Run LDA models with different number of topics and compare them.
     Write output to a file.
@@ -92,3 +79,22 @@ def compare_lda_models_different_topics(docs,
             f.write(f'{num_topics},{coherence},{perplexity}\n')
 
     print('Mission accomplished')
+
+
+def get_topic_distribution(lda_model, tokens):
+    """
+    Get the topic distribution of a document.
+    """
+
+    # convert the abstract to bag-of-words format
+    bag = lda_model.id2word.doc2bow(tokens)
+
+    # get the topic distribution
+    topic_distribution = lda_model.get_document_topics(bag, minimum_probability=0.1)
+
+    # Sort the topic distribution in descending order of probability
+    topic_distribution = sorted(topic_distribution,
+                                key=lambda x: x[1], reverse=True)
+
+    return topic_distribution
+
