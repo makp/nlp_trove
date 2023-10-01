@@ -1,3 +1,4 @@
+import os
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel, CoherenceModel
 # import numpy as np
@@ -55,6 +56,7 @@ def compare_lda_models_with_multiple_k(tokenized_docs,
                                        bow_corpus,
                                        dictionary,
                                        set_num_topics,
+                                       dir_output='.',
                                        filename='lda_output.csv'):
     """
     Generate LDA models with different number of topics and compare
@@ -73,7 +75,8 @@ def compare_lda_models_with_multiple_k(tokenized_docs,
         coherence = compute_coherence(lda_model, tokenized_docs, dictionary)
 
         # Append output to csv file
-        with open(filename, 'a') as f:
+        fullpath = os.path.join(dir_output, filename)
+        with open(fullpath, 'a') as f:
             f.write(f'{num_topics},{coherence}\n')
 
     print('Mission accomplished')
