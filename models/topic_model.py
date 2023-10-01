@@ -1,6 +1,5 @@
-import os
 from gensim.corpora import Dictionary
-from gensim.models import LdaModel, CoherenceModel
+from gensim.models.coherencemodel import CoherenceModel
 # import numpy as np
 
 
@@ -34,36 +33,6 @@ def compute_coherence(lda_model, tokenized_docs, dictionary):
     coherence_model = CoherenceModel(model=lda_model, texts=tokenized_docs,
                                      dictionary=dictionary, coherence='c_v')
     return coherence_model.get_coherence()
-
-
-def compare_lda_models_with_multiple_k(tokenized_docs,
-                                       bow_corpus,
-                                       id2word,
-                                       set_num_topics,
-                                       dir_output='.',
-                                       filename='lda_output.csv'):
-    """
-    Generate LDA models with different number of topics and compare
-    them based on their coherence score. Write output to a file.
-    """
-    # Clear the file and add columns
-    with open(filename, 'w') as f:
-        f.write('')
-        f.write('num_topic,coherence\n')
-
-    for num_topics in set_num_topics:
-        # Build an LDA model and calculate its coherence
-        lda_model = LdaModel(corpus=bow_corpus,
-                             id2word=id2word,
-                             num_topics=num_topics)
-        coherence = compute_coherence(lda_model, tokenized_docs, id2word)
-
-        # Append output to csv file
-        fullpath = os.path.join(dir_output, filename)
-        with open(fullpath, 'a') as f:
-            f.write(f'{num_topics},{coherence}\n')
-
-    print('Mission accomplished')
 
 
 def get_topic_distribution_for_bow(lda_model, bow):
