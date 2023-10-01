@@ -1,6 +1,6 @@
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel, CoherenceModel
-import numpy as np
+# import numpy as np
 
 
 def transform_tokenized_docs_to_bow_vectors(tokenized_docs,
@@ -63,7 +63,7 @@ def compare_lda_models_with_multiple_k(tokenized_docs,
     # Clear the file and add columns
     with open(filename, 'w') as f:
         f.write('')
-        f.write('num_topic,coherence,perplexity\n')
+        f.write('num_topic,coherence\n')
 
     for num_topics in set_num_topics:
         # Build an LDA model and calculate its coherence
