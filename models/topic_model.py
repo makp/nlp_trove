@@ -88,23 +88,25 @@ def list_topics_for_bow_sorted(lda_model, bow):
     return sorted(topic_dist, key=lambda x: x[1], reverse=True)
 
 
-def get_top_n_docs_for_topic(lda_model, corpus, topic_id, num_docs=1):
+def get_top_n_docs_for_topic(series_bow, lda_model, topic_id,
+                             num_docs=1):
     """
-    Get the top `num_docs` documents in the corpus for a given topic.
+    Get the indexes of the top `num_docs` documents for a given topic
+    and their probabilities.
     """
     lst = []
-    for doc_id, bow in enumerate(corpus):
-        topic_dist = dict(list_topics_for_bow_sorted(lda_model, bow))
+    for idx, bow in series_bow.items():
+        topic_dist = dict(lda_model.get_document_topics(bow))
         prob = topic_dist.get(topic_id, 0)
-        lst.append((doc_id, prob))
+        lst.append((idx, prob))
     lst.sort(key=lambda x: x[1], reverse=True)
     return lst[:num_docs]
 
 
 # def compute_perplexity(lda_model, test_corpus):
 #     """
-#     Compute and return the perplexity of a LDA model on a held-out
-#     test set.
+#     Compute and return the perplexity of a LDA model for a holdout
+#     corpus.
 #     Perplexity measures how well a probability model predicts a
 #     sample. The lower the score, the better.
 #     """
