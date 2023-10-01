@@ -25,22 +25,6 @@ def transform_tokenized_docs_to_bow_vectors(tokenized_docs,
     return id2word, bow_corpus
 
 
-def build_lda_model(id2word, bow_corpus, num_topics=15):
-    "Build an LDA model."
-
-    # Train the LDA model
-    lda_model = LdaModel(corpus=bow_corpus,
-                         num_topics=num_topics,
-                         id2word=id2word)
-
-    topics = lda_model.print_topics(num_words=7)
-
-    for topic in topics:
-        print(topic)
-
-    return lda_model
-
-
 def compute_coherence(lda_model, tokenized_docs, dictionary):
     """
     Compute and return the coherence of an LDA model.
@@ -54,7 +38,7 @@ def compute_coherence(lda_model, tokenized_docs, dictionary):
 
 def compare_lda_models_with_multiple_k(tokenized_docs,
                                        bow_corpus,
-                                       dictionary,
+                                       id2word,
                                        set_num_topics,
                                        dir_output='.',
                                        filename='lda_output.csv'):
@@ -69,10 +53,10 @@ def compare_lda_models_with_multiple_k(tokenized_docs,
 
     for num_topics in set_num_topics:
         # Build an LDA model and calculate its coherence
-        lda_model = build_lda_model(dictionary,
-                                    bow_corpus,
-                                    num_topics=num_topics)
-        coherence = compute_coherence(lda_model, tokenized_docs, dictionary)
+        lda_model = LdaModel(corpus=bow_corpus,
+                             id2word=id2word,
+                             num_topics=num_topics)
+        coherence = compute_coherence(lda_model, tokenized_docs, id2word)
 
         # Append output to csv file
         fullpath = os.path.join(dir_output, filename)
@@ -82,17 +66,15 @@ def compare_lda_models_with_multiple_k(tokenized_docs,
     print('Mission accomplished')
 
 
-def get_topic_distribution_for_doc(lda_model, bow):
+def get_topic_distribution_for_bow(lda_model, bow):
     """
-    Get the topic distribution for a given document represented as a
-    bow vector.
+    Get the topic distribution for a given bow vector.
     """
     # Get the topic distribution as a list of (topic_id, prob) tuples
     topic_distribution = lda_model.get_document_topics(bow)
 
     # Sort the topic distribution in descending order of probability
-    topic_distribution = sorted(topic_distribution,
-                                key=lambda x: x[1], reverse=True)
+    topic_distribution.sort(key=lambda x: x[1], reverse=True)
 
     return topic_distribution
 
