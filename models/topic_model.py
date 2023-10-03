@@ -3,25 +3,21 @@ from gensim.models.coherencemodel import CoherenceModel
 # import numpy as np
 
 
-def transform_tokenized_docs_to_bow_vectors(tokenized_docs,
-                                            min_doc_freq=5,
-                                            max_doc_frac=0.9):
+def map_tokens_to_integer_ids(tokenized_docs,
+                              min_doc_freq=25,
+                              max_doc_frac=0.9):
     """
-    Transform tokenized documents into BoW vectors.
+    Build a dictionary from the tokenized documents and filter out
+    some of them. Dictionaries map tokens to unique integer ids.
     """
     # Create a dictionary
-    # Dictionaries map tokens to unique integer ids.
     id2word = Dictionary(tokenized_docs)
 
     # Filter out certain tokens
     id2word.filter_extremes(no_below=min_doc_freq,
                             no_above=max_doc_frac)
 
-    # Create a corpus of bow vectors
-    # Each BoW vector is a list of (token_id, token_count) tuples
-    bow_corpus = [id2word.doc2bow(tokens) for tokens in tokenized_docs]
-
-    return id2word, bow_corpus
+    return id2word
 
 
 def compute_coherence(lda_model, tokenized_docs, dictionary):
