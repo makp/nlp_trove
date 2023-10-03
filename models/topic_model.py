@@ -5,7 +5,7 @@ from gensim.models.coherencemodel import CoherenceModel
 
 def transform_tokenized_docs_to_bow_vectors(tokenized_docs,
                                             min_doc_freq=5,
-                                            max_doc_fraction=0.9):
+                                            max_doc_frac=0.9):
     """
     Transform tokenized documents into BoW vectors.
     """
@@ -15,7 +15,7 @@ def transform_tokenized_docs_to_bow_vectors(tokenized_docs,
 
     # Filter out certain tokens
     id2word.filter_extremes(no_below=min_doc_freq,
-                            no_above=max_doc_fraction)
+                            no_above=max_doc_frac)
 
     # Create a corpus of bow vectors
     # Each BoW vector is a list of (token_id, token_count) tuples
