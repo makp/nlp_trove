@@ -35,19 +35,6 @@ def compute_coherence(lda_model, tokenized_docs, dictionary):
     return coherence_model.get_coherence()
 
 
-def get_topic_distribution_for_bow(lda_model, bow):
-    """
-    Get the topic distribution for a given bow vector.
-    """
-    # Get the topic distribution as a list of (topic_id, prob) tuples
-    topic_distribution = lda_model.get_document_topics(bow)
-
-    # Sort the topic distribution in descending order of probability
-    topic_distribution.sort(key=lambda x: x[1], reverse=True)
-
-    return topic_distribution
-
-
 def list_topics_for_bow_sorted(lda_model, bow):
     """
     Return the list of topics for a bow vector sorted in descending
