@@ -1,6 +1,12 @@
 import os
 import PyPDF2
-from core.helper_funcs import is_pdf
+
+
+def is_pdf(filepath):
+    """Check if a file is a PDF by reading the first 5 bytes."""
+    with open(filepath, 'rb') as f:
+        header = f.read(5)
+    return header == b"%PDF-"
 
 
 def verify_pdf_filenames_and_pdfs_mismatch(df, folder, column_name='pdf_filename'):
