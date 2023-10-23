@@ -1,14 +1,14 @@
 import requests
 import json
 import time
-import data_processing.config_springer
+from data_processing.download import config_springer
 
 
 BASE_URL = "https://api.springernature.com/metadata/json"
 WAIT_TIME = 1  # wait time between requests
 COUNT_PER_REQUEST = 50
 
-api_key = data_processing.config_springer.API_KEY
+api_key = config_springer.API_KEY
 
 
 def get_number_results(query_str):
@@ -47,7 +47,7 @@ def fetch_all_responses(query_str):
     return all_data
 
 
-def download_responses_from_springer(query_str):
+def download_responses(query_str):
     """Download all responses for a given query and save them as a
     JSON file.
     """
