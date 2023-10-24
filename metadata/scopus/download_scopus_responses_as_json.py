@@ -1,7 +1,7 @@
 import requests
 import time
 import json
-import data_processing.config_elsevier
+from data_processing.metadata import config_elsevier
 
 
 BASE_URL = "http://api.elsevier.com/content/search/scopus?"
@@ -9,7 +9,7 @@ WAIT_TIME = 1  # wait time between requests in seconds
 COUNT_PER_REQUEST = 200
 HEADERS = {
     "Accept": "application/json",
-    "X-ELS-APIKey": data_processing.config_elsevier.API_KEY
+    "X-ELS-APIKey": config_elsevier.API_KEY
 }
 
 

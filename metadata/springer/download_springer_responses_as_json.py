@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from data_processing.download import config_springer
+from data_processing.metadata import config_springer
 
 
 BASE_URL = "https://api.springernature.com/metadata/json"
