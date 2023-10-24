@@ -41,3 +41,17 @@ def download_pdf_from_url(url, output_dir='', headers=None):
 
     time.sleep(1)
     return None
+
+
+def check_doi_exists(doi):
+    """Check whether a DOI exists."""
+    url = f"https://doi.org/{doi}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.url
+        else:
+            return None
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None
