@@ -9,20 +9,6 @@ def is_pdf(filepath):
     return header == b"%PDF-"
 
 
-def verify_pdf_filenames_and_pdfs_mismatch(df, folder, column_name='pdf_filename'):
-    """Check whether PDF filenames in DataFrame and those in the PDF folder match."""
-    pdfs_in_df = set(df[column_name])
-    pdfs_in_folder = set(os.listdir(folder))
-    if pdfs_in_df == pdfs_in_folder:
-        return 0
-    else:
-        comp1 = pdfs_in_folder - pdfs_in_df
-        comp2 = pdfs_in_df - pdfs_in_folder
-        print(f"PDFs in folder but not in DataFrame\n {len(comp1)}")
-        print(f"PDF filenames in DataFrame but not in the folder\n {len(comp2)}")
-        return comp1, comp2
-
-
 def list_nonpdf_files_in_folder(folder):
     """List all non-PDF files in a folder."""
     files_in_folder = [os.path.join(folder, f) for f in os.listdir(folder)]
