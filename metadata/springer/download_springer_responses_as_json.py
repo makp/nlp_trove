@@ -47,12 +47,11 @@ def fetch_all_responses(query_str):
     return all_data
 
 
-def download_responses(query_str):
+def download_responses(query_str, fname='out.json'):
     """Download all responses for a given query and save them as a
     JSON file.
     """
     all_data = fetch_all_responses(query_str)
-    fname = query_str.replace(" ", "_") + '.json'
     with open(fname, 'w') as f:
         json.dump(all_data, f)
     print(f"Saved responses to {fname}")

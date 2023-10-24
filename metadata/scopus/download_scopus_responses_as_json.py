@@ -82,12 +82,12 @@ def fetch_all_articles(query_str, cursor='*'):
     return all_articles
 
 
-def download_responses_from_scopus(query_str, cursor='*'):
+def download_responses_from_scopus(query_str, cursor='*', fname='out.json'):
     """Download all responses for a given query and save them as a
     JSON file.
     """
     all_data = fetch_all_articles(query_str, cursor)
-    with open('out.json', 'w') as f:
+    with open(fname, 'w') as f:
         json.dump(all_data, f)
 
-    return 'out.json'
+    return fname
