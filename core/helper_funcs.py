@@ -2,13 +2,19 @@ import os
 from datetime import datetime
 
 
-def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
-    """Save a DataFrame to a file."""
+def create_filename_with_timestamp(prefix, suffix, extension):
+    """Create a filename with a timestamp."""
     today_date = datetime.today().strftime('%m-%d-%y_%H-%M-%S')
     if suffix:
         filename = f"{prefix}_{today_date}_{suffix}.{extension}"
     else:
         filename = f"{prefix}_{today_date}.{extension}"
+    return filename
+
+
+def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
+    """Save a DataFrame to a file."""
+    filename = create_filename_with_timestamp(prefix, suffix, extension)
 
     full_path = os.path.join(folder_path, filename)
 
