@@ -36,7 +36,8 @@ def list_topics_for_bow_sorted(lda_model, bow):
     Return the list of topics for a bow vector sorted in descending
     order of probability.
     """
-    topic_dist = lda_model.get_document_topics(bow)
+    topic_dist = lda_model.get_document_topics(bow,
+                                               minimum_probability=None)
     return sorted(topic_dist, key=lambda x: x[1], reverse=True)
 
 
