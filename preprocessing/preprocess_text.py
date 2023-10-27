@@ -1,6 +1,5 @@
 import re
 
-
 # NLP modules
 import nltk
 from nltk.corpus import stopwords
@@ -9,8 +8,15 @@ from nltk.stem import WordNetLemmatizer
 from nltk.util import bigrams
 
 
-# Regex for matching punctuation characters
+# Regex for matching non-alphabetic characters
+# This regex matches sequences of non-alphabetic characters at the
+# beginning or end of a string
 PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')
+
+
+# Custom stop words
+WORD_STOPLIST = set('would could may might account et al used also'.split(' '))
+BIGRAMS_STOPLIST = set('et_al'.split(' '))
 
 
 class TextPreprocessor:
@@ -19,7 +25,7 @@ class TextPreprocessor:
     """
     def __init__(self):
         self.lemmatizer = WordNetLemmatizer()
-        self.stop_words = set(stopwords.words('english'))
+        self.stop_words = set(stopwords.words('english')).union(WORD_STOPLIST)
 
     def download_nltk_data(self):
         """
@@ -132,6 +138,9 @@ class TextPreprocessor:
         """
         return ['_'.join(bigram) for bigram in bigrams(tokens)]
 
+    def remove_bigrams(self, tokens):
+        return [token for token in tokens if token not in BIGRAMS_STOPLIST]
+
     def preprocess_text(self, text, create_bigrams=True):
         """
         Preprocesses the given text by performing the following steps:
@@ -161,6 +170,7 @@ class TextPreprocessor:
         tokens = self.lemmatize(tokens)
         if create_bigrams:
             b_tokens = self.generate_bigrams(tokens)
+            b_tokens = self.remove_bigrams(b_tokens)
             return tokens + b_tokens
         else:
             return tokens
