@@ -10,7 +10,7 @@ from nltk.util import bigrams
 
 # Regex for matching non-alphabetic characters
 # This regex matches sequences of non-alphabetic characters at the
-# beginning or end of a string
+# beginning or at the end of a token
 PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')
 
 
