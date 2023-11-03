@@ -1,7 +1,6 @@
-from bs4 import BeautifulSoup
 import pandas as pd
 import PyPDF2
-from core.helper_funcs import is_pdf
+from fulltext.pdf_utils import is_pdf
 
 
 def pdf_to_text(filepath):
