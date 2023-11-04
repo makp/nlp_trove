@@ -26,8 +26,7 @@ def read_articles_from_json(json_path):
     df = pd.DataFrame(df['records'].sum())
     return df[COLUMNS_TO_KEEP_FROM_SPRINGER]
 
-
-def clean_creators(lst_creators):
+def clean_creators(creators):
     """
     Clean the `creators` field.
 
@@ -36,14 +35,14 @@ def clean_creators(lst_creators):
     is converted into a DataFrame, the articles without a creator have
     value `NaN`.
     """
-    if isinstance(lst_creators, list):
-        for creator in lst_creators:
+    if isinstance(creators, list):
+        for creator in creators:
             if isinstance(creator, dict) and 'creator' in creator:
-                return [creator['creator'] for creator in lst_creators]
-    elif pd.isna(lst_creators):
+                return [creator['creator'] for creator in creators]
+    elif pd.isna(creators):
         return pd.NA
-    else:
-        return lst_creators
+    else:                       # creators are neither a list nor NaN
+        return creators
 
 
 def clean_genre(genre):
