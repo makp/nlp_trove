@@ -27,6 +27,24 @@ def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
     return print(f"File: {full_path};\nData shape: {df.shape}")
 
 
+def create_springer_pdf_urls_from_doi(doi):
+    """Return the Springer URL for the PDF version of an article via
+    its DOI."""
+    base_url = 'https://link.springer.com/content/pdf/'
+    return "".join([base_url, doi, '.pdf'])
+
+
+def extract_jstor_id_from_jstor_url(jstor_url):
+    return jstor_url.split('/')[-1]
+
+
+def generate_jstor_link_to_pdf(jstor_url):
+    """"""
+    url_base = 'www.jstor.org/stable/pdf/'
+    jstor_id = extract_jstor_id_from_jstor_url(jstor_url)
+    return f"{url_base}{jstor_id}.pdf"
+
+
 def find_database_file(database_dir, filter_str=None, extension='pkl'):
     files = [f for f in os.listdir(database_dir) if f.endswith(extension)]
     if filter_str:
@@ -39,3 +57,31 @@ def find_database_file(database_dir, filter_str=None, extension='pkl'):
 
     files = [os.path.join(database_dir, f) for f in files]
     return sorted(files, key=os.path.getctime)
+
+
+# def are_jstor_articles_in_main_df(df, df_jstor,
+#                                   columns=['title', 'title']):
+#     """
+#     Check if all articles in df_jstor are present in df based on a
+#     specified column.
+#     """
+#     if columns[0] not in df.columns or columns[1] not in df_jstor.columns:
+#         return "Invalid column names"
+
+#     merged_df = pd.merge(df, df_jstor,
+#                          left_on=columns[0],
+#                          right_on=columns[1],
+#                          how='inner')
+#     if len(merged_df) == len(df_jstor):
+#         return True
+#     else:
+#         missing_articles = len(df_jstor) - len(merged_df)
+#         print(f"{missing_articles} articles not present in the main DataFrame")
+#         return False
+
+
+# def only_in_df_jstor(df, df_jstor, column='title'):
+#     merged_df = pd.merge(df, df_jstor, on=column, how='outer',
+#                          indicator="origin")
+#     only_in_df_jstor = merged_df[merged_df['origin'] == "right_only"]
+#     return only_in_df_jstor.drop('origin', axis=1)

@@ -62,11 +62,6 @@ def clean_genre(genre):
         return genre
 
 
-def create_springer_pdf_urls_from_doi(doi):
-    """Return the Springer URL for the PDF version of an article via
-    its DOI."""
-    base_url = 'https://link.springer.com/content/pdf/'
-    return "".join([base_url, doi, '.pdf'])
 
 
 def generate_df_from_springer_json(json_path):
