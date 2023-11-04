@@ -34,14 +34,9 @@ def create_springer_pdf_urls_from_doi(doi):
     return "".join([base_url, doi, '.pdf'])
 
 
-def extract_jstor_id_from_jstor_url(jstor_url):
-    return jstor_url.split('/')[-1]
-
-
-def generate_jstor_link_to_pdf(jstor_url):
-    """"""
+def generate_url_to_jstor_pdf(jstor_url):
     url_base = 'www.jstor.org/stable/pdf/'
-    jstor_id = extract_jstor_id_from_jstor_url(jstor_url)
+    jstor_id = jstor_url.split('/')[-1]
     return f"{url_base}{jstor_id}.pdf"
 
 
