@@ -44,10 +44,11 @@ def generate_url_to_jstor_pdf(jstor_url):
 def find_df_cols_with_less_than_n_unique_values(df, n=3):
     """
     Find columns in a DataFrame with less than `n` unique values.
-    Skip columns with list values.
+    Skip columns with list and dict values.
     """
     lst_cols = [col for col in df.columns
                 if not df[col].apply(type).eq(list).any()
+                if not df[col].apply(type).eq(dict).any()
                 and len(df[col].unique()) < n]
     for c in lst_cols:
         print(f"{c}: {df[c].unique()}")
