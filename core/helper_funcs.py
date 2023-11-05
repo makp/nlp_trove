@@ -40,6 +40,19 @@ def generate_url_to_jstor_pdf(jstor_url):
     return f"{url_base}{jstor_id}.pdf"
 
 
+def find_df_cols_with_less_than_n_unique_values(df, n=3):
+    """
+    Find columns in a DataFrame with less than `n` unique values.
+    Skip columns with list values.
+    """
+    lst_cols = [col for col in df.columns
+                if not df[col].apply(type).eq(list).any()
+                and len(df[col].unique()) < n]
+    for c in lst_cols:
+        print(f"{c}: {df[c].unique()}")
+    return lst_cols
+
+
 def find_database_file(database_dir, filter_str=None, extension='pkl'):
     files = [f for f in os.listdir(database_dir) if f.endswith(extension)]
     if filter_str:
