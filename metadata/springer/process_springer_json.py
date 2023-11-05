@@ -1,31 +1,6 @@
 import pandas as pd
 
 
-COLUMNS_TO_KEEP_FROM_SPRINGER = [
-    'title',
-    'creators',
-    'publicationName',
-    'doi',
-    'publicationDate',
-    'volume',
-    'number',
-    'genre',
-    'startingPage',
-    'endingPage',
-    'abstract',
-]
-
-
-def read_articles_from_json(json_path):
-    """
-    Create a DataFrame from the JSON file downloaded from Springer
-    containing the articles' metadata listed in
-    `COLUMNS_TO_KEEP_FROM_SPRINGER`.
-    """
-    df = pd.read_json(json_path)
-    df = pd.DataFrame(df['records'].sum())
-    return df[COLUMNS_TO_KEEP_FROM_SPRINGER]
-
 def clean_creators(creators):
     """
     Clean the `creators` field.
@@ -59,26 +34,3 @@ def clean_genre(genre):
         return genre[0]
     else:
         return genre
-
-
-
-
-def generate_df_from_springer_json(json_path):
-    """
-    Filter the JSON file to only keep the columns of interest, clean
-    the `creators` and `genre` fields, and change the data types of
-    some columns.
-    """
-    df = read_articles_from_json(json_path)
-    df['publicationDate'] = pd.to_datetime(df['publicationDate'])
-    df['creators'] = df['creators'].apply(clean_creators)
-    df['genre'] = df['genre'].apply(clean_genre)
-    df['startingPage'] = pd.to_numeric(df['startingPage'], errors='coerce')
-    df['endingPage'] = pd.to_numeric(df['endingPage'], errors='coerce')
-    df['num_pages'] = df['endingPage'] - df['startingPage'] + 1
-    # df['springer_url'] = df['doi'].apply(create_springer_pdf_urls_from_doi)
-    print("Column data types:")
-    for col in df.columns:
-        data_type = df[col].apply(type).unique()
-        print(f"{col}: {data_type}")
-    return df
