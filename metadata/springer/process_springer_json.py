@@ -6,18 +6,22 @@ def clean_creators(creators):
     Clean the `creators` field.
 
     The field `creators` is typically a list of dictionaries, where
-    each dictionary represents one of the authors. When the JSON file
-    is converted into a DataFrame, the articles without a creator have
-    value `NaN`.
+    each dictionary represents one of the authors. The key `creator`
+    contains the author name. Some dictionaries contain the ORCID of
+    the author. When the JSON file is converted into a DataFrame, the
+    articles without a creator have value `NaN`.
     """
     if isinstance(creators, list):
         for creator in creators:
             if isinstance(creator, dict) and 'creator' in creator:
                 return [creator['creator'] for creator in creators]
+            else:
+                print(f"Invalid list: {creator}")
     elif pd.isna(creators):
         return pd.NA
-    else:                       # creators are neither a list nor NaN
-        return creators
+    else:
+        print(f"Invalid type: {type(creators)}")
+
 
 
 def clean_genre(genre):
