@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 
 
@@ -53,18 +54,37 @@ def find_df_cols_with_less_than_n_unique_values(df, n=3):
     return lst_cols
 
 
-def find_database_file(database_dir, filter_str=None, extension='pkl'):
-    files = [f for f in os.listdir(database_dir) if f.endswith(extension)]
-    if filter_str:
-        files = [f for f in files if filter_str in f]
+def find_files_with_filters_and_extensions(directory,
+                                           filter_strs=None,
+                                           extensions=None):
 
-    if not files:
-        return None
+    # Ensure that `filter_strs` and `extensions` are lists
+    if isinstance(filter_strs, str):
+        filter_strs = [filter_strs]
+    if isinstance(extensions, str):
+        extensions = [extensions]
 
-    print(f"Found {len(files)} files")
+    # Get all files in the directory
+    all_files = os.listdir(directory)
 
-    files = [os.path.join(database_dir, f) for f in files]
-    return sorted(files, key=os.path.getctime)
+    # Filter files based on `filter_strs` and `extensions`
+    filtered_files = (file for file in all_files if
+                      (extensions is None or
+                       any(file.endswith(ext) for ext in extensions)) and
+                      (filter_strs is None or
+                       any(re.search(filter_str, file) for filter_str in filter_strs)))
+
+    # Convert generator to list and sort by creation time
+    filtered_files = sorted([os.path.join(directory, file) for file in filtered_files],
+                            key=os.path.getctime)
+
+    # Print number of files found
+    if not filtered_files:
+        print("No files found.")
+    else:
+        print(f"{len(filtered_files)} files found.")
+
+    return filtered_files
 
 
 # def are_jstor_articles_in_main_df(df, df_jstor,
