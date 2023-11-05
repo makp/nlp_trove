@@ -23,7 +23,6 @@ def clean_creators(creators):
         print(f"Invalid type: {type(creators)}")
 
 
-
 def clean_genre(genre):
     """
     Clean the `genre` field.
@@ -34,7 +33,7 @@ def clean_genre(genre):
     the special issue).
     """
     if isinstance(genre, list):
-        # return ', '.join(genre)
-        return genre[0]
+        return '_'.join(genre)
+        # return genre[0]
     else:
         return genre
