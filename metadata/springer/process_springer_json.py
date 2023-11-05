@@ -34,6 +34,7 @@ def clean_genre(genre):
     """
     if isinstance(genre, list):
         return '_'.join(genre)
-        # return genre[0]
-    else:
+    elif isinstance(genre, str):
         return genre
+    else:
+        print(f"Invalid genre type: {genre}")
