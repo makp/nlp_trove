@@ -55,6 +55,16 @@ def find_df_cols_with_less_than_n_unique_values(df, n=3):
     return lst_cols
 
 
+def find_df_cols_with_mostly_nans(df, threshold=0.9):
+    """
+    Find columns in a DataFrame with mostly NaN values.
+    """
+    lst_cols = [col for col in df.columns
+                if df[col].isna().sum() / len(df) > threshold]
+    print(lst_cols)
+    return lst_cols
+
+
 def find_files_with_filters_and_extensions(directory,
                                            filter_strs=None,
                                            extensions=None):
