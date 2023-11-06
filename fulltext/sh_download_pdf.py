@@ -2,7 +2,7 @@ import time
 import os
 import hashlib
 from scidownl import scihub_download
-from core.helper_funcs import is_pdf
+from fulltext.pdf_utils import is_pdf
 
 
 def sh_download_article_from_doi(doi):
