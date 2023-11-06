@@ -16,7 +16,7 @@ def extract_content_from_html(html_content, tag, attr_dict):
     - str: The content of the 'content' attribute from the found tag.
       If the tag is not found, returns None.
     """
-    soup = BeautifulSoup(html_content, 'html.parser')
+    soup = BeautifulSoup(html_content, 'lxml')
     meta_tag = soup.find(tag, attr_dict)
     if meta_tag:
         return meta_tag['content']
