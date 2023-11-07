@@ -1,14 +1,18 @@
+"""Functions for topic modeling."""
+
 from gensim.corpora import Dictionary
 from gensim.models.coherencemodel import CoherenceModel
-# import numpy as np
 
 
 def map_tokens_to_integer_ids(tokenized_docs,
                               min_doc_freq=25,
                               max_doc_frac=0.9):
     """
-    Build a dictionary from the tokenized documents and filter out
-    some of them. Dictionaries map tokens to unique integer ids.
+    Build a dictionary from tokenized documents.
+
+    When building a dictionary, filter out frequent and infrequent
+    tokens. A dictionary is a mapping between words and their integer
+    ids.
     """
     # Create a dictionary
     id2word = Dictionary(tokenized_docs)
@@ -23,30 +27,34 @@ def map_tokens_to_integer_ids(tokenized_docs,
 def compute_coherence(lda_model, tokenized_docs, dictionary):
     """
     Compute and return the coherence of an LDA model.
+
     Coherence measures the degree of similarity between high scoring
     words. The higher the coherence score, the better.
     """
-    coherence_model = CoherenceModel(model=lda_model, texts=tokenized_docs,
-                                     dictionary=dictionary, coherence='c_v')
+    coherence_model = CoherenceModel(model=lda_model,
+                                     texts=tokenized_docs,
+                                     dictionary=dictionary,
+                                     coherence='c_v')
+
     return coherence_model.get_coherence()
 
 
 def list_topics_for_bow_sorted(lda_model, bow):
     """
-    Return the list of topics for a bow vector sorted in descending
-    order of probability.
+    Return the list of topics for a bow vector.
+
+    The list is sorted by the probability of each topic.
     """
     topic_dist = lda_model.get_document_topics(bow,
                                                minimum_probability=None)
     return sorted(topic_dist, key=lambda x: x[1], reverse=True)
 
 
-def get_top_n_docs_for_topic(series_bow, lda_model, topic_id,
+def get_top_n_docs_for_topic(series_bow,
+                             lda_model,
+                             topic_id,
                              num_docs=1):
-    """
-    Get the indexes of the top `num_docs` documents for a given topic
-    and their probabilities.
-    """
+    """Get the indexes of the top `num_docs` documents for a given topic."""
     lst = []
     for idx, bow in series_bow.items():
         topic_dist = dict(lda_model.get_document_topics(bow))

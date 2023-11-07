@@ -1,3 +1,5 @@
+"""Common text preprocessing steps for NLP tasks."""
+
 import re
 
 # NLP modules
@@ -20,24 +22,22 @@ BIGRAMS_STOPLIST = set('et_al'.split(' '))
 
 
 class TextPreprocessor:
-    """
-    A class used to preprocess text data for NLP tasks.
-    """
+    """Class for preprocessing text data for NLP tasks."""
+
     def __init__(self):
+        """Initialize the TextPreprocessor."""
         self.lemmatizer = WordNetLemmatizer()
         self.stop_words = set(stopwords.words('english')).union(WORD_STOPLIST)
 
     def download_nltk_data(self):
-        """
-        Downloads required NLTK data for preprocessing.
-        """
+        """Download required NLTK data for preprocessing."""
         nltk.download('punkt')
         nltk.download('stopwords')
         nltk.download('wordnet')
 
     def lowercase_and_tokenize_text(self, text):
         """
-        Tokenizes and lowercases the given text.
+        Tokenize and lowercase the given text.
 
         Parameters
         ----------
@@ -52,15 +52,12 @@ class TextPreprocessor:
         return word_tokenize(text.lower())
 
     def is_punct(self, token):
-        """
-        Check for punctuation characters at the beginning and at end of a
-        string.
-        """
+        """Check if the given token is a punctuation character."""
         return PUNCT_RE.search(token) is not None
 
     def remove_punctuation(self, tokens):
         """
-        Removes punctuation characters from the given list of tokens.
+        Remove punctuation characters from the given list of tokens.
 
         Parameters
         ----------
@@ -76,7 +73,7 @@ class TextPreprocessor:
 
     def remove_stop_words(self, tokens):
         """
-        Removes stop words from the given list of tokens.
+        Remove stopwords from the given list of tokens.
 
         Parameters
         ----------
@@ -92,7 +89,7 @@ class TextPreprocessor:
 
     def lemmatize(self, tokens):
         """
-        Lemmatizes the given list of tokens.
+        Lemmatize the given list of tokens.
 
         Parameters
         ----------
@@ -108,7 +105,7 @@ class TextPreprocessor:
 
     def remove_single_characters(self, tokens):
         """
-        Removes single characters from the given list of tokens.
+        Remove single characters from the given list of tokens.
 
         Parameters
         ----------
@@ -124,7 +121,7 @@ class TextPreprocessor:
 
     def generate_bigrams(self, tokens):
         """
-        Generates bigrams from the given list of tokens.
+        Generate bigrams from the given list of tokens.
 
         Parameters
         ----------
@@ -139,11 +136,14 @@ class TextPreprocessor:
         return ['_'.join(bigram) for bigram in bigrams(tokens)]
 
     def remove_bigrams(self, tokens):
+        """Remove bigrams from the given list of tokens."""
         return [token for token in tokens if token not in BIGRAMS_STOPLIST]
 
     def preprocess_text(self, text, create_bigrams=True):
         """
-        Preprocesses the given text by performing the following steps:
+        Preprocesse the given text.
+
+        Steps:
         1. Tokenizes and lowercases the text.
         2. Removes punctuation characters.
         3. Removes stop words

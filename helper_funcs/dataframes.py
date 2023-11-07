@@ -1,3 +1,5 @@
+"""Helper functions for working with DataFrames."""
+
 import os
 from helper_funcs.files import create_filename_with_timestamp
 
@@ -58,7 +60,8 @@ def find_cols_with_mostly_nans(df, threshold=0.9):
 #         return True
 #     else:
 #         missing_articles = len(df_jstor) - len(merged_df)
-#         print(f"{missing_articles} articles not present in the main DataFrame")
+#         print(f"{missing_articles} articles not present in the main
+#         DataFrame")
 #         return False
 
 
