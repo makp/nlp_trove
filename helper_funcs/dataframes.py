@@ -14,7 +14,8 @@ def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
     }
     method_name, kwargs = method_map[extension]
     getattr(df, method_name)(full_path, kwargs)
-    return print(f"File: {full_path};\nData shape: {df.shape}")
+    print(f"File: {full_path};\nData shape: {df.shape}")
+    return full_path
 
 
 def find_df_cols_with_less_than_n_unique_values(df, n=3):
