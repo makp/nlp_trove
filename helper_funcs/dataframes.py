@@ -21,6 +21,7 @@ def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
 def find_df_cols_with_less_than_n_unique_values(df, n=3):
     """
     Find columns in a DataFrame with less than `n` unique values.
+
     Skip columns with list and dict values.
     """
     lst_cols = [col for col in df.columns
@@ -33,9 +34,7 @@ def find_df_cols_with_less_than_n_unique_values(df, n=3):
 
 
 def find_df_cols_with_mostly_nans(df, threshold=0.9):
-    """
-    Find columns in a DataFrame with mostly NaN values.
-    """
+    """Find columns in a DataFrame with mostly NaN values."""
     lst_cols = [col for col in df.columns
                 if df[col].isna().sum() / len(df) > threshold]
     print(lst_cols)
