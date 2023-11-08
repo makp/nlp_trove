@@ -23,9 +23,6 @@ class TaggedDocumentGenerator:
 
 
 def train_doc2vec_model(tokenized_docs,
-                        vector_size=50,
-                        epochs=40,
-                        window=5,
                         min_count=5,
                         seed=42,
                         **keyargs):
@@ -37,10 +34,8 @@ def train_doc2vec_model(tokenized_docs,
         raise ValueError('Each document should be a list of strings.')
 
     # Define the vec2doc model
-    model = Doc2Vec(vector_size=vector_size,
-                    epochs=epochs,
-                    window=window,
-                    min_count=min_count,
+    model = Doc2Vec(min_count=min_count,
+                    seed=seed,
                     **keyargs)
 
     # Build the tagged documents
