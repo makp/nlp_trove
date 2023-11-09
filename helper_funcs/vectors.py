@@ -1,6 +1,7 @@
 """Vector-related functions."""
 
 import numpy as np
+from gensim import matutils
 
 
 def calculate_avg_distance_every_vec(lst_vecs, distance_func):
@@ -14,3 +15,15 @@ def calculate_avg_distance_every_vec(lst_vecs, distance_func):
             dists_matrix[j, i] = dists_matrix[i, j]
     avg_dists = dists_matrix.sum(axis=1) / (num_vecs - 1)
     return avg_dists
+
+
+def convert_to_gensim_sparse(lst_vecs):
+    """Convert a list of vectors to gensim sparse vectors."""
+    return [matutils.full2sparse(v) for v in lst_vecs]
+
+
+def convert_to_gensim_full(lst_vecs):
+    """Convert a list of vectors to gensim full vectors."""
+    length = len(lst_vecs[0])
+    return [matutils.sparse2full(v, length)
+            for v in lst_vecs]
