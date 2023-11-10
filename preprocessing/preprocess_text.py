@@ -6,21 +6,8 @@ Notes:
   `conda install -c conda-forge spacy-model-en_core_web_sm`
 """
 
-import re
 import spacy
 from gensim.models.phrases import Phrases, Phraser
-
-
-"""
-Regex for matching non-alphabetic characters.
-
-The regexes below match sequences of non-alphabetic characters at the
-beginning or at the end of a token. `[^a-zA-Z]` strictly matches any
-character that is not an uppercase or lowercase letter from A to Z,
-while `^W+` matches any character that is not a word character, which
-includes not only letters but also numbers and underscores.
-"""
-PUNCT_RE = re.compile(r'^[^a-zA-Z]+|[^a-zA-Z]+$')  # r'^\W+|\W+$'
 
 
 # Load spaCy model
@@ -52,26 +39,6 @@ class TextPreprocessor:
         self.phrase_model = Phraser(Phrases(sentences,
                                             min_count=5,
                                             threshold=10))
-
-    def is_punct(self, token):
-        """Check if the given token is a punctuation character."""
-        return PUNCT_RE.search(token) is not None
-
-    def remove_punctuation(self, tokens):
-        """
-        Remove punctuation characters from the given list of tokens.
-
-        Parameters
-        ----------
-        tokens : list of str
-            The list of tokens to remove punctuation from.
-
-        Returns
-        -------
-        list of str
-            The list of tokens with punctuation removed.
-        """
-        return [token for token in tokens if not self.is_punct(token)]
 
     def remove_stop_words(self, tokens):
         """
@@ -147,7 +114,6 @@ class TextPreprocessor:
         """
         doc = nlp(text.lower())
         tokens = [token.text for token in doc if
-                  not token.is_punct and
                   not token.is_space]
         tokens = self.remove_stop_words(tokens)
         tokens = self.lemmatize(tokens)
@@ -155,3 +121,35 @@ class TextPreprocessor:
         if create_bigrams and self.phrase_model:
             tokens = self.phrase_model[tokens]
         return tokens
+
+# """
+# Regex for matching non-alphabetic characters.
+
+# The regexes below match sequences of non-alphabetic characters at the
+# beginning or at the end of a token. `[^a-zA-Z]` strictly matches any
+# character that is not an uppercase or lowercase letter from A to Z,
+# while `^W+` matches any character that is not a word character, which
+# includes not only letters but also numbers and underscores.
+# """
+# NONWORD_RE = re.compile(r'^\W+|\W+$')  # '^[^a-zA-Z]+|[^a-zA-Z]+$'
+
+# def is_punct(self, token):
+#     """Check if the given token is a punctuation character."""
+#     return NONWORD_RE.search(token) is not None
+
+# def remove_punctuation(self, tokens):
+#     """
+#     Remove punctuation characters from the given list of tokens.
+
+#     Parameters
+#     ----------
+#     tokens : list of str
+#         The list of tokens to remove punctuation from.
+
+#     Returns
+#     -------
+#     list of str
+#         The list of tokens with punctuation removed.
+#     """
+#     return [token for token in tokens if not self.is_punct(token)]
+
