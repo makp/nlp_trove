@@ -19,11 +19,11 @@ CUSTOM_STOP_WORDS = set('would could may might account et al used also'.split(' 
 STOP_WORDS = nlp.Defaults.stop_words.union(CUSTOM_STOP_WORDS)
 
 
-class TextPreprocessor:
+class TextTokenizer:
     """Class for preprocessing text data for NLP tasks."""
 
     def __init__(self):
-        """Initialize the TextPreprocessor class."""
+        """Initialize the TextTokenizer class."""
         self.phrase_model = None  # initialize model
 
     def train_phrase_model(self, sentences):
@@ -93,11 +93,11 @@ class TextPreprocessor:
         Preprocesse the given text.
 
         Steps:
-        1. Tokenizes and lemmatize the text using spaCy.
-        2. Removes punctuation characters.
-        3. Removes stop words
-        4. Removes single characters
-        5. Generates bigrams (if `create_bigrams=True`).
+        1. Tokenize the text using spaCy.
+        2. Remove stop words
+        3. Lemmatize
+        4. Remove single characters
+        5. Generate bigrams (if `create_bigrams=True`).
 
         Parameters
         ----------
@@ -152,4 +152,3 @@ class TextPreprocessor:
 #         The list of tokens with punctuation removed.
 #     """
 #     return [token for token in tokens if not self.is_punct(token)]
-
