@@ -38,9 +38,9 @@ normalize_text = tp.make_pipeline(
 replace_from_text = tp.make_pipeline(
     tp.replace.urls,
     tp.replace.emails,
+    tp.replace.phone_numbers,
     tp.replace.numbers,
-    tp.replace.currency_symbols,
-    tp.replace.phone_numbers)
+    tp.replace.currency_symbols)
 
 
 remove_from_text = tp.make_pipeline(
