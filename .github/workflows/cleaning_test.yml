@@ -1,8 +1,14 @@
-name: Test cleaning routines
+name: Test main routines
 on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Run tests
-        run: python -m unittest preprocessing/test/unittest_cleaning_step.py
+      - uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Test cleaning routines with unittest
+        run: |
+          python -m unittest preprocessing/test/unittest_cleaning_step.py
