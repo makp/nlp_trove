@@ -3,7 +3,7 @@ Run common text preprocessing steps.
 
 Notes:
 - Don't forget to download the spaCy model with conda:
-  `conda install -c conda-forge spacy-model-en_core_web_sm`
+  `conda install -c conda-forge en_core_web_trf`
 """
 
 import spacy
@@ -11,7 +11,7 @@ from gensim.models.phrases import Phrases, Phraser
 
 
 # Load spaCy model
-nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
+nlp = spacy.load('en_core_web_trf', disable=['parser', 'ner'])
 
 
 # stopwords
