@@ -56,22 +56,6 @@ class TextTokenizer:
         """
         return [word for word in tokens if word.lower() not in STOP_WORDS]
 
-    def lemmatize(self, tokens):
-        """
-        Lemmatize the given list of tokens.
-
-        Parameters
-        ----------
-        tokens : list of str
-            The list of tokens to lemmatize.
-
-        Returns
-        -------
-        list of str
-            The list of lemmatized tokens.
-        """
-        return [token.lemma_ for token in nlp(" ".join(tokens))]
-
     def remove_single_characters(self, tokens):
         """
         Remove single characters from the given list of tokens.
@@ -94,8 +78,8 @@ class TextTokenizer:
 
         Steps:
         1. Tokenize the text using spaCy.
-        2. Remove stop words
-        3. Lemmatize
+        2. Lemmatize
+        3. Remove stop words
         4. Remove single characters
         5. Generate bigrams (if `create_bigrams=True`).
 
@@ -113,10 +97,8 @@ class TextTokenizer:
             applicable).
         """
         doc = nlp(text.lower())
-        tokens = [token.text for token in doc if
-                  not token.is_space]
+        tokens = [token.lemma_ for token in doc if not token.is_space]
         tokens = self.remove_stop_words(tokens)
-        tokens = self.lemmatize(tokens)
         tokens = self.remove_single_characters(tokens)
         if create_bigrams and self.phrase_model:
             tokens = self.phrase_model[tokens]
