@@ -56,21 +56,18 @@ class TextTokenizer:
         """
         return [word for word in tokens if word.lower() not in STOP_WORDS]
 
-    def remove_single_characters(self, tokens):
+    def remove_short_and_long_tokens(self, tokens,
+                                     min_length=1,
+                                     max_length=15):
         """
-        Remove single characters from the given list of tokens.
+        Remove short and long tokens from the given list of tokens.
 
-        Parameters
-        ----------
-        tokens : list of str
-            The list of tokens to remove single characters from.
-
-        Returns
-        -------
-        list of str
-            The list of tokens with single characters removed.
+        The motivation for removing long tokens is that they could be
+        artifacts of malformed data. And single character tokens are
+        unlikely to be useful for downstream NLP tasks.
         """
-        return [token for token in tokens if len(token) > 1]
+        return [token for token in tokens
+                if len(token) > min_length and len(token) <= max_length]
 
     def preprocess_text(self, text, create_bigrams=True):
         """
@@ -80,7 +77,7 @@ class TextTokenizer:
         1. Tokenize the text using spaCy.
         2. Lemmatize
         3. Remove stop words
-        4. Remove single characters
+        4. Remove short and long tokens
         5. Generate bigrams (if `create_bigrams=True`).
 
         Parameters
@@ -99,7 +96,7 @@ class TextTokenizer:
         doc = nlp(text.lower())
         tokens = [token.lemma_ for token in doc if not token.is_space]
         tokens = self.remove_stop_words(tokens)
-        tokens = self.remove_single_characters(tokens)
+        tokens = self.remove_short_and_long_tokens(tokens)
         if create_bigrams and self.phrase_model:
             tokens = self.phrase_model[tokens]
         return tokens
