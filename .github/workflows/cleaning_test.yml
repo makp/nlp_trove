@@ -1,0 +1,8 @@
+name: Test cleaning routines
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: python -m unittest preprocessing/test/unittest_cleaning_step.py
