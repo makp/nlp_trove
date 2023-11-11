@@ -94,7 +94,9 @@ class TextTokenizer:
             applicable).
         """
         doc = nlp(text.lower())
-        tokens = [token.lemma_ for token in doc if not token.is_space]
+        tokens = [token.lemma_ for token in doc if
+                  not token.is_space and
+                  not token.is_punct]
         tokens = self.remove_stop_words(tokens)
         tokens = self.remove_short_and_long_tokens(tokens)
         if create_bigrams and self.phrase_model:
