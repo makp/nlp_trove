@@ -40,7 +40,7 @@ class TextCleaner:
 
         # remove comments
         for comment in soup.find_all(string=lambda t:
-                                        isinstance(t, Comment)):
+                                     isinstance(t, Comment)):
             comment.extract()  # comment doesn't have decompose() method
 
         # get untagged text
