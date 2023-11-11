@@ -102,34 +102,3 @@ class TextTokenizer:
         if create_bigrams and self.phrase_model:
             tokens = self.phrase_model[tokens]
         return tokens
-
-# """
-# Regex for matching non-alphabetic characters.
-
-# The regexes below match sequences of non-alphabetic characters at the
-# beginning or at the end of a token. `[^a-zA-Z]` strictly matches any
-# character that is not an uppercase or lowercase letter from A to Z,
-# while `^W+` matches any character that is not a word character, which
-# includes not only letters but also numbers and underscores.
-# """
-# NONWORD_RE = re.compile(r'^\W+|\W+$')  # '^[^a-zA-Z]+|[^a-zA-Z]+$'
-
-# def is_punct(self, token):
-#     """Check if the given token is a punctuation character."""
-#     return NONWORD_RE.search(token) is not None
-
-# def remove_punctuation(self, tokens):
-#     """
-#     Remove punctuation characters from the given list of tokens.
-
-#     Parameters
-#     ----------
-#     tokens : list of str
-#         The list of tokens to remove punctuation from.
-
-#     Returns
-#     -------
-#     list of str
-#         The list of tokens with punctuation removed.
-#     """
-#     return [token for token in tokens if not self.is_punct(token)]
