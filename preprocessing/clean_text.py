@@ -27,33 +27,33 @@ class TextCleaner:
             tp.remove.accents,
             tp.remove.punctuation)
 
-        def clean_html(self, text):
-            """Clean HTML text."""
-            text = html.unescape(text)  # convert html escape to characters
+    def clean_html(self, text):
+        """Clean HTML text."""
+        text = html.unescape(text)  # convert html escape to characters
 
-            # parse HTML
-            soup = BeautifulSoup(text, 'lxml')
+        # parse HTML
+        soup = BeautifulSoup(text, 'lxml')
 
-            # remove certain tags
-            for tag in soup(["script", "style"]):
-                tag.decompose()
+        # remove certain tags
+        for tag in soup(["script", "style"]):
+            tag.decompose()
 
-            # remove comments
-            for comment in soup.find_all(string=lambda t:
-                                         isinstance(t, Comment)):
-                comment.extract()  # comment doesn't have decompose() method
+        # remove comments
+        for comment in soup.find_all(string=lambda t:
+                                        isinstance(t, Comment)):
+            comment.extract()  # comment doesn't have decompose() method
 
-            # get untagged text
-            text = soup.get_text()
+        # get untagged text
+        text = soup.get_text()
 
-            return text
+        return text
 
-        def clean_text(self, text, is_html=False):
-            """Clean text."""
-            if is_html:
-                text = clean_html(text)
-            text = self.normalize_text(text)
-            text = self.replace_from_text(text)
-            text = self.remove_from_text(text)
-            text = tp.normalize.whitespace(text)
-            return text
+    def clean_text(self, text, is_html=False):
+        """Clean text."""
+        if is_html:
+            text = clean_html(text)
+        text = self.normalize_text(text)
+        text = self.replace_from_text(text)
+        text = self.remove_from_text(text)
+        text = tp.normalize.whitespace(text)
+        return text
