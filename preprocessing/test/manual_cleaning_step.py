@@ -1,7 +1,11 @@
 """Manual test for cleaning_step.py."""
 
 from preprocessing.test.unittest_cleaning_step import TEXT
-import preprocessing.clean_text as ct
+from preprocessing.clean_text import TextCleaner
+
+
+# Initialize the TextCleaner class
+tc = TextCleaner()
 
 
 # Section
@@ -10,15 +14,15 @@ import preprocessing.clean_text as ct
 
 def manual_test():
     """Inspect the cleaning steps."""
-    norm_text = ct.normalize_text(TEXT)
-    repl_text = ct.replace_from_text(norm_text)
-    remove_text = ct.remove_from_text(repl_text)
+    norm_text = tc.normalize_text(TEXT)
+    repl_text = tc.replace_from_text(norm_text)
+    remove_text = tc.remove_from_text(repl_text)
 
     print(f"""Original text:{TEXT}
     Normalized:{norm_text}
     Without textual elements:{repl_text}
     Without punctuation:{remove_text}
-    Final:{ct.clean_text(TEXT)}""")
+    Final:{tc.clean_text(TEXT)}""")
 
 
 # Manual test
@@ -85,8 +89,8 @@ html_2 = """
 </html>
 """
 
-print(ct.clean_html(html_1))
-print(ct.clean_html(html_2))
+print(tc.clean_html(html_1))
+print(tc.clean_html(html_2))
 
-print(ct.clean_text(html_1, is_html=True))
-print(ct.clean_text(html_2, is_html=True))
+print(tc.clean_text(html_1, is_html=True))
+print(tc.clean_text(html_2, is_html=True))

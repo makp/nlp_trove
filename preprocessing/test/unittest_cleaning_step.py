@@ -2,7 +2,7 @@
 
 import unittest
 from parameterized import parameterized
-import preprocessing.clean_text as ct
+from preprocessing.clean_text import TextCleaner
 
 
 TEXT = """
@@ -14,6 +14,9 @@ The café's vintage sign cost ₽5,000. Check out the details at
 our-website.com or www.our-website.com or contact us at
 info@example.com. For inquiries, call +1 (555) 123-4567.
 """
+
+# Initialize the TextCleaner class
+tc = TextCleaner()
 
 
 class TestCleanText(unittest.TestCase):
@@ -28,12 +31,12 @@ class TestCleanText(unittest.TestCase):
          'She said, "Testing is crucial,"'),])
     def test_normalization(self, name, raw_text, expected_text):
         """Test normalization steps."""
-        self.assertEqual(ct.normalize_text(raw_text),
+        self.assertEqual(tc.normalize_text(raw_text),
                          expected_text)
 
     def setUp(self):
         """Set up the test."""
-        self.processed_text = ct.clean_text(TEXT)
+        self.processed_text = tc.clean_text(TEXT)
 
     def test_text_elements(self):
         """Check whether text elements (e.g., URLs) were removed."""
