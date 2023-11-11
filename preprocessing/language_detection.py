@@ -1,10 +1,17 @@
+"""
+Functions for filtering documents based on language.
+
+Notes:
+- Facebook's `fastText` library provides a pretrained model.
+"""
+
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 from langdetect import detect_langs
-import re
 
 
 def detect_language(text):
+    """Return the language of the text."""
     if not isinstance(text, str) or text.strip() == '':
         return None
     try:
@@ -14,14 +21,14 @@ def detect_language(text):
 
 
 def is_english(text):
+    """Check whether the text is written in English."""
     lang = detect_language(text)
     return lang == 'en'
 
 
 def detect_language_distribution(text):
     """
-    Detect probabilities that the text is written in the languages
-    found in the text.
+    Perform language detection on the text.
 
     Args:
     text (str): The text for which to detect the language distribution.
@@ -34,11 +41,3 @@ def detect_language_distribution(text):
     langs = detect_langs(text)
     lang_prob = {lang.lang: round(lang.prob, 2) for lang in langs}
     return lang_prob
-
-
-def get_number_of_words(text):
-    """Count the number of words in a string."""
-    if not isinstance(text, str):
-        return 0
-    words = re.findall(r'\b\w+\b', text)
-    return len(words)
