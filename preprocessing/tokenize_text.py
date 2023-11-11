@@ -7,7 +7,6 @@ Notes:
 """
 
 import spacy
-from gensim.models.phrases import Phrases, Phraser
 
 
 # Load spaCy model
@@ -25,20 +24,6 @@ class TextTokenizer:
     def __init__(self):
         """Initialize the TextTokenizer class."""
         self.phrase_model = None  # initialize model
-
-    def train_phrase_model(self, sentences):
-        """
-        Train a phrase detection model using Gensim's Phrases.
-
-        Parameters
-        ----------
-        sentences : list of list of str
-            A list of tokenized sentences for training the phrase
-            model.
-        """
-        self.phrase_model = Phraser(Phrases(sentences,
-                                            min_count=5,
-                                            threshold=10))
 
     def remove_stop_words(self, tokens):
         """
@@ -69,7 +54,7 @@ class TextTokenizer:
         return [token for token in tokens
                 if len(token) > min_length and len(token) <= max_length]
 
-    def preprocess_text(self, text, create_bigrams=True):
+    def tokenize_text(self, text):
         """
         Preprocesse the given text.
 
@@ -78,14 +63,11 @@ class TextTokenizer:
         2. Lemmatize
         3. Remove stop words
         4. Remove short and long tokens
-        5. Generate bigrams (if `create_bigrams=True`).
 
         Parameters
         ----------
         text : str
             The text to preprocess.
-        create_bigrams : bool, optional
-            Whether or not to generate bigrams (default is True).
 
         Returns
         -------
@@ -99,6 +81,4 @@ class TextTokenizer:
                   not token.is_punct]
         tokens = self.remove_stop_words(tokens)
         tokens = self.remove_short_and_long_tokens(tokens)
-        if create_bigrams and self.phrase_model:
-            tokens = self.phrase_model[tokens]
         return tokens
