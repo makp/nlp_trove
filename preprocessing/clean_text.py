@@ -51,7 +51,7 @@ class TextCleaner:
     def clean_text(self, text, is_html=False):
         """Clean text."""
         if is_html:
-            text = clean_html(text)
+            text = self.clean_html(text)
         text = self.normalize_text(text)
         text = self.replace_from_text(text)
         text = self.remove_from_text(text)
