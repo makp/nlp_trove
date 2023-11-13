@@ -4,8 +4,8 @@ import numpy as np
 from gensim import matutils
 
 
-def calculate_avg_distance_every_vec(lst_vecs, distance_func):
-    """Calculate average distance of each vector."""
+def calculate_dist_matrix(lst_vecs, distance_func):
+    """Calculate distance matrix for a list of vectors."""
     num_vecs = len(lst_vecs)
     dists_matrix = np.zeros((num_vecs, num_vecs))
 
@@ -13,7 +13,14 @@ def calculate_avg_distance_every_vec(lst_vecs, distance_func):
         for j in range(i+1, num_vecs):
             dists_matrix[i, j] = distance_func(lst_vecs[i], lst_vecs[j])
             dists_matrix[j, i] = dists_matrix[i, j]
-    avg_dists = dists_matrix.sum(axis=1) / (num_vecs - 1)
+    return dists_matrix
+
+
+def calculate_avg_distance_every_vec(lst_vecs, distance_func):
+    """Calculate average distance of each vector."""
+    num_vecs = len(lst_vecs)
+    dist_matrix = calculate_dist_matrix(lst_vecs, distance_func)
+    avg_dists = dist_matrix.sum(axis=1) / (num_vecs - 1)
     return avg_dists
 
 
