@@ -1,4 +1,4 @@
-"""Functions for a doc2vec model."""
+"""Train a doc2vec model."""
 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 

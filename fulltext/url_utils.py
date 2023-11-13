@@ -1,10 +1,12 @@
+"""Misc functions for handling URLs."""
+
 import requests
 from bs4 import BeautifulSoup
 
 
 def extract_content_from_html(html_content, tag, attr_dict):
     """
-    Extracts content from given HTML based on tag and its attributes.
+    Extract content from given HTML based on tag and its attributes.
 
     Parameters:
     - html_content (str): The HTML content as a string.
@@ -46,7 +48,7 @@ def fetch_content_from_url(url):
 
 def extract_content_from_url(url, tag, attr_dict):
     """
-    Fetches content from a given URL.
+    Fetch content from a given URL.
 
     Parameters:
     - url (str): The URL from which to fetch the content.
@@ -67,3 +69,17 @@ def extract_content_from_url(url, tag, attr_dict):
     page_content = fetch_content_from_url(url)
     if page_content:
         return extract_content_from_html(page_content, tag, attr_dict)
+
+
+def check_doi_exists(doi):
+    """Check whether a DOI exists."""
+    url = f"https://doi.org/{doi}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.url
+        else:
+            return None
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None
