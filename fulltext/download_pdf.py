@@ -1,3 +1,5 @@
+"""Functions for downloading PDFs from URLs."""
+
 import requests
 import time
 import os
