@@ -1,9 +1,8 @@
 """
-Run common text preprocessing steps.
+Tokenize text using spaCy.
 
 Notes:
-- Don't forget to download the spaCy model with conda:
-  `conda install -c conda-forge en_core_web_trf`
+- Don't forget to download the spaCy model.
 """
 
 import spacy
