@@ -4,9 +4,7 @@ from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 
 
-def map_tokens_to_integer_ids(tokenized_docs,
-                              min_doc_freq=25,
-                              max_doc_frac=0.9):
+def map_tokens_to_integer_ids(tokenized_docs, no_below, no_above):
     """
     Build a dictionary from tokenized documents.
 
@@ -17,19 +15,25 @@ def map_tokens_to_integer_ids(tokenized_docs,
     id2word = Dictionary(tokenized_docs)
 
     # Filter out certain tokens
-    id2word.filter_extremes(no_below=min_doc_freq,
-                            no_above=max_doc_frac)
+    id2word.filter_extremes(no_below=no_below,
+                            no_above=no_above)
 
     return id2word
 
 
-def build_tfidf_vectors(tokenized_docs, id2word):
+def build_tfidf_vectors(tokenized_docs,
+                        no_below=10,
+                        max_doc=0.9):
     """Build TF-IDF vectors from tokenized documents."""
+    id2word = map_tokens_to_integer_ids(tokenized_docs,
+                                        no_below=no_below,
+                                        no_above=max_doc)
+
     # Convert tokenized documents into bow vectors
     bow_corpus = [id2word.doc2bow(doc) for doc in tokenized_docs]
 
     # Fit the TF-IDF model
     tfidf = TfidfModel(dictionary=id2word)
 
-    # Return corpus as TF-IDF vectors
-    return tfidf[bow_corpus]
+    # Return dictionary and corpus as TF-IDF vecs
+    return id2word, tfidf[bow_corpus]
