@@ -1,27 +1,6 @@
 """Functions for topic modeling."""
 
-from gensim.corpora import Dictionary
 from gensim.models.coherencemodel import CoherenceModel
-
-
-def map_tokens_to_integer_ids(tokenized_docs,
-                              min_doc_freq=25,
-                              max_doc_frac=0.9):
-    """
-    Build a dictionary from tokenized documents.
-
-    When building a dictionary, filter out frequent and infrequent
-    tokens. A dictionary is a mapping between words and their integer
-    ids.
-    """
-    # Create a dictionary
-    id2word = Dictionary(tokenized_docs)
-
-    # Filter out certain tokens
-    id2word.filter_extremes(no_below=min_doc_freq,
-                            no_above=max_doc_frac)
-
-    return id2word
 
 
 def compute_coherence(lda_model, tokenized_docs, dictionary):
