@@ -1,3 +1,5 @@
+"""Download responses from the Scopus API and save them as a JSON file."""
+
 import requests
 import time
 import json
@@ -20,20 +22,26 @@ def get_number_results(query_str):
         "count": 1     # only need to know the total number of results
     }
 
-    response = requests.get(BASE_URL, headers=HEADERS, params=params)
+    response = requests.get(BASE_URL,
+                            headers=HEADERS,
+                            params=params)
 
     if response.status_code != 200:
         print(f"Error: {response.status_code}")
         return None
 
     response_dic = response.json()
-    num_results = response_dic.get('search-results', {}).get('opensearch:totalResults', 0)
+    num_results = response_dic \
+        .get('search-results', {}) \
+        .get('opensearch:totalResults', 0)
     return int(num_results)
 
 
 def fetch_single_request(params):
     """Make a single request to the API and return the response data."""
-    response = requests.get(BASE_URL, headers=HEADERS, params=params)
+    response = requests.get(BASE_URL,
+                            headers=HEADERS,
+                            params=params)
 
     if response.status_code != 200:
         print(f"Error: {response.status_code}")
@@ -54,8 +62,13 @@ def fetch_batch_of_articles(query_str, cursor='*'):
     response_dic = fetch_single_request(params)
 
     if response_dic:
-        next_cursor = response_dic.get('search-results', {}).get('cursor', {}).get('@next', None)
-        return response_dic.get("search-results", {}).get("entry", []), next_cursor
+        next_cursor = response_dic \
+            .get('search-results', {}) \
+            .get('cursor', {}) \
+            .get('@next', None)
+        return response_dic \
+            .get("search-results", {}) \
+            .get("entry", []), next_cursor
     return [], None
 
 
@@ -72,7 +85,8 @@ def fetch_all_articles(query_str, cursor='*'):
     next_cursor = cursor
     num_fetched_articles = 0
     while num_fetched_articles < num_results:
-        batch_articles, next_cursor = fetch_batch_of_articles(query_str, next_cursor)
+        batch_articles, next_cursor = \
+            fetch_batch_of_articles(query_str, next_cursor)
         all_articles.extend(batch_articles)
 
         num_fetched_articles = len(all_articles)
@@ -83,9 +97,7 @@ def fetch_all_articles(query_str, cursor='*'):
 
 
 def download_responses_from_scopus(query_str, cursor='*', fname='out.json'):
-    """Download all responses for a given query and save them as a
-    JSON file.
-    """
+    """Save responses as a JSON file."""
     all_data = fetch_all_articles(query_str, cursor)
     with open(fname, 'w') as f:
         json.dump(all_data, f)
