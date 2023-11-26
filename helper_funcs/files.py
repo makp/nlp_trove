@@ -1,3 +1,4 @@
+"""Functions for working with files."""
 import os
 import re
 from datetime import datetime
@@ -16,7 +17,7 @@ def create_filename_with_timestamp(prefix, suffix, extension):
 def find_files_with_filters_and_extensions(directory,
                                            filter_strs=None,
                                            extensions=None):
-
+    """Find files in directory matching the given filters and extensions."""
     # Ensure that `filter_strs` and `extensions` are lists
     if isinstance(filter_strs, str):
         filter_strs = [filter_strs]
@@ -31,10 +32,12 @@ def find_files_with_filters_and_extensions(directory,
                       (extensions is None or
                        any(file.endswith(ext) for ext in extensions)) and
                       (filter_strs is None or
-                       any(re.search(filter_str, file) for filter_str in filter_strs)))
+                       any(re.search(filter_str, file)
+                           for filter_str in filter_strs)))
 
     # Convert generator to list and sort by creation time
-    filtered_files = sorted([os.path.join(directory, file) for file in filtered_files],
+    filtered_files = sorted([os.path.join(directory, file)
+                             for file in filtered_files],
                             key=os.path.getctime)
 
     # Print number of files found
