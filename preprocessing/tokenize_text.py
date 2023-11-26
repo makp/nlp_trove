@@ -18,11 +18,7 @@ STOP_WORDS = nlp.Defaults.stop_words.union(CUSTOM_STOP_WORDS)
 
 
 class TextTokenizer:
-    """Class for preprocessing text data for NLP tasks."""
-
-    def __init__(self):
-        """Initialize the TextTokenizer class."""
-        self.phrase_model = None  # initialize model
+    """Class for tokenizing text for running NLP tasks."""
 
     def remove_stop_words(self, tokens):
         """
