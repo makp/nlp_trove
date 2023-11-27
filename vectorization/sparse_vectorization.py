@@ -4,12 +4,15 @@ from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 
 
-def map_tokens_to_integer_ids(tokenized_docs, no_below, no_above):
+def map_tokens_to_integer_ids(tokenized_docs,
+                              no_below=1,
+                              no_above=1):
     """
     Build a dictionary from tokenized documents.
 
     When building a dictionary, filter out frequent and infrequent
-    tokens.
+    tokens. The keyword argument `no_below` is an absolute number and
+    `no_above` is a fraction of the total corpus size.
     """
     # Create a dictionary
     id2word = Dictionary(tokenized_docs)
@@ -22,12 +25,12 @@ def map_tokens_to_integer_ids(tokenized_docs, no_below, no_above):
 
 
 def build_tfidf_vectors(tokenized_docs,
-                        no_below=10,
-                        max_doc=0.9):
+                        no_below=1,
+                        no_above=1):
     """Build TF-IDF vectors from tokenized documents."""
     id2word = map_tokens_to_integer_ids(tokenized_docs,
                                         no_below=no_below,
-                                        no_above=max_doc)
+                                        no_above=no_above)
 
     # Convert tokenized documents into bow vectors
     bow_corpus = [id2word.doc2bow(doc) for doc in tokenized_docs]
