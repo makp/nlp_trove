@@ -10,27 +10,27 @@ TODO:
 import spacy
 from vectorization.sparse_vectorization import build_tfidf_vectors
 
-# Load spaCy model
-nlp = spacy.load('en_core_web_trf')
 
+class FilterTokensWithPOS:
+    """Filter Tokens based on spaCy POS tags."""
 
-def convert_to_spacy_doc(tokenized_doc,
-                         disabled_components=['ner',
-                                              'lemmatizer']):
-    """Convert a list of tokens to a spaCy Doc."""
-    doc = spacy.tokens.Doc(nlp.vocab, words=tokenized_doc)
-    for name, proc in nlp.pipeline:
-        if name not in disabled_components:
-            doc = proc(doc)
-    return doc
+    # Load spaCy model
+    nlp = spacy.load('en_core_web_trf')
 
+    def convert_to_spacy_doc(self, tokenized_doc):
+        """Convert a list of tokens to a spaCy Doc."""
+        disabled_components = ['ner', 'lemmatizer']
+        doc = spacy.tokens.Doc(self.nlp.vocab, words=tokenized_doc)
+        for name, proc in self.nlp.pipeline:
+            if name not in disabled_components:
+                doc = proc(doc)
+        return doc
 
-def filter_tokens_with_pos(tokenized_doc):
-    """Filter tokens based on spaCy POS tags."""
-    doc = convert_to_spacy_doc(tokenized_doc)
-    pos_tags = {'NOUN', 'PROPN', 'VERB', 'ADJ'}
-    return [t.text for t in doc
-            if t.pos_ in pos_tags]
+    def filter_content_tokens(self, tokenized_doc, pos_tags=None):
+        """Filter tokens based on spaCy POS tags."""
+        doc = self.convert_to_spacy_doc(tokenized_doc)
+        pos_tags = pos_tags or {'NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV'}
+        return [t.text for t in doc if t.pos_ in pos_tags]
 
 
 class FilterTokensWithTFIDF:
