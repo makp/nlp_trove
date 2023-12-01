@@ -8,6 +8,7 @@ TODO:
 """
 
 import spacy
+from vectorization.sparse_vectorization import build_tfidf_vectors
 
 # Load spaCy model
 nlp = spacy.load('en_core_web_trf')
@@ -32,18 +33,27 @@ def filter_tokens_with_pos(tokenized_doc):
             if t.pos_ in pos_tags]
 
 
-def get_tokens_above_tfidf_score(dictionary, tfidf_vecs,
-                                 threshold=0.1):
-    """Return tokens above a certain TF-IDF score."""
-    tokens_to_keep = set()
-    for doc_vec in tfidf_vecs:
-        for token_id, score in doc_vec:
-            if score > threshold:
-                tokens_to_keep.add(dictionary[token_id])
-    return tokens_to_keep
+class FilterTokensWithTFIDF:
+    """Filter tokens based on their TF-IDF scores."""
 
+    def __init__(self, tokenized_docs, threshold=0.1):
+        """Initialize the FilterTokensWithTFIDF class."""
+        self.tokenized_docs = tokenized_docs
+        self.dictionary, self.tfidf_vecs = build_tfidf_vectors(
+            tokenized_docs)
+        self.threshold = threshold
+        self.tokens_to_keep = self.get_tokens_above_tfidf_score()
 
-def filter_tokens(tokenized_doc, tokens_to_keep):
-    """Filter tokens based on a list of tokens to keep."""
-    return [token for token in tokenized_doc
-            if token in tokens_to_keep]
+    def get_tokens_above_tfidf_score(self):
+        """Return tokens above a certain TF-IDF score."""
+        tokens_to_keep = set()
+        for doc_vec in self.tfidf_vecs:
+            for token_id, score in doc_vec:
+                if score > self.threshold:
+                    tokens_to_keep.add(self.dictionary[token_id])
+        return tokens_to_keep
+
+    def filter_doc(self, tokenized_doc):
+        """Filter tokens based on a list of tokens to keep."""
+        return [token for token in tokenized_doc
+                if token in self.tokens_to_keep]
