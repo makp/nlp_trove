@@ -17,6 +17,10 @@ class FilterTokensWithPOS:
     # Load spaCy model
     nlp = spacy.load('en_core_web_trf')
 
+    # POS tags
+    CONTENT_POS_TAGS = {'NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV'}
+    NOUN_POS_TAGS = {'NOUN', 'PROPN'}
+
     def convert_to_spacy_doc(self, tokenized_doc):
         """Convert a list of tokens to a spaCy Doc."""
         disabled_components = ['ner', 'lemmatizer']
@@ -26,10 +30,8 @@ class FilterTokensWithPOS:
                 doc = proc(doc)
         return doc
 
-    def filter_content_tokens(self, tokenized_doc, pos_tags=None):
+    def filter_doc_with_pos(self, doc, pos_tags=CONTENT_POS_TAGS):
         """Filter tokens based on spaCy POS tags."""
-        doc = self.convert_to_spacy_doc(tokenized_doc)
-        pos_tags = pos_tags or {'NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV'}
         return [t.text for t in doc if t.pos_ in pos_tags]
 
 
