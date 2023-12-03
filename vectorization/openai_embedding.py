@@ -1,9 +1,9 @@
 """Routines for interacting with OpenAI's ADA2 embeddings."""
 
 import os
-import numpy as np
 from openai import OpenAI
 import tiktoken
+from helper_funcs.vectors import cosine_similarity
 
 client = OpenAI(
     api_key=os.getenv("OPENAI_KEY")
@@ -27,11 +27,6 @@ def create_embedding_openai(text, model=EMBEDDING_MODEL):
         input=[text],
         model=model)
     return response.data[0].embedding
-
-
-def cosine_similarity(a, b):
-    """Compute the cosine similarity between two vectors."""
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
 def query_with_openai_embedding(query, ser_embs,

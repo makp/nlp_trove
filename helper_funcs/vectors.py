@@ -2,7 +2,6 @@
 
 import numpy as np
 from gensim import matutils
-from gensim.matutils import cossim
 from gensim.matutils import kullback_leibler
 import pickle
 
@@ -54,9 +53,9 @@ def load_sbert_embeddings(fname='sbert_embeddings.pkl'):
     return data['sentences'], data['embeddings']
 
 
-def get_cosine_distance(vec1, vec2):
-    """Compute the cosine distance between two vectors."""
-    return 1 - cossim(vec1, vec2)
+def cosine_similarity(a, b):
+    """Compute the cosine similarity between two vectors."""
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
 def calculate_jensen_shannon_div(vec1, vec2):
