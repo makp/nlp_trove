@@ -2,10 +2,14 @@
 
 import spacy
 import pytextrank               # noqa
+from keybert import KeyBERT
 
 # Load spaCy model
 nlp = spacy.load('en_core_web_trf')
 nlp.add_pipe("textrank")
+
+# Load KeyBERT model
+kw_model = KeyBERT(model='all-MiniLM-L6-v2')
 
 
 def extract_key_phrases(text, num_phrases=5):
