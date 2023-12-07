@@ -9,7 +9,7 @@ import spacy
 
 
 # Load spaCy model
-nlp = spacy.load('en_core_web_trf', disable=['parser', 'ner'])
+nlp = spacy.load('en_core_web_trf')
 
 
 # stopwords
@@ -21,20 +21,8 @@ class TextTokenizer:
     """Class for tokenizing text for running NLP tasks."""
 
     def remove_stop_words(self, tokens):
-        """
-        Remove stopwords from the given list of tokens.
-
-        Parameters
-        ----------
-        tokens : list of str
-            The list of tokens to remove stop words from.
-
-        Returns
-        -------
-        list of str
-            The list of tokens with stop words removed.
-        """
-        return [word for word in tokens if word.lower() not in STOP_WORDS]
+        """Remove stopwords from the given list of tokens."""
+        return [t for t in tokens if t.lower() not in STOP_WORDS]
 
     def remove_short_and_long_tokens(self, tokens,
                                      min_length=1,
@@ -46,29 +34,20 @@ class TextTokenizer:
         artifacts of malformed data. And single character tokens are
         unlikely to be useful for downstream NLP tasks.
         """
-        return [token for token in tokens
-                if len(token) > min_length and len(token) <= max_length]
+        return [t for t in tokens
+                if len(t) > min_length and len(t) <= max_length]
 
     def tokenize_text(self, text):
         """
         Preprocesse the given text.
 
+        Return a spaCy Doc to retain spaCy attributes.
+
         Steps:
-        1. Tokenize the text using spaCy.
+        1. Lowercase and tokenize
         2. Lemmatize
         3. Remove stop words
         4. Remove short and long tokens
-
-        Parameters
-        ----------
-        text : str
-            The text to preprocess.
-
-        Returns
-        -------
-        list of str
-            The list of preprocessed tokens (and bigrams, if
-            applicable).
         """
         doc = nlp(text.lower())
         tokens = [token.lemma_ for token in doc if
@@ -76,4 +55,4 @@ class TextTokenizer:
                   not token.is_punct]
         tokens = self.remove_stop_words(tokens)
         tokens = self.remove_short_and_long_tokens(tokens)
-        return tokens
+        return spacy.tokens.Doc(nlp.vocab, words=tokens)
