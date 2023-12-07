@@ -8,21 +8,19 @@ Notes:
 import spacy
 
 
-# Load spaCy model
-nlp = spacy.load('en_core_web_trf')
-
-
-# stopwords
-CUSTOM_STOP_WORDS = set('would could may might account et al used also'.split(' ')) # noqa
-STOP_WORDS = nlp.Defaults.stop_words.union(CUSTOM_STOP_WORDS)
-
-
 class TextTokenizer:
     """Class for tokenizing text for running NLP tasks."""
 
+    # Load spaCy model
+    nlp = spacy.load('en_core_web_trf')
+
+    # stopwords
+    CUSTOM_STOP_WORDS = set('would could may might account et al used also'.split(' ')) # noqa
+    STOP_WORDS = nlp.Defaults.stop_words.union(CUSTOM_STOP_WORDS)
+
     def remove_stop_words(self, tokens):
         """Remove stopwords from the given list of tokens."""
-        return [t for t in tokens if t.lower() not in STOP_WORDS]
+        return [t for t in tokens if t.lower() not in self.STOP_WORDS]
 
     def remove_short_and_long_tokens(self, tokens,
                                      min_length=1,
@@ -49,10 +47,10 @@ class TextTokenizer:
         3. Remove stop words
         4. Remove short and long tokens
         """
-        doc = nlp(text.lower())
+        doc = self.nlp(text.lower())
         tokens = [token.lemma_ for token in doc if
                   not token.is_space and
                   not token.is_punct]
         tokens = self.remove_stop_words(tokens)
         tokens = self.remove_short_and_long_tokens(tokens)
-        return spacy.tokens.Doc(nlp.vocab, words=tokens)
+        return spacy.tokens.Doc(self.nlp.vocab, words=tokens)
