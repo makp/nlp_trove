@@ -11,16 +11,16 @@ import spacy
 class TextTokenizer:
     """Class for tokenizing text for running NLP tasks."""
 
-    # Load spaCy model
-    nlp = spacy.load('en_core_web_trf')
-
-    # stopwords
-    CUSTOM_STOP_WORDS = set('would could may might account et al used also'.split(' ')) # noqa
-    STOP_WORDS = nlp.Defaults.stop_words.union(CUSTOM_STOP_WORDS)
+    def __init__(self, model='en_core_web_trf'):
+        """Initialize the TextTokenizer class."""
+        self.nlp = spacy.load(model)
+        self.custom_stopwords = set('would could may might account et al used also'.split(' ')) # noqa
+        self.stopwords = self.nlp.Defaults.stop_words.union(
+            self.custom_stopwords)
 
     def remove_stop_words(self, tokens):
         """Remove stopwords from the given list of tokens."""
-        return [t for t in tokens if t.lower() not in self.STOP_WORDS]
+        return [t for t in tokens if t.lower() not in self.stopwords]
 
     def remove_short_and_long_tokens(self, tokens,
                                      min_length=1,
