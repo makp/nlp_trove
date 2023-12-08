@@ -1,5 +1,5 @@
 """
-Tokenize text using spaCy.
+Tokenize text and run some common preprocessing tasks.
 
 Notes:
 - Don't forget to download the spaCy model.
@@ -9,7 +9,7 @@ import spacy
 
 
 class TextTokenizer:
-    """Class for tokenizing text for running NLP tasks."""
+    """Class for tokenizing text."""
 
     def __init__(self, model='en_core_web_trf'):
         """Initialize the TextTokenizer class."""
@@ -39,7 +39,7 @@ class TextTokenizer:
         """
         Preprocesse the given text.
 
-        Return a spaCy Doc to retain spaCy attributes.
+        Return a list of spaCy Token objects.
 
         Steps:
         1. Lowercase and tokenize
@@ -53,4 +53,5 @@ class TextTokenizer:
                   not token.is_punct]
         tokens = self.remove_stop_words(tokens)
         tokens = self.remove_short_and_long_tokens(tokens)
-        return spacy.tokens.Doc(self.nlp.vocab, words=tokens)
+        return tokens
+
