@@ -3,7 +3,6 @@
 import spacy
 from keybert import KeyBERT
 from textacy import extract
-from typing import List
 
 
 class KeywordExtractor:
@@ -16,7 +15,7 @@ class KeywordExtractor:
 
     def extract_keywords_textacy(self, doc,
                                  algorithm: str = "sgrank",
-                                 top_n: int = 5) -> List[str]:
+                                 top_n: int = 5) -> [str]:
         """Extract keywords from the given text using textacy."""
         if isinstance(doc, spacy.tokens.Doc):
             spacy_doc = doc
@@ -40,7 +39,7 @@ class KeywordExtractor:
         keywords = [keyword for keyword, weight in keywords]
         return keywords
 
-    def extract_keywords_keybert(self, doc, top_n: int = 5) -> List[str]:
+    def extract_keywords_keybert(self, doc, top_n: int = 5) -> [str]:
         """Extract keywords from the given text using KeyBERT."""
         if isinstance(doc, spacy.tokens.Doc):
             text = doc.text
