@@ -16,12 +16,10 @@ def manual_test():
     """Inspect the cleaning steps."""
     norm_text = tc.normalize_text(TEXT)
     repl_text = tc.replace_from_text(norm_text)
-    remove_text = tc.remove_from_text(repl_text)
 
     print(f"""Original text:{TEXT}
     Normalized:{norm_text}
     Without textual elements:{repl_text}
-    Without punctuation:{remove_text}
     Final:{tc.clean_text(TEXT)}""")
 
 
