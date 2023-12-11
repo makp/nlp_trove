@@ -14,7 +14,8 @@ class TextCleaner:
             tp.normalize.bullet_points,
             tp.normalize.hyphenated_words,  # reattach separated by line breaks
             tp.normalize.quotation_marks,
-            tp.normalize.unicode)
+            tp.normalize.unicode,
+            tp.remove.accents)
 
         self.replace_from_text = tp.make_pipeline(
             tp.replace.urls,
