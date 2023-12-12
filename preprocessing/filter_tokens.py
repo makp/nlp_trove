@@ -31,9 +31,9 @@ class FilterTokens:
 
     def preprocess_tokens(self, doc):
         """Preprocess the given spaCy doc."""
-        tokens = [token.lemma_ for token in doc if
+        tokens = [token.lemma_.lower() for token in doc if
                   token.is_alpha and
-                  not token.is_punct and  # redundant?
+                  # not token.is_punct and
                   not token.is_stop]
         tokens = self.remove_custom_stopwords(tokens)
         tokens = self.remove_short_and_long_tokens(tokens)
