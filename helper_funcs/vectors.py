@@ -3,7 +3,6 @@
 import numpy as np
 from gensim import matutils
 from gensim.matutils import kullback_leibler
-import pickle
 
 
 def calculate_dist_matrix(lst_vecs, distance_func):
@@ -36,21 +35,6 @@ def convert_to_gensim_full(lst_vecs):
     length = len(lst_vecs[0])
     return [matutils.sparse2full(v, length)
             for v in lst_vecs]
-
-
-def store_sbert_embeddings(sentences, embeddings,
-                           fname='sbert_embeddings.pkl'):
-    """Store sentence-BERT embeddings."""
-    with open(fname, "wb") as fOut:
-        pickle.dump({'sentences': sentences, 'embeddings': embeddings}, fOut,
-                    protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def load_sbert_embeddings(fname='sbert_embeddings.pkl'):
-    """Load sentence-BERT embeddings."""
-    with open(fname, "rb") as fIn:
-        data = pickle.load(fIn)
-    return data['sentences'], data['embeddings']
 
 
 def cosine_similarity(a, b):
