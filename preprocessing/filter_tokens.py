@@ -6,43 +6,44 @@ from vectorization.sparse_vectorization import build_tfidf_vectors
 class FilterTokens:
     """Class for filtering tokens."""
 
-    def __init__(self):
+    def __init__(self, min_length=1, max_length=15):
         """Initialize the FilterTokens class."""
         self.custom_stopwords = set('would could may might account et al used also'.split(' ')) # noqa
         self.content_pos = {'NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV'}
         self.noun_pos = {'NOUN', 'PROPN'}
+        self.min_length = min_length
+        self.max_length = max_length
 
-    def remove_custom_stopwords(self, tokens):
-        """Remove stopwords from the given list of tokens."""
-        return [t for t in tokens if t not in self.custom_stopwords]
+    def add_custom_stopwords(self, stopwords):
+        """Add custom stopwords."""
+        self.custom_stopwords.update(stopwords)
 
-    def remove_short_and_long_tokens(self, tokens,
-                                     min_length=1,
-                                     max_length=15):
+    def preprocess_tokens(self, doc, remove_stop=True):
         """
-        Remove short and long tokens from the given list of tokens.
+        Preprocess a spaCy Doc or a list of spaCy Tokens.
 
         The motivation for removing long tokens is that they could be
         artifacts of malformed data. And single character tokens are
         unlikely to be useful for downstream NLP tasks.
         """
-        return [t for t in tokens
-                if len(t) > min_length and len(t) <= max_length]
-
-    def preprocess_tokens(self, doc):
-        """Preprocess the given spaCy doc."""
         tokens = [token.lemma_.lower() for token in doc if
                   token.is_alpha and
-                  # not token.is_punct and
-                  not token.is_stop]
-        tokens = self.remove_custom_stopwords(tokens)
-        tokens = self.remove_short_and_long_tokens(tokens)
+                  (not remove_stop or
+                   (not token.is_stop and
+                    token.text not in self.custom_stopwords)) and
+                  self.min_length < len(token.lemma_) <= self.max_length
+                  ]
         return tokens
 
-    def filter_doc_with_pos(self, doc, pos_tags):
+    def filter_doc_with_pos(self, doc, pos_tags,
+                            remove_stop=True):
         """Filter tokens based on spaCy POS tags."""
         tokens = [t for t in doc if t.pos_ in pos_tags]
-        return self.preprocess_tokens(tokens)
+        return self.preprocess_tokens(tokens, remove_stop=remove_stop)
+
+    def __call__(self, doc):
+        """Preprocess a spaCy Doc based on the class default arguments."""
+        return self.preprocess_tokens(doc)
 
 
 class FilterTokensWithTFIDF:
