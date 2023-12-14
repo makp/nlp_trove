@@ -1,4 +1,5 @@
-import pandas as pd
+"""Extract text from PDFs."""
+
 import PyPDF2
 from fulltext.pdf_utils import is_pdf
 
@@ -24,11 +25,9 @@ def pdf_to_text(filepath):
         return None
 
 
-def extract_text_from_pdf(filename, path_to_pdfs):
-    """Extract text from PDF based on a given DataFrame row and path
-    to PDFs."""
-    if pd.isna(filename):
-        return None
+# def extract_text_from_pdf(filename, path_to_pdfs):
+#     if pd.isna(filename):
+#         return None
 
-    full_path = f"{path_to_pdfs}/{filename}"
-    return pdf_to_text(full_path)
+#     full_path = f"{path_to_pdfs}/{filename}"
+#     return pdf_to_text(full_path)
