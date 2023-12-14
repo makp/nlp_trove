@@ -1,3 +1,5 @@
+"""Utilities for working with PDF files."""
+
 import os
 import PyPDF2
 

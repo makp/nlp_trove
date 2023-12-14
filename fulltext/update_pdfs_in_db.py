@@ -1,11 +1,19 @@
+"""Functions for updating PDFs in the database."""
+
 import os
 import hashlib
 
 
-def incorporate_pdf_into_database(pdf_path, database_dir, df, row_indx, column_name='pdf_filename'):
+def incorporate_pdf_into_database(pdf_path,
+                                  database_dir,
+                                  df,
+                                  row_indx,
+                                  column_name='pdf_filename'):
     """
-    Rename the PDF using MD5 hash, save it to the database directory, and
-    update the corresponding row in DataFrame.
+    Incorporate a single PDF into the database.
+
+    Rename the PDF using MD5 hash, save it to the database directory,
+    and update the corresponding row in DataFrame.
     """
     with open(pdf_path, 'rb') as f:
         file_content = f.read()
@@ -18,7 +26,10 @@ def incorporate_pdf_into_database(pdf_path, database_dir, df, row_indx, column_n
     return df.loc[row_indx]
 
 
-def del_rows_and_corresponding_pdfs(idx, df, pdf_folder, pdf_column='pdf_filename'):
+def del_rows_and_corresponding_pdfs(idx,
+                                    df,
+                                    pdf_folder,
+                                    pdf_column='pdf_filename'):
     """Delete rows from a DataFrame and the corresponding PDF files."""
     if isinstance(idx, int):
         idx = [idx]
@@ -34,8 +45,10 @@ def del_rows_and_corresponding_pdfs(idx, df, pdf_folder, pdf_column='pdf_filenam
             print(f"File {path} does not exist. Skipping deletion.")
 
 
-def verify_pdf_filenames_and_pdfs_mismatch(df, folder, column_name='pdf_filename'):
-    """Check whether PDF filenames in DataFrame and those in the PDF folder match."""
+def verify_pdf_filenames_and_pdfs_mismatch(df,
+                                           folder,
+                                           column_name='pdf_filename'):
+    """Verify PDF filenames in DataFrame and those in the PDF folder match."""
     pdfs_in_df = set(df[column_name])
     pdfs_in_folder = set(os.listdir(folder))
     if pdfs_in_df == pdfs_in_folder:

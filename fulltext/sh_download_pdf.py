@@ -1,3 +1,5 @@
+"""Download a PDF version of an article using its DOI."""
+
 import time
 import os
 import hashlib
@@ -6,6 +8,7 @@ from fulltext.pdf_utils import is_pdf
 
 
 def sh_download_article_from_doi(doi):
+    """Download an article using its DOI."""
     out = './out.pdf'
     url = f"https://doi.org/{doi}"
     scihub_download(url, paper_type="doi", out=out)
@@ -21,6 +24,7 @@ def sh_download_article_from_doi(doi):
 
 
 def sh_move_and_rename_pdf(dest_folder):
+    """Move the downloaded PDF to `dest_folder` and rename it."""
     if not os.path.exists("./out.pdf"):
         return None
 
@@ -38,6 +42,7 @@ def sh_move_and_rename_pdf(dest_folder):
 
 
 def sh_download_and_rename_pdf(doi, dest_folder):
+    """Download and move an article to `dest_folder` using its DOI."""
     success = sh_download_article_from_doi(doi)
     if success:
         return sh_move_and_rename_pdf(dest_folder)
