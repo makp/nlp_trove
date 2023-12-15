@@ -1,7 +1,7 @@
 """Utilities for working with PDF files."""
 
 import os
-import PyPDF2
+from pypdf import PdfReader
 
 
 def is_pdf(filepath):
@@ -23,11 +23,14 @@ def is_pdf_corrupted(pdf_filename, pdf_folder, verbose=False):
     filepath = os.path.join(pdf_folder, pdf_filename)
     try:
         with open(filepath, 'rb') as f:
-            reader = PyPDF2.PdfFileReader(f)
+            reader = PdfReader(f)
 
-            # Perform some operations to provoke an error
-            reader.getNumPages()
-            reader.getPage(0).extract_text()
+            # Check for valid number of pages
+            if len(reader.pages) == 0:
+                return True
+
+            # Check page accessibility (raises exception)
+            reader.pages[0].extract_text()
 
             return False
     except Exception as e:
@@ -45,21 +48,13 @@ def pdf_to_text(filepath):
             return None
 
         with open(filepath, 'rb') as f:
-            reader = PyPDF2.PdfFileReader(f)
+            reader = PdfReader(f)
             text = ""
-            for i in range(reader.numPages):
-                page = reader.getPage(i)
+            for i in range(len(reader.pages)):
+                page = reader.pages[i]
                 text += page.extractText()
             return text
     except Exception as e:
         with open('error_files.txt', 'a') as error_file:
             error_file.write(f"{filepath} - {str(e)}\n")
         return None
-
-
-# def extract_text_from_pdf(filename, path_to_pdfs):
-#     if pd.isna(filename):
-#         return None
-
-#     full_path = f"{path_to_pdfs}/{filename}"
-#     return pdf_to_text(full_path)
