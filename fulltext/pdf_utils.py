@@ -52,7 +52,7 @@ def pdf_to_text(filepath):
             text = ""
             for i in range(len(reader.pages)):
                 page = reader.pages[i]
-                text += page.extractText()
+                text += page.extract_text()
             return text
     except Exception as e:
         with open('error_files.txt', 'a') as error_file:
