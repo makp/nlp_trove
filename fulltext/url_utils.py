@@ -4,26 +4,15 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def extract_content_from_html(html_content, tag, attr_dict):
-    """
-    Extract content from given HTML based on tag and its attributes.
+def find_elements_by_tag_and_attrs(html_content, tag, attr_dict):
+    """Find HTML elements based on tag and its attributes."""
+    try:
+        soup = BeautifulSoup(html_content, 'lxml')
+    except Exception as e:
+        raise ValueError(f"Error parsing HTML content: {e}")
 
-    Parameters:
-    - html_content (str): The HTML content as a string.
-    - tag (str): The HTML tag to search for.
-    - attr_dict (dict): A dictionary containing attribute keys and
-      their corresponding values to refine the tag search.
-
-    Returns:
-    - str: The content of the 'content' attribute from the found tag.
-      If the tag is not found, returns None.
-    """
-    soup = BeautifulSoup(html_content, 'lxml')
-    meta_tag = soup.find(tag, attr_dict)
-    if meta_tag:
-        return meta_tag['content']
-    else:
-        return None
+    found_elements = soup.find_all(tag, attr_dict)
+    return found_elements
 
 
 def fetch_content_from_url(url):
