@@ -16,7 +16,7 @@ class TextPreprocessor:
         self.batch_size = batch_size
 
     def process_texts(self, texts):
-        """Process texts in batches."""
+        """Return a generator of spaCy Doc objects."""
         for doc in self.nlp.pipe(texts,
                                  batch_size=self.batch_size):
             yield doc
