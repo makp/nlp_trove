@@ -17,8 +17,7 @@ class TextPreprocessor:
 
     def process_texts(self, texts):
         """Process texts in batches."""
-        text_stream = (text for text in texts)
-        for doc in self.nlp.pipe(text_stream,
+        for doc in self.nlp.pipe(texts,
                                  batch_size=self.batch_size):
             yield doc
 
