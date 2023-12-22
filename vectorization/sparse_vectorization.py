@@ -6,13 +6,15 @@ from gensim.models import TfidfModel
 
 def map_tokens_to_integer_ids(tokenized_docs,
                               no_below=1,
-                              no_above=1):
+                              no_above=1,
+                              keep_n=None):
     """
     Build a dictionary from tokenized documents.
 
     When building a dictionary, filter out frequent and infrequent
     tokens. The keyword argument `no_below` is an absolute number and
-    `no_above` is a fraction of the total corpus size.
+    `no_above` is a fraction of the total corpus size. Keep `keep_n`
+    most frequent tokens after the above filtering.
     """
     # Create a dictionary
     id2word = Dictionary(tokenized_docs)
@@ -26,7 +28,8 @@ def map_tokens_to_integer_ids(tokenized_docs,
 
 def build_tfidf_vectors(tokenized_docs,
                         no_below=1,
-                        no_above=1):
+                        no_above=1,
+                        keep_n=None):
     """Build TF-IDF vectors from tokenized documents."""
     id2word = map_tokens_to_integer_ids(tokenized_docs,
                                         no_below=no_below,
