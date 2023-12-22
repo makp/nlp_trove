@@ -21,7 +21,8 @@ def map_tokens_to_integer_ids(tokenized_docs,
 
     # Filter out certain tokens
     id2word.filter_extremes(no_below=no_below,
-                            no_above=no_above)
+                            no_above=no_above,
+                            keep_n=keep_n)
 
     return id2word
 
@@ -33,7 +34,8 @@ def build_tfidf_vectors(tokenized_docs,
     """Build TF-IDF vectors from tokenized documents."""
     id2word = map_tokens_to_integer_ids(tokenized_docs,
                                         no_below=no_below,
-                                        no_above=no_above)
+                                        no_above=no_above,
+                                        keep_n=keep_n)
 
     # Convert tokenized documents into bow vectors
     bow_corpus = [id2word.doc2bow(doc) for doc in tokenized_docs]
