@@ -27,11 +27,11 @@ def map_tokens_to_integer_ids(tokenized_docs,
     return id2word
 
 
-def build_tfidf_vectors(tokenized_docs,
-                        no_below=1,
-                        no_above=1,
-                        keep_n=None):
-    """Build TF-IDF vectors from tokenized documents."""
+def build_bow_vectors(tokenized_docs,
+                      no_below=1,
+                      no_above=1,
+                      keep_n=None):
+    """Build bag-of-words vectors from tokenized documents."""
     id2word = map_tokens_to_integer_ids(tokenized_docs,
                                         no_below=no_below,
                                         no_above=no_above,
@@ -39,6 +39,20 @@ def build_tfidf_vectors(tokenized_docs,
 
     # Convert tokenized documents into bow vectors
     bow_corpus = [id2word.doc2bow(doc) for doc in tokenized_docs]
+
+    # Return dictionary and corpus as bow vecs
+    return id2word, bow_corpus
+
+
+def build_tfidf_vectors(tokenized_docs,
+                        no_below=1,
+                        no_above=1,
+                        keep_n=None):
+    """Build TF-IDF vectors from tokenized documents."""
+    id2word, bow_corpus = build_bow_vectors(tokenized_docs,
+                                            no_below=no_below,
+                                            no_above=no_above,
+                                            keep_n=keep_n)
 
     # Fit the TF-IDF model
     tfidf = TfidfModel(dictionary=id2word)
