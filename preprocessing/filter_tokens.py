@@ -35,11 +35,13 @@ class FilterTokens:
                   ]
         return tokens
 
-    def filter_doc_with_pos(self, doc, pos_tags,
-                            remove_stop=True):
-        """Filter tokens based on spaCy POS tags."""
-        tokens = [t for t in doc if t.pos_ in pos_tags]
-        return self.preprocess_tokens(tokens, remove_stop=remove_stop)
+    def keep_tokens_with_pos(self, doc, pos_tags):
+        """Keep tokens with certain POS tags."""
+        return [t for t in doc if t.pos_ in pos_tags]
+
+    def drop_tokens_with_ner(self, doc, ner_labels):
+        """Drop tokens with certain NER labels."""
+        return [t for t in doc if t.ent_type_ not in ner_labels]
 
     def __call__(self, doc):
         """Preprocess a spaCy Doc based on the class default arguments."""
