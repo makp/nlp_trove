@@ -39,6 +39,14 @@ class FilterTokens:
         """Keep tokens with certain POS tags."""
         return [t for t in doc if t.pos_ in pos_tags]
 
+    def drop_tokens_with_pos(self, doc, pos_tags):
+        """Drop tokens with certain POS tags."""
+        return [t for t in doc if t.pos_ not in pos_tags]
+
+    def keep_tokens_with_ner(self, doc, ner_labels):
+        """Keep tokens with certain NER labels."""
+        return [t for t in doc if t.ent_type_ in ner_labels]
+
     def drop_tokens_with_ner(self, doc, ner_labels):
         """Drop tokens with certain NER labels."""
         return [t for t in doc if t.ent_type_ not in ner_labels]
