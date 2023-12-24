@@ -3,19 +3,60 @@
 from gensim.models.coherencemodel import CoherenceModel
 
 
-def compute_coherence(lda_model, tokenized_docs, dictionary):
-    """
-    Compute and return the coherence of an LDA model.
+def get_lda_topics_without_prob(lda_model):
+    """Return the `num_topics` topics of an LDA model without probabilities."""
+    num_topics = lda_model.num_topics
+    lda_topics = []
+    for topic_id in range(num_topics):
+        topic = lda_model.show_topic(topic_id)
+        topic_words = [word for (word, _) in topic]
+        lda_topics.append(topic_words)
 
-    Coherence measures the degree of similarity between high scoring
-    words. The higher the coherence score, the better.
-    """
-    coherence_model = CoherenceModel(model=lda_model,
-                                     texts=tokenized_docs,
-                                     dictionary=dictionary,
-                                     coherence='c_v')
+    return lda_topics
 
-    return coherence_model.get_coherence()
+
+def get_nmf_topics_without_prob(nmf_model):
+    """Return the `num_topics` topics of an NMF model without probabilities."""
+    num_topics = nmf_model.num_topics
+    nmf_topics = []
+    for topic_id in range(num_topics):
+        topic = nmf_model.show_topic(topic_id)
+        topic_words = [word for word, _ in topic]
+        nmf_topics.append(topic_words)
+
+    return nmf_topics
+
+
+def compute_coherence(topics,
+                      tokenized_docs,
+                      dictionary):
+    """
+    Compute the coherence of a topic model using c_v and u_mass.
+
+    Sliding window methods (e.g., 'c_v') do not require the corpus
+    but they require tokenized texts. 'u_mass' requires a corpus but
+    not tokenized texts. However, Gensim uses the dictionary and the
+    tokenized docs to generate the corpus if it is not provided.
+    Moreover, not having 'corpus' as an argument avoids the risk of
+    calculating the coherence score with TF-IDF vectors (TF-IDF
+    vectors might distort the co-occurrence information that u_mass
+    relies upon).
+
+    Roughly, while c_v favors topics that are distinct but maybe not
+    very specific, u_mass favors topics that are tightly focused but
+    possibly overlapping.
+    """
+    cm_cv = CoherenceModel(topics=topics,
+                           texts=tokenized_docs,
+                           dictionary=dictionary,
+                           coherence='c_v')
+
+    cm_umass = CoherenceModel(topics=topics,
+                              texts=tokenized_docs,
+                              dictionary=dictionary,
+                              coherence='u_mass')
+
+    return cm_cv.get_coherence(), cm_umass.get_coherence()
 
 
 def list_topics_for_bow_sorted(lda_model, bow):
