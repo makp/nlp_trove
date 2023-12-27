@@ -8,7 +8,7 @@ class FilterTokens:
 
     def __init__(self, min_length=1, max_length=15):
         """Initialize the FilterTokens class."""
-        self.custom_stopwords = set('would could may might account et al used also essay review paper examine important press mit aim'.split(' ')) # noqa
+        self.custom_stopwords = set('would could may might account et al used also essay review paper book chapter examine aim important press mit'.split(' ')) # noqa
         self.content_pos = {'NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV'}
         self.noun_pos = {'NOUN', 'PROPN'}
         self.min_length = min_length
