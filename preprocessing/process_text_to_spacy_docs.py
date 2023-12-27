@@ -11,7 +11,7 @@ class TextPreprocessor:
                  model="en_core_web_trf",
                  disable_pipes=None,
                  add_pipe=None,
-                 batch_size=50):
+                 batch_size=25):
         """Initialize the class."""
         self.nlp = spacy.load(model, disable=disable_pipes or [])
         if add_pipe:
