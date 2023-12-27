@@ -58,5 +58,5 @@ class TextCleaner:
             text = self.clean_html(text)
         text = self.normalize_text(text)
         text = self.replace_from_text(text)
-        text = tp.normalize.whitespace(text)
+        # text = tp.normalize.whitespace(text)
         return text
