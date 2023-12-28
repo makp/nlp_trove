@@ -3,6 +3,9 @@
 import html
 import textacy.preprocessing as tp
 from bs4 import BeautifulSoup, Comment
+import spacy
+import re
+from symspellpy.symspellpy import SymSpell
 
 
 class TextCleaner:
@@ -60,3 +63,52 @@ class TextCleaner:
         text = self.replace_from_text(text)
         # text = tp.normalize.whitespace(text)
         return text
+
+
+class SplitTokens:
+    """Class for splitting tokens."""
+
+    def __init__(self, path_data_dict):
+        """Initialize the SplitTokens class."""
+        # Define alphanumeric regex pattern
+        self.pattern = r"^[a-zA-Z0-9]+$"
+
+        # Initialize SymSpell
+        self.sym_spell = SymSpell()
+        self.sym_spell.create_dictionary(path_data_dict)
+
+        # Initialize spaCy model
+        self.nlp = spacy.load("en_core_web_trf",
+                              disable=["parser", "ner"])
+
+    def fix_word_segmentation(self, text, max_edit_distance=0):
+        """Fix word segmentation."""
+        # Tokenize text with spaCy
+        doc = self.nlp.make_doc(text)
+
+        # Create list to store tokens
+        lst_tokens = []
+
+        for t in doc:
+            # Check if t.text is alphanumeric
+            if re.match(self.pattern, t.text):
+
+                # Run SymSpell word segmentation
+                segmented_token = self.sym_spell.word_segmentation(
+                    t.text, max_edit_distance=max_edit_distance)
+
+                # Don't correct words and only accept segments if both
+                # words are in the dictionary
+                if (segmented_token.corrected_string.replace(" ", "") == t.text
+                    and all(part in self.sym_spell.words for
+                            part in segmented_token.corrected_string.split())):
+
+                    # Save segmented token
+                    lst_tokens.append(
+                        segmented_token.corrected_string + t.whitespace_)
+                else:
+                    lst_tokens.append(t.text + t.whitespace_)
+            else:
+                lst_tokens.append(t.text + t.whitespace_)
+
+        return "".join(lst_tokens)
