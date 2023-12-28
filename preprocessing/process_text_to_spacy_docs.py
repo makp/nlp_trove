@@ -10,12 +10,12 @@ class TextPreprocessor:
     def __init__(self,
                  model="en_core_web_trf",
                  disable_pipes=None,
-                 add_pipe=None,
+                 enable_pipe=None,
                  batch_size=25):
         """Initialize the class."""
         self.nlp = spacy.load(model, disable=disable_pipes or [])
-        if add_pipe:
-            self.nlp.add_pipe(add_pipe)
+        if enable_pipe:
+            self.nlp.add_pipe(enable_pipe)
         self.batch_size = batch_size
 
     def process_texts(self, texts):
