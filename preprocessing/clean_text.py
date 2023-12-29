@@ -107,7 +107,7 @@ class SplitTokens:
 
         for t in doc:
             # Check if t.text is alphanumeric
-            if re.match(self.pattern, t.text):
+            if (re.match(self.pattern, t.text) and (t.text not in self.sym_spell.words)):
 
                 # Run SymSpell word segmentation
                 segmented_token = self.sym_spell.word_segmentation(
