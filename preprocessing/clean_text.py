@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup, Comment
 import spacy
 import re
 from symspellpy.symspellpy import SymSpell
+import pkg_resources
 
 
 class TextCleaner:
@@ -68,18 +69,30 @@ class TextCleaner:
 class SplitTokens:
     """Class for splitting tokens."""
 
-    def __init__(self, path_data_dict):
+    # Dictionary shipped with symspellpy
+    path = pkg_resources.resource_filename(
+        "symspellpy", "frequency_dictionary_en_82_765.txt")
+
+    def __init__(self, path_dict=path):
         """Initialize the SplitTokens class."""
         # Define alphanumeric regex pattern
         self.pattern = r"^[a-zA-Z0-9]+$"
 
         # Initialize SymSpell
         self.sym_spell = SymSpell()
-        self.sym_spell.create_dictionary(path_data_dict)
+        self.sym_spell.load_dictionary(
+            path_dict, term_index=0, count_index=1)
 
         # Initialize spaCy model
         self.nlp = spacy.load("en_core_web_trf",
                               disable=["parser", "ner"])
+
+    def update_dictionary(self, text):
+        """Use text to update SymSpell dictionary."""
+        doc = self.nlp.make_doc(text)
+        for t in doc:
+            if (t.is_alpha and len(t.text) > 1):
+                self.sym_spell.create_dictionary_entry(t.text, 1)
 
     def fix_word_segmentation(self, text, max_edit_distance=0):
         """Fix word segmentation."""
