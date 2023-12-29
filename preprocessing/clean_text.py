@@ -80,8 +80,11 @@ class SplitTokens:
 
         # Initialize SymSpell
         self.sym_spell = SymSpell()
-        self.sym_spell.load_dictionary(
-            path_dict, term_index=0, count_index=1)
+        if self.sym_spell.load_dictionary(
+                path_dict, term_index=0, count_index=1):
+            print("Dictionary loaded.")
+        else:
+            print("Dictionary failed to loaded.")
 
         # Initialize spaCy model
         self.nlp = spacy.load("en_core_web_trf",
