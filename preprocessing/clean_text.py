@@ -2,6 +2,7 @@
 
 import html
 import textacy.preprocessing as tp
+from functools import partial
 from bs4 import BeautifulSoup, Comment
 import spacy
 import re
@@ -22,11 +23,26 @@ class TextCleaner:
             tp.remove.accents)
 
         self.replace_from_text = tp.make_pipeline(
-            tp.replace.urls,
-            tp.replace.emails,
-            tp.replace.phone_numbers,
-            tp.replace.numbers,
-            tp.replace.currency_symbols)
+            partial(tp.replace.urls, repl=" _URL_ "),
+            partial(tp.replace.emails, repl=" _EMAIL_ "),
+            partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
+            # partial(tp.replace.numbers, repl=""),
+            partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "))
+
+    def remove_numbers_before(self, text):
+        """Replace numbers before non-digits with a space."""
+        pattern = r"(\d+)([^\d\s]+)"
+        # '(\d+)' matches one or more digits
+        # '([^\d\s]+)' matches one or more non-digit and
+        # non-whitespace
+        text = re.sub(pattern, r' \2', text)
+        return text
+
+    def remove_numbers_after(self, text):
+        """Replace numbers after non-digits with a space."""
+        pattern = r"([^\d\s]+)(\d+)"
+        text = re.sub(pattern, r'\1 ', text)
+        return text
 
     def clean_html(self, text):
         """Clean HTML text."""
@@ -49,22 +65,20 @@ class TextCleaner:
 
         return text
 
-    def clean_text(self, text, is_html=False):
+    def aggressive_clean(self, text, is_html=False):
         """
-        Clean text.
+        More aggressive cleaning.
 
-        Main steps:
-        - Normalize text
-        - Replace certain types of text (e.g. URLs, emails, phone
-          numbers).
+        Steps:
+        - Normalize text.
+        - Replace certain types of text (e.g. URLs, emails,
+          and phone numbers).
+        - Normalize whitespace.
         """
         if is_html:
             text = self.clean_html(text)
         text = self.normalize_text(text)
-        # text = self.replace_from_text(text)
-        # text = tp.normalize.whitespace(text)
-        return text
-
+        text = self.replace_from_text(text)
 
 class SplitTokens:
     """Class for splitting tokens."""
@@ -126,5 +140,5 @@ class SplitTokens:
                     lst_tokens.append(t.text + t.whitespace_)
             else:
                 lst_tokens.append(t.text + t.whitespace_)
-
-        return "".join(lst_tokens)
+        text = self.remove_numbers_before_words(text)
+        return tp.normalize.whitespace(text)
