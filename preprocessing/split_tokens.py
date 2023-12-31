@@ -28,7 +28,7 @@ class SplitTokens:
 
     def update_dictionary(self, text):
         """Use text to update SymSpell dictionary."""
-        doc = self.nlp(text)
+        doc = self.nlp.make_doc(text)
         for t in doc:
             # Check whether t is alpha and longer than 1 char
             if (t.is_alpha and len(t.text) > 1):
@@ -37,7 +37,7 @@ class SplitTokens:
     def fix_word_segmentation(self, text, max_edit_distance=0):
         """Fix word segmentation."""
         # Tokenize text with spaCy
-        doc = self.nlp.make_doc(text)
+        doc = self.nlp(text)
 
         # Create list to store tokens
         lst_tokens = []
