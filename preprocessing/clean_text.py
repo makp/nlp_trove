@@ -41,6 +41,10 @@ class TextCleaner:
         text = re.sub(pattern, r'\1 ', text)
         return text
 
+    def surround_non_alpha_with_spaces(self, text):
+        """Surround non-alphabetic characters within words with spaces."""
+        return re.sub(r"(\w)([^a-zA-Z\s-]+)(\w)", r"\1 \2 \3", text)
+
     def clean_html(self, text):
         """Clean HTML text."""
         text = html.unescape(text)  # convert html escape to characters
@@ -78,4 +82,5 @@ class TextCleaner:
         text = self.replace_from_text(text)
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
+        text = self.surround_non_alpha_with_spaces(text)
         return tp.normalize.whitespace(text)
