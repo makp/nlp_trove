@@ -42,8 +42,9 @@ html_1 = """
 </head>
 <body>
     <!-- This is a comment that should be removed -->
-    <h1>Biology and Philosophy: An Introduction</h1>
-    <p>Understanding the <strong>philosophy</strong> of biology can
+    <h1>Biology and Philosophy: An Introduction</h1><p>
+Understanding the
+<strong>philosophy</strong> of biology can
     enrich the way we study and perceive life.</p>
     <p class="important">&copy; 2023 Philosophy Studies</p>
     <script type="text/javascript">
@@ -89,6 +90,3 @@ html_2 = """
 
 print(tc.clean_html(html_1))
 print(tc.clean_html(html_2))
-
-print(tc.clean_text(html_1, is_html=True))
-print(tc.clean_text(html_2, is_html=True))
