@@ -57,15 +57,8 @@ class TextCleaner:
                 string=lambda t: isinstance(t, Comment)):
             comment.extract()  # comment doesn't have decompose() method
 
-        # insert space between tags to avoid merging words
-        block_tags = ['p', 'br', 'hr', 'tr', 'div', 'ul', 'ol', 'li',
-                      'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-        for tag in soup.find_all(block_tags):
-            tag.insert_after(" ")
-            tag.unwrap()
-
-        # get untagged text
-        text = ' '.join(soup.stripped_strings)
+        # get text and add a space between tags
+        text = soup.get_text(" ")
 
         return text
 
