@@ -23,15 +23,14 @@ class SplitTokens:
             print("Dictionary failed to loaded.")
 
         # Initialize spaCy model
-        self.nlp = spacy.load("en_core_web_trf",
-                              disable=["parser", "ner"])
+        self.nlp = spacy.load("en_core_web_trf")
 
     def update_dictionary(self, text):
         """Use text to update SymSpell dictionary."""
         doc = self.nlp.make_doc(text)
         for t in doc:
-            # Check whether t is alpha and longer than 1 char
-            if (t.is_alpha and len(t.text) > 1):
+            # Check whether t is alpha and longer than 2 chars
+            if (t.is_alpha and len(t.text) > 2):
                 self.sym_spell.create_dictionary_entry(t.text, 1)
 
     def fix_word_segmentation(self, text, max_edit_distance=0):
