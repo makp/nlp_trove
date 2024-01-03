@@ -6,7 +6,7 @@ from vectorization.sparse_vectorization import build_tfidf_vectors
 class FilterTokens:
     """Class for filtering tokens."""
 
-    def __init__(self, min_length=1, max_length=15):
+    def __init__(self, min_length=1, max_length=18):
         """Initialize the FilterTokens class."""
         self.custom_stopwords = {
             'account',
@@ -16,6 +16,7 @@ class FilterTokens:
             'chapter',
             'department',
             'essay',
+            'scientist',
             'et',
             'al',
             'examine',
