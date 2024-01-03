@@ -22,9 +22,17 @@ class TextCleaner:
         self.replace_from_text = tp.make_pipeline(
             partial(tp.replace.urls, repl=" _URL_ "),
             partial(tp.replace.emails, repl=" _EMAIL_ "),
-            partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
+            # partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
             # partial(tp.replace.numbers, repl=""),
             partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "))
+
+    def add_space_after_punctuation(self, text):
+        """Add a space after punctuation symbols."""
+        return re.sub(r"([.,;!?])(\w)", r"\1 \2", text)
+
+    def surround_suspicious_chars_with_spaces(self, text):
+        """Surround suspicious characters within words with spaces."""
+        return re.sub(r"(\w)([^a-zA-Z\s-]+)(\w)", r"\1 \2 \3", text)
 
     def remove_numbers_before(self, text):
         """Replace numbers before non-digits with a space."""
@@ -40,10 +48,6 @@ class TextCleaner:
         pattern = r"([^\d\s]+)(\d+)"
         text = re.sub(pattern, r'\1 ', text)
         return text
-
-    def surround_non_alpha_with_spaces(self, text):
-        """Surround non-alphabetic characters within words with spaces."""
-        return re.sub(r"(\w)([^a-zA-Z\s-]+)(\w)", r"\1 \2 \3", text)
 
     def clean_html(self, text):
         """Clean HTML text."""
@@ -66,7 +70,7 @@ class TextCleaner:
 
         return text
 
-    def aggressive_clean(self, text, is_html=False):
+    def aggressive_clean(self, text):
         """
         More aggressive cleaning.
 
@@ -76,11 +80,12 @@ class TextCleaner:
           and phone numbers).
         - Normalize whitespace.
         """
-        if is_html:
-            text = self.clean_html(text)
         text = self.normalize_text(text)
         text = self.replace_from_text(text)
+
+        # Help tokenizer by adding spaces
+        text = self.add_space_after_punctuation(text)
+        text = self.surround_suspicious_chars_with_spaces(text)
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
-        text = self.surround_non_alpha_with_spaces(text)
         return tp.normalize.whitespace(text)
