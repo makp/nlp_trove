@@ -58,6 +58,12 @@ class TextCleaner:
         text = re.sub(pattern, r"\1 ", text)
         return text
 
+    def remove_hyphens(self, text):
+        """Remove hyphens between words."""
+        pattern = self.RE_TOKEN + r"-" + self.RE_TOKEN
+        text = re.sub(pattern, r"\1\2", text)
+        return text
+
     def clean_html(self, text):
         """Clean HTML text."""
         text = html.unescape(text)  # convert html escape to characters
@@ -97,4 +103,5 @@ class TextCleaner:
         text = self.surround_suspicious_chars_with_spaces(text)
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
+        text = self.remove_hyphens(text)
         return tp.normalize.whitespace(text)
