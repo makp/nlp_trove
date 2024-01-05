@@ -43,9 +43,12 @@ class TextCleaner:
         return re.sub(pattern, r"\1 \2 \3", text)
 
     def remove_numbers_before(self, text):
-        """Replace numbers before non-digits with a space."""
-        pattern = r"(\d+)" + self.RE_TOKEN
-        # '(\d+)' matches one or more digits
+        """
+        Replace numbers before non-digits with a space.
+
+        But only replace if there are at least two alphabetic characters.
+        """
+        pattern = r"(\d+)(?=" + self.RE_TOKEN + r")" + self.RE_TOKEN + r"{2,}"
         text = re.sub(pattern, r" \2", text)
         return text
 
