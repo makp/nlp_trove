@@ -12,6 +12,12 @@ class TextCleaner:
 
     def __init__(self):
         """Initialize the TextCleaner class."""
+        # Regexes
+        self.RE_SUSPICIOUS = r"([^a-zA-Z\s-]+)"
+        # Alternatives: '[&#<>{}\[\]\\]+' or '\W+'
+        self.RE_TOKEN = r"([a-zA-Z]+(?:-[a-zA-Z]+)*)"
+        self.RE_PUNCT = r"([.,;!?])"
+
         self.normalize_text = tp.make_pipeline(
             tp.normalize.bullet_points,
             tp.normalize.hyphenated_words,  # reattach separated by line breaks
@@ -28,25 +34,25 @@ class TextCleaner:
 
     def add_space_after_punctuation(self, text):
         """Add a space after punctuation symbols."""
-        return re.sub(r"([.,;!?])(\w)", r"\1 \2", text)
+        pattern = f"{self.RE_PUNCT}{self.RE_TOKEN}"
+        return re.sub(pattern, r"\1 \2", text)
 
     def surround_suspicious_chars_with_spaces(self, text):
         """Surround suspicious characters within words with spaces."""
-        return re.sub(r"(\w)([^a-zA-Z\s-]+)(\w)", r"\1 \2 \3", text)
+        pattern = f"{self.RE_TOKEN}{self.RE_SUSPICIOUS}{self.RE_TOKEN}"
+        return re.sub(pattern, r"\1 \2 \3", text)
 
     def remove_numbers_before(self, text):
         """Replace numbers before non-digits with a space."""
-        pattern = r"(\d+)([^\d\s]+)"
+        pattern = r"(\d+)" + self.RE_TOKEN
         # '(\d+)' matches one or more digits
-        # '([^\d\s]+)' matches one or more non-digit and
-        # non-whitespace
-        text = re.sub(pattern, r' \2', text)
+        text = re.sub(pattern, r" \2", text)
         return text
 
     def remove_numbers_after(self, text):
         """Replace numbers after non-digits with a space."""
-        pattern = r"([^\d\s]+)(\d+)"
-        text = re.sub(pattern, r'\1 ', text)
+        pattern = self.RE_TOKEN + r"(\d+)"
+        text = re.sub(pattern, r"\1 ", text)
         return text
 
     def clean_html(self, text):
