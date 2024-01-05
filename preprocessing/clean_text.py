@@ -13,7 +13,7 @@ class TextCleaner:
     def __init__(self):
         """Initialize the TextCleaner class."""
         # Regexes
-        self.RE_SUSPICIOUS = r"([^a-zA-Z\s-]+)"
+        self.RE_SUSPICIOUS = r"([^a-zA-Z'\s-]+)"
         # Alternatives: '[&#<>{}\[\]\\]+' or '\W+'
         self.RE_TOKEN = r"([a-zA-Z]+(?:-[a-zA-Z]+)*)"
         self.RE_PUNCT = r"([.,;!?])"
