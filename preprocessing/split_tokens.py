@@ -33,7 +33,7 @@ class SplitTokens:
             if (t.is_alpha and (18 > len(t.text) > 2)):
                 self.sym_spell.create_dictionary_entry(t.text, 1)
 
-    def fix_word_segmentation(self, text, max_edit_distance=0):
+    def fix_word_segmentation(self, text):
         """Fix word segmentation."""
         # Tokenize text with spaCy
         doc = self.nlp(text)
@@ -46,15 +46,14 @@ class SplitTokens:
                (t.ent_type == 0) and  # not an entity
                (t.lemma_.lower() not in self.sym_spell.words)):
 
-                # Run SymSpell word segmentation
+                # Run SymSpell word segmentation but don't correct words
                 seg_token = self.sym_spell.word_segmentation(
-                    t.text, max_edit_distance=max_edit_distance)
+                    t.text, max_edit_distance=0)
 
-                # Don't correct words and only accept segments if all
-                # segments are in the dictionary
-                if (seg_token.corrected_string.replace(" ", "") == t.text
-                    and all(part in self.sym_spell.words for
-                            part in seg_token.corrected_string.split())):
+                # Only accept segments if all of them are in the dictionary
+                if all(part in self.sym_spell.words for
+                       part in seg_token.corrected_string.split()):
+                    # (seg_token.corrected_string.replace(" ", "") == t.text)
 
                     # Save segmented token
                     lst_tokens.append(
