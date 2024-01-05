@@ -63,7 +63,8 @@ class SplitTokens:
                         seg_token.corrected_string + t.whitespace_)
                 else:
                     if len(t.text) > 20:
-                        with open("long_tokens.txt", "a") as f:
+                        with open("long_tokens.txt", "a",
+                                  encoding='utf-8') as f:
                             f.write(t.text + "\n")
                     lst_tokens.append(t.text_with_ws)
             else:
