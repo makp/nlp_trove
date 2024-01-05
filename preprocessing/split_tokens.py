@@ -12,6 +12,9 @@ class SplitTokens:
     path = pkg_resources.resource_filename(
         "symspellpy", "frequency_dictionary_en_82_765.txt")
 
+    # Tell whether GPU is available
+    print("GPU available:", spacy.prefer_gpu())
+
     def __init__(self, path_dict=path):
         """Initialize the SplitTokens class."""
         # Set up SymSpell
