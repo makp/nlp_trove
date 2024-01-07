@@ -7,6 +7,9 @@ from spacy.tokens import DocBin
 class TextPreprocessor:
     """Preprocess text data to spaCy docs."""
 
+    # Confirm GPU availability
+    print("GPU available:", spacy.prefer_gpu())
+
     def __init__(self,
                  model="en_core_web_trf",
                  disable_pipes=None,
@@ -20,8 +23,8 @@ class TextPreprocessor:
 
     def process_texts(self, texts):
         """Return a generator of spaCy Doc objects."""
-        for doc in self.nlp.pipe(texts,
-                                 batch_size=self.batch_size):
+        for doc in self.nlp.pipe(
+                texts, batch_size=self.batch_size):
             yield doc
 
     def serialize_docs(self, docs, output_path):
