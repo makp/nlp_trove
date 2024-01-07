@@ -34,7 +34,7 @@ class TextCleaner:
 
     def add_space_after_punctuation(self, text):
         """Add a space after punctuation symbols."""
-        pattern = f"{self.RE_PUNCT}{self.RE_TOKEN}"
+        pattern = fr"{self.RE_PUNCT}(\w+)"
         return re.sub(pattern, r"\1 \2", text)
 
     def surround_suspicious_chars_with_spaces(self, text):
