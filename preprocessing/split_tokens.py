@@ -53,19 +53,16 @@ class SplitTokens:
                 seg_token = self.sym_spell.word_segmentation(
                     t.text, max_edit_distance=0)
 
-                # Only accept segments if all of them are in the dictionary
-                if all(part in self.sym_spell.words for
-                       part in seg_token.corrected_string.split()):
-                    # (seg_token.corrected_string.replace(" ", "") == t.text)
+                # Segments in the dictionary?
+                segs_in_dict = all(part in self.sym_spell.words for
+                                   part in seg_token.corrected_string.split())
 
-                    # Save segmented token
+                if segs_in_dict or (len(t.text) > 20):
+                    # Save segmented tokens
                     lst_tokens.append(
                         seg_token.corrected_string + t.whitespace_)
                 else:
-                    if len(t.text) > 20:
-                        with open("long_tokens.txt", "a",
-                                  encoding='utf-8') as f:
-                            f.write(t.text + "\n")
+                    # Save original token
                     lst_tokens.append(t.text_with_ws)
             else:
                 lst_tokens.append(t.text_with_ws)
