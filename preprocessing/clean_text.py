@@ -16,7 +16,7 @@ class TextCleaner:
         self.RE_SUSPICIOUS = r"([^a-zA-Z'\s-]+)"
         # Alternatives: '[&#<>{}\[\]\\]+' or '\W+'
         self.RE_TOKEN = r"([a-zA-Z]+(?:-[a-zA-Z]+)*)"
-        self.RE_PUNCT = r"([.,;!?])"
+        self.RE_PUNCT = r"([.,;!?\)])"
 
         self.normalize_text = tp.make_pipeline(
             tp.normalize.bullet_points,
