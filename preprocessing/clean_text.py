@@ -64,6 +64,17 @@ class TextCleaner:
         text = re.sub(pattern, r"\1\2", text)
         return text
 
+    def handle_apostrophes(self, text):
+        """Handle apostrophes."""
+        # Replace apostrophes in possessive nouns
+        pattern_a = self.RE_TOKEN + r"(s')|('s)" + self.RE_TOKEN
+        text = re.sub(pattern_a, r"\1\2 \3", text)
+
+        # Replace apostrophes when there is more than one
+        pattern_b = self.RE_TOKEN + r"('{2,})" + self.RE_TOKEN
+        text = re.sub(pattern_b, r"\1 \3", text)
+        return text
+
     def clean_html(self, text):
         """Clean HTML text."""
         text = html.unescape(text)  # convert html escape to characters
@@ -89,11 +100,8 @@ class TextCleaner:
         """
         More aggressive cleaning.
 
-        Steps:
-        - Normalize text.
-        - Replace certain types of text (e.g. URLs, emails,
-          and phone numbers).
-        - Normalize whitespace.
+        This function is supposed to improve the quality of texts
+        containing words that are incorrectly concatenated.
         """
         text = self.normalize_text(text)
         text = self.replace_from_text(text)
@@ -104,4 +112,5 @@ class TextCleaner:
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
         text = self.remove_hyphens(text)
+        text = self.handle_apostrophes(text)
         return tp.normalize.whitespace(text)
