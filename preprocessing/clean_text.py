@@ -37,6 +37,11 @@ class TextCleaner:
         pattern = fr"{self.RE_PUNCT}(\w+)"
         return re.sub(pattern, r"\1 \2", text)
 
+    def add_space_before_delimiters(self, text):
+        """Add a space before delimiters."""
+        pattern = r"(\w+)([\[\(])"
+        return re.sub(pattern, r"\1 \2", text)
+
     def surround_suspicious_chars_with_spaces(self, text):
         """Surround suspicious characters within words with spaces."""
         pattern = f"{self.RE_TOKEN}{self.RE_SUSPICIOUS}{self.RE_TOKEN}"
@@ -103,6 +108,7 @@ class TextCleaner:
 
         # Help tokenizer by adding spaces
         text = self.add_space_after_punctuation(text)
+        text = self.add_space_before_delimiters(text)
         text = self.surround_suspicious_chars_with_spaces(text)
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
