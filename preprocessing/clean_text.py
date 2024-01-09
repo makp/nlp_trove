@@ -64,16 +64,10 @@ class TextCleaner:
         text = re.sub(pattern, r"\1\2", text)
         return text
 
-    def handle_apostrophes(self, text):
-        """Handle apostrophes."""
-        # Replace apostrophes in possessive nouns
-        pattern_a = self.RE_TOKEN + r"(s')|('s)" + self.RE_TOKEN
-        text = re.sub(pattern_a, r"\1\2 \3", text)
-
-        # Replace apostrophes when there is more than one
-        pattern_b = self.RE_TOKEN + r"('{2,})" + self.RE_TOKEN
-        text = re.sub(pattern_b, r"\1 \3", text)
-        return text
+    def remove_quotes_and_apostrophes(self, text):
+        """Replace quotes and apostrophes with a space."""
+        pattern = r"['\"]+"
+        return re.sub(pattern, r" ", text)
 
     def clean_html(self, text):
         """Clean HTML text."""
@@ -112,5 +106,5 @@ class TextCleaner:
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
         text = self.remove_hyphens(text)
-        text = self.handle_apostrophes(text)
+        text = self.remove_quotes_and_apostrophes(text)
         return tp.normalize.whitespace(text)
