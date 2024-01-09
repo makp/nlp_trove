@@ -15,8 +15,12 @@ class FilterTokens:
             'book',
             'chapter',
             'department',
+            'university',
+            'school',
+            'email',
             'essay',
             'scientist',
+            'referee',
             'et',
             'al',
             'examine',
@@ -27,7 +31,6 @@ class FilterTokens:
             'paper',
             'press',
             'review',
-            'university',
             'used',
             'would'}
         self.content_pos = {'NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV'}
@@ -51,7 +54,7 @@ class FilterTokens:
                   token.is_alpha and
                   (not remove_stop or
                    (not token.is_stop and
-                    token.text not in self.custom_stopwords)) and
+                    token.text.lower() not in self.custom_stopwords)) and
                   self.min_length < len(token.lemma_) <= self.max_length
                   ]
         return tokens
