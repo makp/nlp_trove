@@ -59,10 +59,11 @@ class TextCleaner:
         return text
 
     def remove_hyphens(self, text):
-        """Remove hyphens between words."""
-        pattern = self.RE_TOKEN + r"-" + self.RE_TOKEN
-        text = re.sub(pattern, r"\1\2", text)
-        return text
+        """Remove hyphens."""
+        # pattern = self.RE_TOKEN + r"-" + self.RE_TOKEN
+        # text = re.sub(pattern, r"\1\2", text)
+        pattern = r"-+"
+        return re.sub(pattern, "", text)
 
     def remove_quotes_and_apostrophes(self, text):
         """Replace quotes and apostrophes with a space."""
