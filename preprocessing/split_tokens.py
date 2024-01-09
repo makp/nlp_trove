@@ -36,9 +36,24 @@ class SplitTokens:
             if (t.is_alpha and (18 > len(t.text) > 2)):
                 self.sym_spell.create_dictionary_entry(t.text, 1)
 
-    def fix_word_segmentation(self, text):
+    def prudent_segment(self, token):
+        """Prudent word segmentation on a spaCy Token."""
+        # Run SymSpell word segmentation but don't correct words
+        seg_token = self.sym_spell.word_segmentation(
+            token.text, max_edit_distance=0)
+
+        # Segments in the dictionary?
+        segs_in_dict = all(part in self.sym_spell.words for
+                           part in seg_token.corrected_string.split())
+
+        if segs_in_dict or (len(token.text) > 20):
+            return seg_token.corrected_string + token.whitespace_
+        else:
+            return token.text_with_ws
+
+    def fix_word_segmentation(self, text, cautious=True):
         """Fix word segmentation."""
-        # Tokenize text with spaCy
+        # Process text with spaCy
         doc = self.nlp(text)
 
         # Create list to store tokens
@@ -48,22 +63,12 @@ class SplitTokens:
             if (t.is_alpha and
                (t.ent_type == 0) and  # not an entity
                (t.lemma_.lower() not in self.sym_spell.words)):
-
-                # Run SymSpell word segmentation but don't correct words
-                seg_token = self.sym_spell.word_segmentation(
-                    t.text, max_edit_distance=0)
-
-                # Segments in the dictionary?
-                segs_in_dict = all(part in self.sym_spell.words for
-                                   part in seg_token.corrected_string.split())
-
-                if segs_in_dict or (len(t.text) > 20):
-                    # Save segmented tokens
+                if cautious:
+                    lst_tokens.append(self.prudent_segment(t))
+                else:
+                    seg_token = self.sym_spell.word_segmentation(t.text)
                     lst_tokens.append(
                         seg_token.corrected_string + t.whitespace_)
-                else:
-                    # Save original token
-                    lst_tokens.append(t.text_with_ws)
             else:
                 lst_tokens.append(t.text_with_ws)
 
