@@ -39,7 +39,7 @@ class TextCleaner:
 
     def add_space_before_delimiters(self, text):
         """Add a space before delimiters."""
-        pattern = r"(\w+)([\[\(])"
+        pattern = r"(\w+)([\[\(/])"
         return re.sub(pattern, r"\1 \2", text)
 
     def surround_suspicious_chars_with_spaces(self, text):
