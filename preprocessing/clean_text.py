@@ -44,7 +44,7 @@ class TextCleaner:
 
     def surround_suspicious_chars_with_spaces(self, text):
         """Surround suspicious characters within words with spaces."""
-        pattern = f"{self.RE_TOKEN}{self.RE_SUSPICIOUS}{self.RE_TOKEN}"
+        pattern = fr"(\w+){self.RE_SUSPICIOUS}(\w+)"
         return re.sub(pattern, r"\1 \2 \3", text)
 
     def remove_numbers_before(self, text):
@@ -67,7 +67,7 @@ class TextCleaner:
         """Remove hyphens."""
         # pattern = self.RE_TOKEN + r"-" + self.RE_TOKEN
         # text = re.sub(pattern, r"\1\2", text)
-        pattern = r"-+"
+        pattern = r"-+|‐+"
         return re.sub(pattern, "", text)
 
     def remove_quotes_and_apostrophes(self, text):
