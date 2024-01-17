@@ -44,7 +44,7 @@ class TextCleaner:
 
     def surround_suspicious_chars_with_spaces(self, text):
         """Surround suspicious characters within words with spaces."""
-        pattern = fr"(\w+){self.RE_SUSPICIOUS}(\w+)"
+        pattern = f"{self.RE_TOKEN}{self.RE_SUSPICIOUS}{self.RE_TOKEN}"
         return re.sub(pattern, r"\1 \2 \3", text)
 
     def remove_numbers_before(self, text):
