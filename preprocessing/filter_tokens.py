@@ -6,7 +6,7 @@ from vectorization.sparse_vectorization import build_tfidf_vectors
 class FilterTokens:
     """Class for filtering tokens."""
 
-    def __init__(self, min_length=1, max_length=20):
+    def __init__(self, min_length=2, max_length=20):
         """Initialize the FilterTokens class."""
         self.custom_stopwords = {
             'account',
@@ -54,8 +54,8 @@ class FilterTokens:
                   token.is_alpha and
                   (not remove_stop or
                    (not token.is_stop and
-                    token.text.lower() not in self.custom_stopwords)) and
-                  self.min_length < len(token.lemma_) <= self.max_length
+                    token.lemma_.lower() not in self.custom_stopwords)) and
+                  self.min_length <= len(token.lemma_) <= self.max_length
                   ]
         return tokens
 
