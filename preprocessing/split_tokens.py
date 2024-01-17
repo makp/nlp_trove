@@ -38,11 +38,11 @@ class SplitTokens:
 
     def prudent_segment(self, token):
         """Prudent word segmentation on a spaCy Token."""
-        # Run SymSpell word segmentation but don't correct words
+        # Run word segmentation but don't correct words
         seg_token = self.sym_spell.word_segmentation(
-            token.text, max_edit_distance=0)
+            token.lemma_, max_edit_distance=0)
 
-        # Segments in the dictionary?
+        # All segments in the dictionary?
         segs_in_dict = all(part in self.sym_spell.words for
                            part in seg_token.corrected_string.split())
 
