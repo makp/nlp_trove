@@ -40,7 +40,7 @@ class SplitTokens:
         """Prudent word segmentation on a spaCy Token."""
         # Run word segmentation without correcting words
         seg_token = self.sym_spell.word_segmentation(
-            token.lemma_, max_edit_distance=0)
+            token.text, max_edit_distance=0)
 
         # Are all segments in the dictionary?
         segs_in_dict = all(part in self.sym_spell.words for
@@ -66,7 +66,7 @@ class SplitTokens:
                 if cautious:
                     lst_tokens.append(self.prudent_segment(t))
                 else:
-                    seg_token = self.sym_spell.word_segmentation(t.lemma_)
+                    seg_token = self.sym_spell.word_segmentation(t.text)
                     lst_tokens.append(
                         seg_token.corrected_string + t.whitespace_)
             else:
