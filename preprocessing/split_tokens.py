@@ -66,7 +66,7 @@ class SplitTokens:
                 if cautious:
                     lst_tokens.append(self.prudent_segment(t))
                 else:
-                    seg_token = self.sym_spell.word_segmentation(t.text)
+                    seg_token = self.sym_spell.word_segmentation(t.lemma_)
                     lst_tokens.append(
                         seg_token.corrected_string + t.whitespace_)
             else:
