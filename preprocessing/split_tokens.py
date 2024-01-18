@@ -33,16 +33,16 @@ class SplitTokens:
         doc = self.nlp.make_doc(text)
         for t in doc:
             # Check whether t is alpha and has a reasonable length
-            if (t.is_alpha and (18 > len(t.text) > 2)):
+            if (t.is_alpha and (20 > len(t.text) > 2)):
                 self.sym_spell.create_dictionary_entry(t.text, 1)
 
     def prudent_segment(self, token):
         """Prudent word segmentation on a spaCy Token."""
-        # Run word segmentation but don't correct words
+        # Run word segmentation without correcting words
         seg_token = self.sym_spell.word_segmentation(
             token.lemma_, max_edit_distance=0)
 
-        # All segments in the dictionary?
+        # Are all segments in the dictionary?
         segs_in_dict = all(part in self.sym_spell.words for
                            part in seg_token.corrected_string.split())
 
