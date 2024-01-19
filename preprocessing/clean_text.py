@@ -53,8 +53,8 @@ class TextCleaner:
 
         But only replace if there are at least two alphabetic characters.
         """
-        pattern = r"(\d+)(?=" + self.RE_TOKEN + r")" + self.RE_TOKEN + r"{2,}"
-        text = re.sub(pattern, r" \2", text)
+        pattern = r"\d+([a-zA-Z]{2,})"
+        text = re.sub(pattern, r" \1", text)
         return text
 
     def remove_numbers_after(self, text):
