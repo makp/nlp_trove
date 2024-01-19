@@ -64,16 +64,25 @@ class TextCleaner:
         return text
 
     def remove_hyphens(self, text):
-        """Remove hyphens."""
-        # pattern = self.RE_TOKEN + r"-" + self.RE_TOKEN
-        # text = re.sub(pattern, r"\1\2", text)
+        """Replace hyphens with space."""
         pattern = r"-+|‐+"
-        return re.sub(pattern, "", text)
+        return re.sub(pattern, " ", text)
 
     def remove_quotes_and_apostrophes(self, text):
         """Replace quotes and apostrophes with a space."""
         pattern = r"['\"]+"
         return re.sub(pattern, r" ", text)
+
+    def use_uppercase_to_split_words(self, text):
+        """
+        Use uppercase to separate words.
+
+        Make sure the capital letter is preceded by a lowercase
+        letter before adding space. Accordingly, this function
+        incorrectly split words such as `iPhone`.
+        """
+        pattern = r"([a-z])([A-Z])"
+        return re.sub(pattern, r"\1 \2", text)
 
     def clean_html(self, text):
         """Clean HTML text."""
@@ -114,4 +123,5 @@ class TextCleaner:
         text = self.remove_numbers_after(text)
         text = self.remove_hyphens(text)
         text = self.remove_quotes_and_apostrophes(text)
+        text = self.use_uppercase_to_split_words(text)
         return tp.normalize.whitespace(text)
