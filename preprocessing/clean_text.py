@@ -12,12 +12,6 @@ class TextCleaner:
 
     def __init__(self):
         """Initialize the TextCleaner class."""
-        # Regexes
-        self.RE_SUSPICIOUS = r"([^a-zA-Z'\s-]+)"
-        # Alternatives: '[&#<>{}\[\]\\]+' or '\W+'
-        self.RE_TOKEN = r"([a-zA-Z]+(?:-[a-zA-Z]+)*)"
-        self.RE_PUNCT = r"([.,;:!?\)\]])"
-
         self.normalize_text = tp.make_pipeline(
             tp.normalize.bullet_points,
             tp.normalize.hyphenated_words,  # reattach separated by line breaks
@@ -32,14 +26,51 @@ class TextCleaner:
             # partial(tp.replace.numbers, repl=""),
             partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "))
 
-    def add_space_after_punctuation(self, text):
-        """Add a space after punctuation symbols."""
-        pattern = fr"{self.RE_PUNCT}(\w+)"
+    def clean_html(self, text):
+        """Clean HTML text."""
+        text = html.unescape(text)  # convert html escape to characters
+
+        # parse HTML
+        soup = BeautifulSoup(text, 'lxml')
+
+        # remove certain tags
+        for tag in soup(["script", "style"]):
+            tag.decompose()
+
+        # remove comments
+        for comment in soup.find_all(
+                string=lambda t: isinstance(t, Comment)):
+            comment.extract()  # comment doesn't have decompose() method
+
+        # get text and add a space between tags
+        text = soup.get_text(" ")
+
+        return text
+
+    def clean_text(self, text):
+        """Clean text."""
+        text = self.normalize_text(text)
+        text = self.replace_from_text(text)
+        return tp.normalize.whitespace(text)
+
+
+class TextSplitter:
+    """Class for splitting text by using regexes."""
+
+    def __init__(self):
+        """Initialize the TextSplitter class."""
+        # Regexes
+        self.RE_SUSPICIOUS = r"([^a-zA-Z'\s-]+)"
+        self.RE_TOKEN = r"([a-zA-Z]+(?:-[a-zA-Z]+)*)"
+
+    def add_space_after(self, text):
+        """Add a space after certain symbols."""
+        pattern = r"([.,;:!?\)\]/]+)(\w+)"
         return re.sub(pattern, r"\1 \2", text)
 
-    def add_space_before_delimiters(self, text):
-        """Add a space before delimiters."""
-        pattern = r"(\w+)([\[\(/])"
+    def add_space_before(self, text):
+        """Add a space before certain symbols."""
+        pattern = r"(\w+)([\[\(/]+)"
         return re.sub(pattern, r"\1 \2", text)
 
     def surround_suspicious_chars_with_spaces(self, text):
@@ -59,7 +90,7 @@ class TextCleaner:
 
     def remove_numbers_after(self, text):
         """Replace numbers after non-digits with a space."""
-        pattern = self.RE_TOKEN + r"(\d+)"
+        pattern = self.RE_TOKEN + r"\d+"
         text = re.sub(pattern, r"\1 ", text)
         return text
 
@@ -84,40 +115,10 @@ class TextCleaner:
         pattern = r"([a-z])([A-Z])"
         return re.sub(pattern, r"\1 \2", text)
 
-    def clean_html(self, text):
-        """Clean HTML text."""
-        text = html.unescape(text)  # convert html escape to characters
-
-        # parse HTML
-        soup = BeautifulSoup(text, 'lxml')
-
-        # remove certain tags
-        for tag in soup(["script", "style"]):
-            tag.decompose()
-
-        # remove comments
-        for comment in soup.find_all(
-                string=lambda t: isinstance(t, Comment)):
-            comment.extract()  # comment doesn't have decompose() method
-
-        # get text and add a space between tags
-        text = soup.get_text(" ")
-
-        return text
-
-    def aggressive_clean(self, text):
-        """
-        More aggressive cleaning.
-
-        This function is supposed to improve the quality of texts
-        containing words that are incorrectly concatenated.
-        """
-        text = self.normalize_text(text)
-        text = self.replace_from_text(text)
-
-        # Help tokenizer by adding spaces
-        text = self.add_space_after_punctuation(text)
-        text = self.add_space_before_delimiters(text)
+    def split_text(self, text):
+        """Split text."""
+        text = self.add_space_after(text)
+        text = self.add_space_before(text)
         text = self.surround_suspicious_chars_with_spaces(text)
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
