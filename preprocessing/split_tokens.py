@@ -23,7 +23,7 @@ class SplitTokens:
                 path_dict, term_index=0, count_index=1):
             print("Dictionary loaded.")
         else:
-            print("Dictionary failed to loaded.")
+            print("Dictionary failed to load.")
 
         # Initialize spaCy model
         self.nlp = spacy.load("en_core_web_trf")
@@ -62,7 +62,8 @@ class SplitTokens:
         for t in doc:
             if (t.is_alpha and
                (t.ent_type == 0) and  # not an entity
-               (t.lemma_.lower() not in self.sym_spell.words)):
+               {t.lemma_.lower(), t.text.lower(), t.lemma_, t.text}.\
+               isdisjoint(set(self.sym_spell.words.keys()))):
                 if cautious:
                     lst_tokens.append(self.prudent_segment(t))
                 else:
