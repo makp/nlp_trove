@@ -36,23 +36,26 @@ class SplitTokens:
             if (t.is_alpha and (20 > len(t.text) > 2)):
                 self.sym_spell.create_dictionary_entry(t.text, 1)
 
-    def prudent_segment(self, token):
-        """Prudent word segmentation on a spaCy Token."""
+    def segment_token(self, token, cautious=True):
+        """Segment a spaCy Token."""
         # Run word segmentation without correcting words
         seg_token = self.sym_spell.word_segmentation(
             token.text, max_edit_distance=0)
 
-        # Are all segments in the dictionary?
+        # Are all segs in the dictionary?
         segs_in_dict = all(part in self.sym_spell.words for
                            part in seg_token.corrected_string.split())
 
-        if segs_in_dict:        # or (len(token.text) > 20)
+        # Accept segmentation?
+        accept_seg = segs_in_dict or (not cautious and len(token.text) >= 20)
+
+        if accept_seg:
             return seg_token.corrected_string + token.whitespace_
         else:
             return token.text_with_ws
 
     def fix_word_segmentation(self, text, cautious=True):
-        """Fix word segmentation."""
+        """Fix word segmentation of alpha tokens."""
         # Process text with spaCy
         doc = self.nlp(text)
 
@@ -64,12 +67,9 @@ class SplitTokens:
                (t.ent_type == 0) and  # not an entity
                {t.lemma_.lower(), t.text.lower(), t.lemma_, t.text}.\
                isdisjoint(set(self.sym_spell.words.keys()))):
-                if cautious:
-                    lst_tokens.append(self.prudent_segment(t))
-                else:
-                    seg_token = self.sym_spell.word_segmentation(t.text)
-                    lst_tokens.append(
-                        seg_token.corrected_string + t.whitespace_)
+
+                # Segment token
+                lst_tokens.append(self.segment_token(t, cautious=cautious))
             else:
                 lst_tokens.append(t.text_with_ws)
 
