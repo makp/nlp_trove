@@ -46,7 +46,7 @@ class SplitTokens:
         segs_in_dict = all(part in self.sym_spell.words for
                            part in seg_token.corrected_string.split())
 
-        if segs_in_dict or (len(token.text) > 20):
+        if segs_in_dict:        # or (len(token.text) > 20)
             return seg_token.corrected_string + token.whitespace_
         else:
             return token.text_with_ws
