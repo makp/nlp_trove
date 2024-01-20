@@ -95,9 +95,9 @@ class TextSplitter:
         return text
 
     def remove_hyphens(self, text):
-        """Replace hyphens with space."""
+        """Replace hyphens."""
         pattern = r"-+|‐+"
-        return re.sub(pattern, " ", text)
+        return re.sub(pattern, "", text)
 
     def remove_quotes_and_apostrophes(self, text):
         """Replace quotes and apostrophes with a space."""
