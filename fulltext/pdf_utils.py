@@ -2,6 +2,8 @@
 
 import os
 from pypdf import PdfReader
+import pdfplumber
+import fitz
 
 
 def is_pdf(filepath):
@@ -39,7 +41,39 @@ def is_pdf_corrupted(pdf_filename, pdf_folder, verbose=False):
         return True
 
 
-def pdf_to_text(filepath):
+def extract_text_with_pypdf(filepath):
+    """Extract text from a PDF file using pypdf."""
+    with open(filepath, 'rb') as f:
+        text = ""
+        reader = PdfReader(f)
+        for i in range(len(reader.pages)):
+            page = reader.pages[i]
+            text += page.extract_text()
+    return text
+
+
+def extract_text_with_pdfplumber(filepath):
+    """
+    Extract text from a PDF file using pdfplumber.
+
+    Note threshold for x and y tolerance has been lowered to improve
+    segmentation.
+    """
+    with pdfplumber.open(filepath) as pdf:
+        text = "\n".join([page.extract_text(x_tolerance=1,
+                                            y_tolerance=1)
+                          for page in pdf.pages])
+    return text.strip()
+
+
+def extract_text_with_pymupdf(filepath):
+    """Extract text from a PDF using PyMuPDF."""
+    with fitz.open(filepath) as doc:
+        text = "\n".join([page.get_text() for page in doc])
+    return text.strip()
+
+
+def pdf_to_text(filepath, engine='pdfplumber'):
     """Extract text from a PDF file."""
     try:
         if not is_pdf(filepath):
@@ -47,13 +81,14 @@ def pdf_to_text(filepath):
                 error_file.write(f"{filepath}\n")
             return None
 
-        with open(filepath, 'rb') as f:
-            reader = PdfReader(f)
-            text = ""
-            for i in range(len(reader.pages)):
-                page = reader.pages[i]
-                text += page.extract_text()
-            return text
+        dic_engines = {
+            'pdfplumber': extract_text_with_pdfplumber,
+            'pypdf': extract_text_with_pypdf,
+            'pymupdf': extract_text_with_pymupdf
+        }
+
+        return dic_engines[engine](filepath)
+
     except Exception as e:
         with open('error_files.txt', 'a') as error_file:
             error_file.write(f"{filepath} - {str(e)}\n")
