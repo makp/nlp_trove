@@ -1,7 +1,6 @@
 """Vector-related functions."""
 
 import numpy as np
-from gensim import matutils
 from gensim.matutils import kullback_leibler
 
 
@@ -23,18 +22,6 @@ def calculate_avg_distance_every_vec(lst_vecs, distance_func):
     dist_matrix = calculate_dist_matrix(lst_vecs, distance_func)
     avg_dists = dist_matrix.sum(axis=1) / (num_vecs - 1)
     return avg_dists
-
-
-def convert_to_gensim_sparse(lst_vecs):
-    """Convert a list of vectors to gensim sparse vectors."""
-    return [matutils.full2sparse(v) for v in lst_vecs]
-
-
-def convert_to_gensim_full(lst_vecs):
-    """Convert a list of vectors to gensim full vectors."""
-    length = len(lst_vecs[0])
-    return [matutils.sparse2full(v, length)
-            for v in lst_vecs]
 
 
 def cosine_similarity(a, b):
@@ -60,3 +47,15 @@ def calculate_jensen_shannon_div(vec1, vec2):
     # Calculate Jensen-Shannon divergence
     return 0.5 * (kullback_leibler(vec1, m) +
                   kullback_leibler(vec2, m))
+
+
+# def convert_to_gensim_sparse(lst_vecs):
+#     """Convert a list of vectors to gensim sparse vectors."""
+#     return [matutils.full2sparse(v) for v in lst_vecs]
+
+
+# def convert_to_gensim_full(lst_vecs):
+#     """Convert a list of vectors to gensim full vectors."""
+#     length = len(lst_vecs[0])
+#     return [matutils.sparse2full(v, length)
+#             for v in lst_vecs]
