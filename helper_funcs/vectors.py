@@ -46,9 +46,12 @@ def calculate_jensen_shannon_div(vec1, vec2):
     """
     Calculate the Jensen-Shannon divergence between two vectors.
 
-    The Jensen-Shannon Divergence (JS) is the average of two
-    Kullback-Leibler Divergences (KL). But unlike KL, JS is symmetric and
-    bounded between 0 and 1. JS represents a type of average
+    The vectors have to sum to 1---i.e., the vectors must represent
+    probability distributions.
+
+    The Jensen-Shannon Divergence (JSD) is the average of two
+    Kullback-Leibler Divergences (KL). But unlike KL, JSD is symmetric
+    and bounded between 0 and 1. JS represents a type of average
     'information gain' of one distribution over the other.
     """
     # Calculate the average of the two vectors
