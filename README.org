@@ -1,1 +1,0 @@
-Collection of Python scripts for interacting with Scopus and Springer APIs, and for performing common NLP tasks, such as preprocessing text and training NLP models.
