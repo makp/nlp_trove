@@ -1,6 +1,8 @@
 [submodule "data_analysis"]
 	path = data_processing
 	url = git@github.com:makp/academic_data_mining_private.git
+  branch = experimental
 [submodule "nlp_notes"]
 	path = nlp_notes
 	url = git@github.com:makp/nlp_notes.git
+  branch = main
