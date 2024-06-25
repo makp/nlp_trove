@@ -1,15 +1,17 @@
 """Download a PDF version of an article using its DOI."""
 
-import time
-import os
 import hashlib
+import os
+import time
+
 from scidownl import scihub_download
-from fulltext.pdf_utils import is_pdf
+
+from data_acquisition.pdf.pdf_utils import is_pdf
 
 
 def sh_download_article_from_doi(doi):
     """Download an article using its DOI."""
-    out = './out.pdf'
+    out = "./out.pdf"
     url = f"https://doi.org/{doi}"
     scihub_download(url, paper_type="doi", out=out)
     time.sleep(1)
@@ -29,7 +31,7 @@ def sh_move_and_rename_pdf(dest_folder):
         return None
 
     # Generate MD5 hash
-    with open("out.pdf", 'rb') as f:
+    with open("out.pdf", "rb") as f:
         file_content = f.read()
         md5_hash = hashlib.md5(file_content).hexdigest()
 
