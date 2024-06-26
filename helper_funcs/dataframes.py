@@ -1,18 +1,19 @@
 """Helper functions for working with DataFrames."""
 
 import os
+
 from helper_funcs.files import create_filename_with_timestamp
 
 
-def save_df(df, folder_path, prefix='out', suffix='', extension='pkl'):
-    """Save a DataFrame to a file."""
+def save_df(df, folder_path, prefix="out", suffix="", extension="pkl"):
+    """Save a DataFrame or Series to a file."""
     filename = create_filename_with_timestamp(prefix, suffix, extension)
 
     full_path = os.path.join(folder_path, filename)
 
     method_map = {
-        'csv': ('to_csv', 'index=False'),
-        'pkl': ('to_pickle', None),
+        "csv": ("to_csv", "index=False"),
+        "pkl": ("to_pickle", None),
     }
     method_name, kwargs = method_map[extension]
     getattr(df, method_name)(full_path, kwargs)
@@ -26,10 +27,12 @@ def find_cols_with_few_values(df, n=3):
 
     Skip columns with list and dict values.
     """
-    lst_cols = [col for col in df.columns
-                if not df[col].apply(type).eq(list).any()
-                if not df[col].apply(type).eq(dict).any()
-                and len(df[col].unique()) < n]
+    lst_cols = [
+        col
+        for col in df.columns
+        if not df[col].apply(type).eq(list).any()
+        if not df[col].apply(type).eq(dict).any() and len(df[col].unique()) < n
+    ]
     for c in lst_cols:
         print(f"{c}: {df[c].unique()}")
     return lst_cols
@@ -37,8 +40,7 @@ def find_cols_with_few_values(df, n=3):
 
 def find_cols_with_mostly_nans(df, threshold=0.9):
     """Find columns in a DataFrame with mostly NaN values."""
-    lst_cols = [col for col in df.columns
-                if df[col].isna().sum() / len(df) > threshold]
+    lst_cols = [col for col in df.columns if df[col].isna().sum() / len(df) > threshold]
     print(lst_cols)
     return lst_cols
 
