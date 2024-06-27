@@ -1,10 +1,11 @@
 """Clean text."""
 
 import html
-import textacy.preprocessing as tp
-from functools import partial
-from bs4 import BeautifulSoup, Comment
 import re
+from functools import partial
+
+import textacy.preprocessing as tp
+from bs4 import BeautifulSoup, Comment
 
 
 class TextCleaner:
@@ -12,34 +13,35 @@ class TextCleaner:
 
     def __init__(self):
         """Initialize the TextCleaner class."""
-        self.normalize_text = tp.make_pipeline(
+        self.normalize_text = tp.make_pipeline(  # type: ignore
             tp.normalize.bullet_points,
             tp.normalize.hyphenated_words,  # reattach separated by line breaks
             tp.normalize.quotation_marks,
             tp.normalize.unicode,
-            tp.remove.accents)
+            tp.remove.accents,
+        )
 
-        self.replace_from_text = tp.make_pipeline(
+        self.replace_from_text = tp.make_pipeline(  # type: ignore
             partial(tp.replace.urls, repl=" _URL_ "),
             partial(tp.replace.emails, repl=" _EMAIL_ "),
             # partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
             # partial(tp.replace.numbers, repl=""),
-            partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "))
+            partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "),
+        )
 
     def clean_html(self, text):
         """Clean HTML text."""
         text = html.unescape(text)  # convert html escape to characters
 
         # parse HTML
-        soup = BeautifulSoup(text, 'lxml')
+        soup = BeautifulSoup(text, "lxml")
 
         # remove certain tags
         for tag in soup(["script", "style"]):
             tag.decompose()
 
         # remove comments
-        for comment in soup.find_all(
-                string=lambda t: isinstance(t, Comment)):
+        for comment in soup.find_all(string=lambda t: isinstance(t, Comment)):
             comment.extract()  # comment doesn't have decompose() method
 
         # get text and add a space between tags
