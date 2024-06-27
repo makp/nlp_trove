@@ -3,12 +3,11 @@
 import re
 
 
-def get_number_of_words(text):
-    """Count the number of words in a string."""
+def tokenize_with_regex(text):
+    """Tokenize text using regex."""
     if not isinstance(text, str):
-        return 0
-    words = re.findall(r"\b\w+\b", text)
-    return len(words)
+        raise ValueError("Input must be a string.")
+    return re.findall(r"\b\w+\b", text)
 
 
 def search_for_long_words(text, min_length=15):
