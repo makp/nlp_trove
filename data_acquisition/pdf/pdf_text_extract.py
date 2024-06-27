@@ -9,8 +9,6 @@ Notes about the libraries used:
   (e.g., `x_tolerance` and `x_tolerance_ratio`). `pypdf` has a multiplier
   called `layout_mode_scale_weight`. AFAIK `PyMuPDF` doesn't have kwargs to
   adjust how words are identified.
-- `Tesseract` can be used in combination with `PyMuPDF`:
-  <https://pymupdf.readthedocs.io/en/latest/recipes-ocr.html#how-to-ocr-a-document-page>
 """
 
 import pdfplumber
@@ -27,6 +25,7 @@ class PDFTextExtractor:
             "pdfplumber": self.extract_text_with_pdfplumber,
             "pypdf": self.extract_text_with_pypdf,
             "pymupdf": self.extract_text_with_pymupdf,
+            "tesseract": self.extract_text_with_tesseract,
         }
 
     def extract_text_with_pypdf(self, filepath, **kwargs):
@@ -46,13 +45,22 @@ class PDFTextExtractor:
         return text.strip()
 
     def extract_text_with_pymupdf(self, filepath, **kwargs):
-        """
-        Extract text from a PDF using PyMuPDF.
-
-        AFAIK, PyMuPDF doesn't have options to adjust x and y tolerance.
-        """
+        """Extract text from a PDF using PyMuPDF."""
         with pymupdf.open(filepath) as doc:
             text = "\n".join([page.get_text(**kwargs) for page in doc])  # type: ignore
+        return text.strip()
+
+    def extract_text_with_tesseract(self, filepath, **kwargs):
+        """Extract text from a PDF using Tesseract via `PyMuPDF`."""
+        with pymupdf.open(filepath) as doc:
+            text = "\n".join(
+                [
+                    page.get_textpage_ocr(  # type: ignore
+                        language="eng", tessdata="/usr/share/tessdata/", **kwargs
+                    ).extractText()
+                    for page in doc
+                ]
+            )
         return text.strip()
 
     def pdf_to_text(self, filepath, engine="pdfplumber", **kwargs):
