@@ -1,3 +1,18 @@
+"""
+Class to extract text from PDF files using different libraries.
+
+Notes about the libraries used:
+- `pdfplumber` is built on top of `pdfminer.six`.
+- `pypdf` can do other things than text extraction such as cropping, merging,
+  etc.
+- `pdfplumber` has different options for controlling how words are identified
+  (e.g., `x_tolerance` and `x_tolerance_ratio`). `pypdf` has a multiplier
+  called `layout_mode_scale_weight`. AFAIK `PyMuPDF` doesn't have kwargs to
+  adjust how words are identified.
+- `Tesseract` can be used in combination with `PyMuPDF`:
+  <https://pymupdf.readthedocs.io/en/latest/recipes-ocr.html#how-to-ocr-a-document-page>
+"""
+
 import pdfplumber
 import pymupdf
 from pypdf import PdfReader
