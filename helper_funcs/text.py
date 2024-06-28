@@ -19,20 +19,28 @@ def search_for_long_words(text, min_length=15):
     return long_words
 
 
-def get_percentage_in_dictionary(text, dictionary):
-    """Get percentage of words in a text that are in a dictionary."""
-    if not isinstance(text, str):
-        raise ValueError("Input must be a string.")
-    if not isinstance(dictionary, set):
-        raise ValueError("Dictionary must be a set.")
-    words = tokenize_with_regex(text.lower())
-    num_words_in_dict = sum(word in dictionary for word in words)
-    return num_words_in_dict / len(words) if words else 0
+class CheckTextQuality:
+    """Check text quality using different criteria."""
 
+    def __init__(self, dictionary):
+        """Initialize the CheckTextQuality class."""
+        if not isinstance(dictionary, set):
+            raise ValueError("Dictionary must be a set.")
+        self.dictionary = dictionary
+        self.min_length = 20
 
-def get_percentage_long_words(text, min_length=15):
-    """Get percentage of words in a text that are long."""
-    if not isinstance(text, str):
-        raise ValueError("Input must be a string.")
-    long_words = search_for_long_words(text, min_length)
-    return len(long_words) / len(tokenize_with_regex(text)) if long_words else 0
+    def get_percentage_in_dictionary(self, text):
+        """Get percentage of words in a text that are in a dictionary."""
+        if not isinstance(text, str):
+            raise ValueError("Input must be a string.")
+        words = tokenize_with_regex(text.lower())
+        num_words_in_dict = sum(word in self.dictionary for word in words)
+        return num_words_in_dict / len(words) if words else 0
+
+    def get_percentage_long_words(self, text):
+        """Get percentage of words in a text that are long."""
+        if not isinstance(text, str):
+            raise ValueError("Input must be a string.")
+        words = tokenize_with_regex(text.lower())
+        long_words = search_for_long_words(text, self.min_length)
+        return len(long_words) / len(words) if words else 0
