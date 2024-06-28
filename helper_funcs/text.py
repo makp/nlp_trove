@@ -29,16 +29,16 @@ class CheckTextQuality:
         self.dictionary = dictionary
         self.min_length = 20
 
-    def get_percentage_in_dictionary(self, text):
-        """Get percentage of words in a text that are in a dictionary."""
+    def get_ratio_in_dictionary(self, text):
+        """Get the ratio of words that are in the dictionary."""
         if not isinstance(text, str):
             raise ValueError("Input must be a string.")
         words = tokenize_with_regex(text.lower())
         num_words_in_dict = sum(word in self.dictionary for word in words)
         return num_words_in_dict / len(words) if words else 0
 
-    def get_percentage_long_words(self, text):
-        """Get percentage of words in a text that are long."""
+    def get_ratio_long_words(self, text):
+        """Get the ratio of long words."""
         if not isinstance(text, str):
             raise ValueError("Input must be a string.")
         words = tokenize_with_regex(text.lower())
