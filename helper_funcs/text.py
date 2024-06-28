@@ -28,3 +28,11 @@ def get_percentage_in_dictionary(text, dictionary):
     words = tokenize_with_regex(text.lower())
     num_words_in_dict = sum(word in dictionary for word in words)
     return num_words_in_dict / len(words) if words else 0
+
+
+def get_percentage_long_words(text, min_length=15):
+    """Get percentage of words in a text that are long."""
+    if not isinstance(text, str):
+        raise ValueError("Input must be a string.")
+    long_words = search_for_long_words(text, min_length)
+    return len(long_words) / len(tokenize_with_regex(text)) if long_words else 0

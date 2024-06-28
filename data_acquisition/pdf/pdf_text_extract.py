@@ -6,9 +6,9 @@ Notes about the libraries used:
 - `pypdf` can do other things than text extraction such as cropping, merging,
   etc.
 - `pdfplumber` has different options for controlling how words are identified
-  (e.g., `x_tolerance` and `x_tolerance_ratio`). `pypdf` has a multiplier
-  called `layout_mode_scale_weight`. AFAIK `PyMuPDF` doesn't have kwargs to
-  adjust how words are identified.
+  (e.g., `x_tolerance` and `x_tolerance_ratio`). `pypdf` has the par
+  `space_width` and a multiplier called `layout_mode_scale_weight`. AFAIK
+  `PyMuPDF` doesn't have kwargs to adjust how words are identified.
 """
 
 import pdfplumber
