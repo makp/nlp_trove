@@ -61,8 +61,12 @@ class TextSplitter:
 
     def __init__(self):
         """Initialize the TextSplitter class."""
-        # Regexes
+        # Match one or more consecutive chars that are *not* alphabetic,
+        # apostrophes, spaces, or hyphens
         self.RE_SUSPICIOUS = r"([^a-zA-Z'\s-]+)"
+
+        # Match one or more consecutive alphabetic chars, possibly separated by
+        # hyphens
         self.RE_TOKEN = r"([a-zA-Z]+(?:-[a-zA-Z]+)*)"
 
     def add_space_after(self, text):
@@ -97,7 +101,7 @@ class TextSplitter:
         return text
 
     def remove_hyphens(self, text):
-        """Replace hyphens."""
+        """Delete hyphens."""
         pattern = r"-+|‐+"
         return re.sub(pattern, "", text)
 
@@ -108,11 +112,9 @@ class TextSplitter:
 
     def use_uppercase_to_split_words(self, text):
         """
-        Use uppercase to separate words.
+        Add space before capital letters if preceded by a lowercase letter.
 
-        Make sure the capital letter is preceded by a lowercase
-        letter before adding space. Accordingly, this function
-        incorrectly split words such as `iPhone`.
+        Note this function would incorrectly split words such as `iPhone`.
         """
         pattern = r"([a-z])([A-Z])"
         return re.sub(pattern, r"\1 \2", text)
