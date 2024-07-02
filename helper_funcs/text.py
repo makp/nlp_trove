@@ -44,3 +44,10 @@ class CheckTextQuality:
         words = tokenize_with_regex(text.lower())
         long_words = search_for_long_words(text, self.min_length)
         return len(long_words) / len(words) if words else 0
+
+    def check_quality_tokens(self, tokens):
+        """Check the quality of a group of tokens."""
+        num_tokens = len(tokens)
+        num_words_in_dict = sum(token in self.dictionary for token in tokens)
+        num_long_words = sum(len(token) > self.min_length for token in tokens)
+        return num_words_in_dict / num_tokens, num_long_words / num_tokens
