@@ -14,6 +14,7 @@ class TextCleaner:
     def __init__(self):
         """Initialize the TextCleaner class."""
         self.normalize_text = tp.make_pipeline(  # type: ignore
+            tp.normalize.whitespace,
             tp.normalize.bullet_points,
             tp.normalize.hyphenated_words,  # reattach separated by line breaks
             tp.normalize.quotation_marks,
@@ -27,6 +28,7 @@ class TextCleaner:
             # partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
             # partial(tp.replace.numbers, repl=""),
             partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "),
+            tp.normalize.whitespace,
         )
 
     def clean_html(self, text):
@@ -52,8 +54,7 @@ class TextCleaner:
     def clean_text(self, text):
         """Clean text."""
         text = self.normalize_text(text)
-        text = self.replace_from_text(text)
-        return tp.normalize.whitespace(text)
+        return self.replace_from_text(text)
 
 
 class TextSplitter:
