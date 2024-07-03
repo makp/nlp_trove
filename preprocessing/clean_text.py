@@ -58,7 +58,11 @@ class TextCleaner:
 
 
 class TextSplitter:
-    """Class for splitting text by using regexes."""
+    """
+    Class for splitting text by using regexes.
+
+    The goal of this class is to split text to make the tokenizer's job easier.
+    """
 
     def __init__(self):
         """Initialize the TextSplitter class."""
@@ -106,6 +110,11 @@ class TextSplitter:
         pattern = r"-+|‐+|—+"
         return re.sub(pattern, " ", text)
 
+    def remove_possessive_endings(self, text):
+        """Remove possessive endings."""
+        pattern = r"(\w+)'s\b|\b(\w+)'"
+        return re.sub(pattern, r"\1\2", text)
+
     def remove_quotes_and_apostrophes(self, text):
         """Replace quotes and apostrophes with a space."""
         pattern = r"['\"]+"
@@ -128,6 +137,7 @@ class TextSplitter:
         text = self.remove_numbers_before(text)
         text = self.remove_numbers_after(text)
         text = self.remove_hyphens(text)
+        text = self.remove_possessive_endings(text)
         text = self.remove_quotes_and_apostrophes(text)
         text = self.use_uppercase_to_split_words(text)
         return tp.normalize.whitespace(text)
