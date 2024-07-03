@@ -1,6 +1,7 @@
 """Transform text data to spaCy Docs."""
 
-import pandas as pd
+import subprocess
+
 import spacy
 from spacy.tokens import DocBin
 
@@ -9,7 +10,13 @@ class TextToDocs:
     """Transform plain text data to spaCy Doc objects."""
 
     # Confirm GPU availability
-    print("GPU available:", spacy.prefer_gpu())  # type: ignore
+    print("GPU available? ", spacy.prefer_gpu())  # type: ignore
+
+    # Validate spaCy installation
+    result = subprocess.run(
+        ["python", "-m", "spacy", "validate"], capture_output=True, text=True
+    )
+    print("Check installed pipelines: ", result.stdout)
 
     def __init__(
         self,
@@ -24,29 +31,30 @@ class TextToDocs:
             self.nlp.add_pipe(enable_pipe)
         self.batch_size = batch_size
 
-    def process_texts(self, series):
-        """Process a Pandas Series and return a generator of spaCy Doc objects along with indices."""
+    def convert_text_series_to_docs_as_gen(self, series):
+        """Return a generator of spaCy Doc objects along with their indices
+        from texts stored as Pandas Series."""
         for idx, doc in zip(
             series.index, self.nlp.pipe(series, batch_size=self.batch_size)
         ):
             yield idx, doc
 
-    def serialize_docs(self, docs_with_idxs, output_path):
-        """Serialize docs."""
+    def convert_text_series_to_docs_and_serialize(self, series):
+        """
+        Convert a Series of texts to spaCy Doc objects and serialize them.
+
+        Doc objects have a to_bytes() method that serializes the Doc object to a binary format. However, the DocBin class is more efficient for serializing multiple Doc objects. See <https://spacy.io/usage/saving-loading>.
+        """
         doc_bin = DocBin()
         doc_meta = []
+        docs_with_idxs = self.convert_text_series_to_docs_as_gen(series)
         for idx, doc in docs_with_idxs:
             doc_bin.add(doc)
             doc_meta.append(idx)
-        doc_bin.to_disk(output_path)
-        with open(output_path + "_meta.txt", "w") as meta_file:
-            for index in doc_meta:
-                meta_file.write(f"{index}\n")
+        data = doc_bin.to_bytes()
+        return (doc_meta, data)
 
-    def load_serialized_docs(self, filepath):
-        """Load serialized docs and return a Pandas Series of spaCy Doc objects."""
-        doc_bin = DocBin().from_disk(filepath)
-        with open(filepath + "_meta.txt", "r") as meta_file:
-            idxs = [line.strip() for line in meta_file]
-        docs = list(doc_bin.get_docs(self.nlp.vocab))
-        return pd.Series(data=docs, index=idxs)
+    def deserialize_docs(self, bytes_data):
+        """Deserialize Doc objects and return them as a list."""
+        doc_bin = DocBin().from_bytes(bytes_data)
+        return list(doc_bin.get_docs(self.nlp.vocab))
