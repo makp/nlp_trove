@@ -107,7 +107,13 @@ class TextSplitter:
 
     def remove_hyphens(self, text):
         """Replace hyphens with spaces."""
-        pattern = r"-+|‐+|—+"
+        # -+: ASCII hyphens (hyphen-minus).
+        # ‐+: Unicode hyphens (U+2010).
+        # —+: em dashes (U+2014).
+        # –+: en dashes (U+2013).
+        # ‒+: figure dashes (U+2012).
+        # ‑+: non-breaking hyphens (U+2011).
+        pattern = r"-+|‐+|—+|–+|‒+|‑+"
         return re.sub(pattern, " ", text)
 
     def remove_possessive_endings(self, text):
