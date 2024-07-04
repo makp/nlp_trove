@@ -25,7 +25,7 @@ class TextCleaner:
         self.replace_from_text = tp.make_pipeline(  # type: ignore
             partial(tp.replace.urls, repl=" _URL_ "),
             partial(tp.replace.emails, repl=" _EMAIL_ "),
-            # partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
+            partial(tp.replace.phone_numbers, repl=" _PHONE_ "),
             # partial(tp.replace.numbers, repl=""),
             partial(tp.replace.currency_symbols, repl=" _CURRENCY_ "),
             tp.normalize.whitespace,
