@@ -31,6 +31,36 @@ class TextCleaner:
             tp.normalize.whitespace,
         )
 
+        """
+        Hyphen and dash characters include in RE_HYPHENS:
+        See: <https://en.wikipedia.org/wiki/Dash#Unicode>
+         u002d (-): hyphen-minus (ASCII)
+         u2010 (‐): hyphen
+         u2011 (‑): non-breaking hyphen
+         u2012 (‒): figure dash
+         u2013 (–): en dash
+         u2014 (—): em dash
+         u207b (⁻): superscript minus
+         u208b (₋): subscript minus
+         u2043 (⁃): hyphen bullet
+         u2015 (―): horizontal bar
+         u2212 (−): minus sign
+         ufe58 (﹘): small em dash
+         uff0d (－): fullwidth hyphen-minus
+         u00ad (­): soft hyphen
+         u058a (֊): Armenian Hyphen
+         u1400 (᐀): Canadian Syllabics Hyphen
+         u1806 (᠆):  Mongolian Todo Soft Hyphen
+         u05be (־): Hebrew Punctuation Maqaf
+        """
+        self.RE_HYPHENS = re.compile(
+            r"[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe58\uff0d\u00ad\u207b\u208b\u2043\u058a\u1400\u1806\u05be]"
+        )
+
+    def normalize_hyphens(self, text):
+        """Normalize hyphens."""
+        return self.RE_HYPHENS.sub("-", text)
+
     def clean_html(self, text):
         """Clean HTML text."""
         text = html.unescape(text)  # convert html escape to characters
@@ -53,6 +83,7 @@ class TextCleaner:
 
     def clean_text(self, text):
         """Clean text."""
+        text = self.normalize_hyphens(text)
         text = self.normalize_text(text)
         return self.replace_from_text(text)
 
@@ -107,13 +138,7 @@ class TextSplitter:
 
     def remove_hyphens(self, text):
         """Replace hyphens with spaces."""
-        # -+: ASCII hyphens (hyphen-minus).
-        # ‐+: Unicode hyphens (U+2010).
-        # —+: em dashes (U+2014).
-        # –+: en dashes (U+2013).
-        # ‒+: figure dashes (U+2012).
-        # ‑+: non-breaking hyphens (U+2011).
-        pattern = r"-+|‐+|—+|–+|‒+|‑+"
+        pattern = r"-+"
         return re.sub(pattern, " ", text)
 
     def remove_possessive_endings(self, text):
