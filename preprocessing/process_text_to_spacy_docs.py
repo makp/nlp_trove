@@ -2,12 +2,13 @@
 
 import subprocess
 
+import pandas as pd
 import spacy
-from spacy.tokens import DocBin
+from spacy.tokens import Doc, DocBin
 
 
 class TextToDocs:
-    """Transform plain text data to spaCy Doc objects."""
+    """Transform plain text stored as Pandas Series to spaCy Doc objects."""
 
     @staticmethod
     def validate_spacy():
@@ -32,31 +33,40 @@ class TextToDocs:
         if enable_pipe:
             self.nlp.add_pipe(enable_pipe)
         self.batch_size = batch_size
+        if not Doc.has_extension("idx"):
+            Doc.set_extension("idx", default=None)
 
-    def convert_text_series_to_docs_as_gen(self, series):
-        """Return a generator of spaCy Doc objects along with their indices
-        from texts stored as Pandas Series."""
-        for idx, doc in zip(
-            series.index, self.nlp.pipe(series, batch_size=self.batch_size)
+    def stream_text_series(self, series):
+        """Stream spaCy Doc objects along with their indexes as a Doc extension
+        called 'idx'."""
+        data = [(text, {"idx": idx}) for idx, text in series.items()]
+        for doc, context in self.nlp.pipe(
+            data, batch_size=self.batch_size, as_tuples=True
         ):
-            yield idx, doc
+            doc._.idx = context["idx"]
+            yield doc
 
     def convert_text_series_to_docs_and_serialize(self, series):
         """
         Convert a Series of texts to spaCy Doc objects and serialize them.
 
-        Doc objects have a to_bytes() method that serializes the Doc object to a binary format. However, the DocBin class is more efficient for serializing multiple Doc objects. See <https://spacy.io/usage/saving-loading>.
+        Doc objects have a `to_bytes` method that serializes the Doc object to
+        a binary format. However, the `DocBin` class is more efficient for
+        serializing multiple `Doc` objects. See
+        <https://spacy.io/usage/saving-loading> for further details.
         """
         doc_bin = DocBin()
-        doc_meta = []
-        docs_with_idxs = self.convert_text_series_to_docs_as_gen(series)
-        for idx, doc in docs_with_idxs:
+        for doc in self.stream_text_series(series):
             doc_bin.add(doc)
-            doc_meta.append(idx)
-        data = doc_bin.to_bytes()
-        return (doc_meta, data)
+        return doc_bin.to_bytes()
 
     def deserialize_docs(self, bytes_data):
         """Deserialize Doc objects and return them as a list."""
         doc_bin = DocBin().from_bytes(bytes_data)
         return list(doc_bin.get_docs(self.nlp.vocab))
+
+    def deserialize_docs_as_series(self, bytes_data):
+        """Deserialize Doc objects and return them as a Pandas Series."""
+        docs = self.deserialize_docs(bytes_data)
+        index = [doc._.idx for doc in docs]
+        return pd.Series(data=docs, index=index)
