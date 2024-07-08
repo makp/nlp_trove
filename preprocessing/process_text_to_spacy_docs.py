@@ -37,13 +37,12 @@ class TextToDocs:
             Doc.set_extension("idx", default=None)
 
     def stream_text_series(self, series):
-        """Stream spaCy Doc objects along with their indexes as a Doc extension
-        called 'idx'."""
+        """Stream text series data as spaCy Doc objects."""
         data = [(text, {"idx": idx}) for idx, text in series.items()]
         for doc, context in self.nlp.pipe(
             data, batch_size=self.batch_size, as_tuples=True
         ):
-            doc._.idx = context["idx"]
+            doc._.idx = str(context["idx"])
             yield doc
 
     def convert_text_series_to_docs_and_serialize(self, series):
@@ -55,7 +54,9 @@ class TextToDocs:
         serializing multiple `Doc` objects. See
         <https://spacy.io/usage/saving-loading> for further details.
         """
-        doc_bin = DocBin()
+        # Create a DocBin object
+        # NOTE: `store_user_data` is set to True to store the extension data
+        doc_bin = DocBin(store_user_data=True)
         for doc in self.stream_text_series(series):
             doc_bin.add(doc)
         return doc_bin.to_bytes()
