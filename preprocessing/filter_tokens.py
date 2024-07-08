@@ -1,6 +1,6 @@
 """Filter tokens."""
 
-from vectorization.sparse_vectorization import build_tfidf_vectors
+from ..vectorization.sparse_vectorization import build_tfidf_vectors
 
 
 class FilterTokens:
