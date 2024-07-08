@@ -10,16 +10,16 @@ from spacy.tokens import Doc, DocBin
 class TextToDocs:
     """Transform plain text stored as Pandas Series to spaCy Doc objects."""
 
+    # Confirm GPU availability
+    print("GPU available? ", spacy.prefer_gpu())  # type: ignore
+
     @staticmethod
     def validate_spacy():
-        """Validate spaCy installation and GPU availability."""
-        # Validate spaCy installation
+        """Validate spaCy installation."""
         result = subprocess.run(
             ["python", "-m", "spacy", "validate"], capture_output=True, text=True
         )
         print("Check installed pipelines: ", result.stdout)
-        # Confirm GPU availability
-        print("GPU available? ", spacy.prefer_gpu())  # type: ignore
 
     def __init__(
         self,
