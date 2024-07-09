@@ -38,11 +38,11 @@ class TextToDocs:
 
     def stream_text_series(self, series):
         """Stream text series data as spaCy Doc objects."""
-        data = [(text, {"idx": idx}) for idx, text in series.items()]
+        data = ((text, {"idx": idx}) for idx, text in series.items())
         for doc, context in self.nlp.pipe(
             data, batch_size=self.batch_size, as_tuples=True
         ):
-            doc._.idx = str(context["idx"])
+            doc._.idx = context["idx"]
             yield doc
 
     def convert_text_series_to_docs_and_serialize(self, series):
