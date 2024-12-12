@@ -8,7 +8,7 @@ WAIT_TIME = 1  # wait time between requests
 COUNT_PER_REQUEST = 25
 
 
-def get_number_results(query_str, api_key):
+def get_number_results(query_str, api_key, print_url=False):
     """Return the total number of results for a given query."""
     params = {
         "q": query_str,
@@ -16,9 +16,22 @@ def get_number_results(query_str, api_key):
         "s": 1,  # Start index
         "api_key": api_key,
     }
+
+    # Print the URL
+    if print_url:
+        req = requests.Request("GET", BASE_URL, params=params)
+        print(f"URL: {req.prepare().url}")
+
+    # Make the request
     response = requests.get(BASE_URL, params=params)
-    data = response.json()
-    return int(data["result"][0]["total"])
+
+    try:
+        response.raise_for_status()
+
+        data = response.json()
+        return int(data["result"][0]["total"])
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
 
 
 def fetch_single_response(query_str, start, api_key):
@@ -31,7 +44,13 @@ def fetch_single_response(query_str, start, api_key):
 def fetch_all_responses(query_str, api_key):
     """Return all response data for a given query."""
     total_records = get_number_results(query_str, api_key)
+
+    if not total_records:
+        print("No records found.")
+        return []
+
     all_data = []
+
     for start in range(1, total_records + 1, COUNT_PER_REQUEST):
         data = fetch_single_response(query_str, start, api_key)
         all_data.append(data)
