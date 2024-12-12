@@ -5,7 +5,7 @@ import requests
 
 BASE_URL = "https://api.springernature.com/meta/v2/json"
 WAIT_TIME = 1  # wait time between requests
-COUNT_PER_REQUEST = 50
+COUNT_PER_REQUEST = 25
 
 
 def get_number_results(query_str, api_key):
