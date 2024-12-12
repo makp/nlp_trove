@@ -3,7 +3,7 @@ import time
 
 import requests
 
-BASE_URL = "https://api.springernature.com/metadata/json"
+BASE_URL = "https://api.springernature.com/meta/v2/json"
 WAIT_TIME = 1  # wait time between requests
 COUNT_PER_REQUEST = 50
 
