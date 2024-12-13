@@ -45,6 +45,18 @@ def find_cols_with_mostly_nans(df, threshold=0.9):
     return lst_cols
 
 
+def find_cols_with_mostly_empty_values(df, threshold=0.9):
+    """Find columns in a DataFrame with mostly empty values."""
+    empty_vals = ["", [], {}, None]
+    lst_cols = [
+        col
+        for col in df.columns
+        if df[col].isin(empty_vals).sum() / len(df) > threshold
+    ]
+    print(lst_cols)
+    return lst_cols
+
+
 # def are_jstor_articles_in_main_df(df, df_jstor,
 #                                   columns=['title', 'title']):
 #     """
