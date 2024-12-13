@@ -2,7 +2,7 @@
 
 import os
 
-from helper_funcs.files import create_filename_with_timestamp
+from .files import create_filename_with_timestamp
 
 
 def save_df(df, folder_path, prefix="out", suffix="", extension="pkl"):
