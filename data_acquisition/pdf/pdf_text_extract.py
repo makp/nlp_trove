@@ -15,7 +15,7 @@ import pdfplumber
 import pymupdf
 from pypdf import PdfReader
 
-from data_acquisition.pdf.pdf_utils import is_pdf
+from .pdf_utils import is_pdf
 
 
 class PDFTextExtractor:

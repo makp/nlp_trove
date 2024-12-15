@@ -6,7 +6,7 @@ import time
 
 from scidownl import scihub_download
 
-from data_acquisition.pdf.pdf_utils import is_pdf
+from .pdf_utils import is_pdf
 
 
 def sh_download_article_from_doi(doi):
