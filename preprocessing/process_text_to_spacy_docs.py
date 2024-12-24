@@ -4,6 +4,7 @@ import gc
 import logging
 import os
 import subprocess
+import tracemalloc
 from collections import Counter
 
 import pandas as pd
@@ -82,6 +83,9 @@ class SeriesToDocs:
         serializing multiple `Doc` objects. Source:
         <https://spacy.io/usage/saving-loading#docs>
         """
+        if self.mem_log:
+            tracemalloc.start()
+
         # Create a DocBin object
         # NOTE: `store_user_data` is set to True to store the extension data
         doc_bin = DocBin(store_user_data=True)
@@ -90,16 +94,19 @@ class SeriesToDocs:
             if self.mem_log:
                 gc.collect()  # Force garbage collection before counting objects
                 num_objs = len(gc.get_objects())
-                # psutil
-                process = psutil.Process()
+                process = psutil.Process()  # psutil
+                snapshot = tracemalloc.take_snapshot()
+                top_stats = snapshot.statistics("lineno")
                 logging.info(
                     f"Number of Docs in DocBin: {len(doc_bin)};\n"
                     f"Number of objects tracked by gc: {num_objs};\n"
                     f"Object counts: {dict(analyze_memory_usage().most_common(10))}\n"
                     f"Total memory usage in MB: {process.memory_info().rss / (1024 * 1024):.2f}\n"
+                    f"Tracemalloc top stats: {top_stats[:5]}\n"
                     "---------------------------------------------"
                 )
-
+        if self.mem_log:
+            tracemalloc.stop()
         return doc_bin.to_bytes()
 
     def deserialize_docs(self, bytes_data):
