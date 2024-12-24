@@ -1,14 +1,25 @@
 """Transform text data to spaCy Docs."""
 
+import gc
+import logging
+import os
 import subprocess
+from collections import Counter
 
 import pandas as pd
+import psutil
 import spacy
 from spacy.tokens import Doc, DocBin
 
 # Confirm GPU availability
 # NOTE: `prefer_gpu` has to be loaded *before* any pipelines
 print("GPU available? ", spacy.prefer_gpu())  # type: ignore
+
+
+def analyze_memory_usage():
+    """Analyze memory usage by counting number of objects in memory."""
+    type_count = Counter(type(o).__name__ for o in gc.get_objects())
+    return type_count
 
 
 class SeriesToDocs:
@@ -28,7 +39,8 @@ class SeriesToDocs:
         disable_pipes=None,
         enable_pipe=None,
         batch_size=25,
-        n_process=1,  # Num of processors
+        n_process=1,
+        mem_log=False,
     ):
         """Initialize the class."""
         self.nlp = spacy.load(model, disable=disable_pipes or [])
@@ -38,7 +50,16 @@ class SeriesToDocs:
         self.n_process = n_process
         if not Doc.has_extension("idx"):
             Doc.set_extension("idx", default=None)
-        self.verbose = False
+        self.mem_log = mem_log
+        if mem_log:
+            log_dir = "logs"
+            os.makedirs(log_dir, exist_ok=True)
+            logging.basicConfig(
+                filename=os.path.join(log_dir, "memory_usage.log"),
+                level=logging.INFO,
+                format="%(asctime)s - %(message)s",
+            )
+            logging.info("Memory usage log")
 
     def stream_text_series_as_docs(self, series):
         """Stream text series data as spaCy Doc objects."""
@@ -66,9 +87,19 @@ class SeriesToDocs:
         doc_bin = DocBin(store_user_data=True)
         for doc in self.stream_text_series_as_docs(series):
             doc_bin.add(doc)
-            if self.verbose:
-                print(f"Processed doc with idx: {doc._.idx}")
-                print(len(doc_bin))
+            if self.mem_log:
+                gc.collect()  # Force garbage collection before counting objects
+                num_objs = len(gc.get_objects())
+                # psutil
+                process = psutil.Process()
+                logging.info(
+                    f"Number of Docs in DocBin: {len(doc_bin)};\n"
+                    f"Number of objects tracked by gc: {num_objs};\n"
+                    f"Object counts: {dict(analyze_memory_usage().most_common(10))}\n"
+                    f"Total memory usage in MB: {process.memory_info().rss / (1024 * 1024):.2f}\n"
+                    "---------------------------------------------"
+                )
+
         return doc_bin.to_bytes()
 
     def deserialize_docs(self, bytes_data):
