@@ -1,11 +1,9 @@
 """Transform text data to spaCy Docs."""
 
-import gc
 import logging
 import os
 import subprocess
 import tracemalloc
-from collections import Counter
 
 import pandas as pd
 import psutil
@@ -15,12 +13,6 @@ from spacy.tokens import Doc, DocBin
 # Confirm GPU availability
 # NOTE: `prefer_gpu` has to be loaded *before* any pipelines
 print("GPU available? ", spacy.prefer_gpu())  # type: ignore
-
-
-def analyze_memory_usage():
-    """Analyze memory usage by counting number of objects in memory."""
-    type_count = Counter(type(o).__name__ for o in gc.get_objects())
-    return type_count
 
 
 class SeriesToDocs:
@@ -92,15 +84,11 @@ class SeriesToDocs:
         for doc in self.stream_text_series_as_docs(series):
             doc_bin.add(doc)
             if self.mem_log:
-                gc.collect()  # Force garbage collection before counting objects
-                num_objs = len(gc.get_objects())
                 process = psutil.Process()  # psutil
                 snapshot = tracemalloc.take_snapshot()
                 top_stats = snapshot.statistics("lineno")
                 logging.info(
                     f"Number of Docs in DocBin: {len(doc_bin)};\n"
-                    f"Number of objects tracked by gc: {num_objs};\n"
-                    f"Object counts: {dict(analyze_memory_usage().most_common(10))}\n"
                     f"Total memory usage in MB: {process.memory_info().rss / (1024 * 1024):.2f}\n"
                     f"Tracemalloc top stats: {top_stats[:5]}\n"
                     "---------------------------------------------"
