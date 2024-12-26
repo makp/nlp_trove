@@ -16,7 +16,7 @@ print("GPU available? ", spacy.prefer_gpu())  # type: ignore
 
 
 class SeriesToDocs:
-    """Transform text Series to spaCy Doc objects."""
+    """Transform Series storing text to spaCy Doc objects."""
 
     @staticmethod
     def validate_spacy():
@@ -35,40 +35,42 @@ class SeriesToDocs:
         n_process=1,
         mem_log=False,
     ):
-        """Initialize the class."""
+        """Initialize spaCy pipeline and parameters."""
         self.nlp = spacy.load(model, disable=disable_pipes or [])
         if enable_pipe:
             self.nlp.add_pipe(enable_pipe)
         self.batch_size = batch_size
         self.n_process = n_process
-        if not Doc.has_extension("idx"):
-            Doc.set_extension("idx", default=None)
         self.mem_log = mem_log
         if mem_log:
-            log_dir = "logs"
-            os.makedirs(log_dir, exist_ok=True)
-            logging.basicConfig(
-                filename=os.path.join(log_dir, "memory_usage.log"),
-                level=logging.INFO,
-                format="%(asctime)s - %(message)s",
-            )
-            logging.info("Memory usage log")
+            self._setup_logging()
 
-    def stream_text_series_as_docs(self, series):
-        """Stream text series data as spaCy Doc objects."""
-        doc_stream = ((text, {"idx": str(idx)}) for idx, text in series.items())
+    def _setup_logging(self):
+        log_dir = "logs"
+        os.makedirs(log_dir, exist_ok=True)
+        logging.basicConfig(
+            filename=os.path.join(log_dir, "memory_usage.log"),
+            level=logging.INFO,
+            format="%(asctime)s - %(message)s",
+        )
+        logging.info("Memory usage log during serialization")
+
+    def stream_docs(self, series):
+        """Stream Series containing text data as spaCy Doc objects."""
+        # Format Series in a way that spaCy can process
+        text_tuples = [(text, {"idx": str(idx)}) for idx, text in series.items()]
+
         for doc, context in self.nlp.pipe(
-            doc_stream,
+            text_tuples,
             batch_size=self.batch_size,
-            as_tuples=True,
             n_process=self.n_process,
+            as_tuples=True,
         ):
-            doc._.idx = context["idx"]
-            yield doc
+            yield context["idx"], doc
 
-    def convert_text_series_to_docs_and_serialize(self, series):
+    def serialize_series_as_docs(self, text):
         """
-        Convert a Series of texts to spaCy Doc objects and serialize them.
+        Serialize a container of texts into a DocBin object.
 
         Although Doc objects have a `to_bytes` method that serializes the Doc
         object to a binary format, the `DocBin` class is more efficient for
@@ -79,47 +81,56 @@ class SeriesToDocs:
             tracemalloc.start()
             snapshot1 = tracemalloc.take_snapshot()
 
-        # Create a DocBin object
-        # NOTE: `store_user_data` is set to True to store the extension data
-        doc_bin = DocBin(store_user_data=True)
-        for doc in self.stream_text_series_as_docs(series):
+        # Create a `DocBin` to store the `Doc` objects
+        doc_bin = DocBin()
+
+        # Serialize the text data
+        idx_list = []
+        for idx, doc in self.stream_docs(text):
             doc_bin.add(doc)
+            idx_list.append(idx)
+
             if self.mem_log:
-                process = psutil.Process()
-                snapshot2 = tracemalloc.take_snapshot()
-                top_stats = snapshot2.compare_to(snapshot1, "lineno")  # type: ignore
-                logging.info(
-                    f"Number of Docs in DocBin: {len(doc_bin)};\n"
-                    f"Total memory usage in MB: {process.memory_info().rss / (1024 ** 2):.2f}\n"
-                    f"Tracemalloc top stats: {top_stats[:5]}\n"
-                    # current, peak = tracemalloc.get_traced_memory()
-                    "---------------------------------------------"
-                )
+                self._log_memory_usage(doc_bin, snapshot1)  # type: ignore
+
         if self.mem_log:
             tracemalloc.stop()
-        return doc_bin.to_bytes()
 
-    def deserialize_docs(self, bytes_data):
+        return idx_list, doc_bin.to_bytes()
+
+    def _log_memory_usage(self, object_name, snapshot_base):
+        process = psutil.Process()
+        snapshot2 = tracemalloc.take_snapshot()
+        top_stats = snapshot2.compare_to(snapshot_base, "lineno")  # type: ignore
+        logging.info(
+            f"Object length ({object_name}): {len(object_name)};\n"
+            f"Total memory usage in MB: {process.memory_info().rss / (1024 ** 2):.2f}\n"
+            f"Tracemalloc top stats: {top_stats[:5]}\n"
+            # current, peak = tracemalloc.get_traced_memory()
+            "---------------------------------------------"
+        )
+
+    def deserialize_docbin(self, bytes_data):
         """Deserialize Doc objects and return them as a list."""
         doc_bin = DocBin().from_bytes(bytes_data)
         return list(doc_bin.get_docs(self.nlp.vocab))
 
-    def deserialize_docs_as_series(self, bytes_data):
+    def deserialize_docbin_as_series(self, bytes_data, idx_list):
         """Deserialize Doc objects and return them as a Pandas Series."""
-        docs = self.deserialize_docs(bytes_data)
-        return pd.Series({doc._.idx: doc for doc in docs})
+        docs = self.deserialize_docbin(bytes_data)
+        return pd.Series({idx: doc for idx, doc in zip(idx_list, docs)})
 
 
-class TextToDocs:
-    """Transform plain text to spaCy Doc objects."""
+class SeriesToDocsWithAttrib(SeriesToDocs):
+    """
+    Transform text Series to spaCy Doc objects with custom extension attributes.
 
-    @staticmethod
-    def validate_spacy():
-        """Validate spaCy installation."""
-        result = subprocess.run(
-            ["python", "-m", "spacy", "validate"], capture_output=True, text=True
-        )
-        print("Check installed pipelines: ", result.stdout)
+    Further info on extension attributes:
+    <https://spacy.io/usage/processing-pipelines#custom-components-attributes>
+
+    *NOTE*: Using spaCy extension attributes to store the series index
+    has dramatically increased the memory usage of this class.
+    """
 
     def __init__(
         self,
@@ -127,21 +138,58 @@ class TextToDocs:
         disable_pipes=None,
         enable_pipe=None,
         batch_size=25,
+        n_process=1,
+        mem_log=False,
     ):
         """Initialize the class."""
-        self.nlp = spacy.load(model, disable=disable_pipes or [])
-        if enable_pipe:
-            self.nlp.add_pipe(enable_pipe)
-        self.batch_size = batch_size
+        super().__init__(
+            model, disable_pipes, enable_pipe, batch_size, n_process, mem_log
+        )
+        if not Doc.has_extension("idx"):
+            Doc.set_extension("idx", default=None)
 
-    def convert_text_to_docs_and_serialize(self, text):
-        """Convert texts to spaCy Doc objects and serialize them."""
-        doc_bin = DocBin()
-        for doc in self.nlp.pipe(text, batch_size=self.batch_size):
+    def stream_docs_with_attributes(self, series):
+        """
+        Stream text series data as spaCy Doc objects with custom attributes.
+
+        Source: <https://spacy.io/usage/processing-pipelines#processing>
+        """
+        text_tuples = [(text, {"idx": str(idx)}) for idx, text in series.items()]
+        for doc, context in self.nlp.pipe(
+            text_tuples,
+            batch_size=self.batch_size,
+            n_process=self.n_process,
+            as_tuples=True,
+        ):
+            doc._.idx = context["idx"]
+            yield doc
+
+    def serialize_docs_with_attributes(self, series):
+        """
+        Convert a Series of texts to spaCy Doc objects and serialize them.
+        """
+        if self.mem_log:
+            tracemalloc.start()
+            snapshot1 = tracemalloc.take_snapshot()
+
+        # Create a DocBin object
+        # `store_user_data` is set to True to store the extension data
+        doc_bin = DocBin(store_user_data=True)
+
+        # Serialize the text data
+
+        for doc in self.stream_docs_with_attributes(series):
             doc_bin.add(doc)
+
+            if self.mem_log:
+                self._log_memory_usage(doc_bin, snapshot1)  # type: ignore
+
+        if self.mem_log:
+            tracemalloc.stop()
+
         return doc_bin.to_bytes()
 
-    def deserialize_docs(self, bytes_data):
-        """Deserialize Doc objects and return them as a list."""
-        doc_bin = DocBin().from_bytes(bytes_data)
-        return list(doc_bin.get_docs(self.nlp.vocab))
+    def deserialize_docs_with_attributes_as_series(self, bytes_data):
+        """Deserialize Doc objects and return them as a Pandas Series."""
+        docs = self.deserialize_docbin(bytes_data)
+        return pd.Series({doc._.idx: doc for doc in docs})
