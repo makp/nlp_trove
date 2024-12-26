@@ -77,6 +77,7 @@ class SeriesToDocs:
         """
         if self.mem_log:
             tracemalloc.start()
+            snapshot1 = tracemalloc.take_snapshot()
 
         # Create a DocBin object
         # NOTE: `store_user_data` is set to True to store the extension data
@@ -84,13 +85,14 @@ class SeriesToDocs:
         for doc in self.stream_text_series_as_docs(series):
             doc_bin.add(doc)
             if self.mem_log:
-                process = psutil.Process()  # psutil
-                snapshot = tracemalloc.take_snapshot()
-                top_stats = snapshot.statistics("lineno")
+                process = psutil.Process()
+                snapshot2 = tracemalloc.take_snapshot()
+                top_stats = snapshot2.compare_to(snapshot1, "lineno")  # type: ignore
                 logging.info(
                     f"Number of Docs in DocBin: {len(doc_bin)};\n"
-                    f"Total memory usage in MB: {process.memory_info().rss / (1024 * 1024):.2f}\n"
+                    f"Total memory usage in MB: {process.memory_info().rss / (1024 ** 2):.2f}\n"
                     f"Tracemalloc top stats: {top_stats[:5]}\n"
+                    # current, peak = tracemalloc.get_traced_memory()
                     "---------------------------------------------"
                 )
         if self.mem_log:
