@@ -103,7 +103,7 @@ class SeriesToDocs:
         snapshot2 = tracemalloc.take_snapshot()
         top_stats = snapshot2.compare_to(snapshot_base, "lineno")  # type: ignore
         logging.info(
-            f"Object length ({object_name}): {len(object_name)};\n"
+            f"Object length ({type(object_name)}): {len(object_name)};\n"
             f"Total memory usage in MB: {process.memory_info().rss / (1024 ** 2):.2f}\n"
             f"Tracemalloc top stats: {top_stats[:5]}\n"
             # current, peak = tracemalloc.get_traced_memory()
