@@ -2,12 +2,12 @@
 
 import os
 
-from .files import create_filename_with_timestamp
+from .files import create_filename_with_date
 
 
 def save_df(df, folder_path, prefix="out", suffix="", extension="pkl"):
     """Save a DataFrame or Series to a file."""
-    filename = create_filename_with_timestamp(prefix, suffix, extension)
+    filename = create_filename_with_date(prefix, suffix, extension)
 
     full_path = os.path.join(folder_path, filename)
 
