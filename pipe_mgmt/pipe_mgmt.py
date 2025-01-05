@@ -12,32 +12,31 @@ def create_root_pipes(root_pipes: list) -> list[dict]:
     return [{**PIPE_TEMPLATE, "pipe_name": pipe} for pipe in root_pipes]
 
 
-def find_pipe(pipes: list[dict], pipe_name: str) -> list[dict]:
-    """Search pipeline recursively."""
-    lst_matches = []
+def find_pipe(pipes: list[dict], conditions: dict) -> list[dict]:
+    """Search pipeline recursively for a condition."""
+    matches: list = []
     for pipe in pipes:
-        if pipe["pipe_name"] == pipe_name:
-            lst_matches.append(pipe)
-        lst_matches.extend(find_pipe(pipe.get("children", []), pipe_name))
-    return lst_matches
+        if all(pipe.get(key) == value for key, value in conditions.items()):
+            matches.append(pipe)
+        matches.extend(find_pipe(pipe.get("children", []), conditions))
+    return matches
 
 
-def _list_pipe_lineage(root_pipe: dict) -> list[list]:
+def _get_lineage(root_pipe: dict) -> list[list]:
     """List children from root pipe recursively."""
-    lst_children: list[list] = []
+    children: list[list] = []
     for child in root_pipe.get("children", []):
-        lst_children.append([child["pipe_name"]])
-        lst_children.extend(_list_pipe_lineage(child))
-    for lineage in lst_children:
+        children.append([child["pipe_name"]])
+        children.extend(_get_lineage(child))
+    for lineage in children:
         lineage.insert(0, root_pipe["pipe_name"])
-    return lst_children
+    return children
 
 
 def list_pipeline_lineage(pipes: list[dict]) -> list[list]:
     """List pipeline lineage."""
-    lst_lineage = []
+    lineages: list = []
     for pipe in pipes:
-        pipe_children = _list_pipe_lineage(pipe)
-        lst_lineage.extend(pipe_children)
-    return lst_lineage
-
+        pipe_children = _get_lineage(pipe)
+        lineages.extend(pipe_children)
+    return lineages
