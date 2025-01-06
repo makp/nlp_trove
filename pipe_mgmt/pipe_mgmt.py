@@ -54,20 +54,12 @@ class PipeMgmt:
                     matches.extend(self.search_pipe(pipe["children"], conditions))
         return matches
 
-    def get_lineage(self, root_pipe: dict) -> list[list]:
-        """List children from root pipe recursively."""
-        children: list[list] = []
-        for child in root_pipe.get("children", []):
+    def get_descendants(self, pipe: dict) -> list:
+        """List the descendants of a pipe recursively."""
+        children = []
+        for child in pipe.get("children", []):
             children.append([child["name"]])
-            children.extend(self.get_lineage(child))
+            children.extend(self.get_descendants(child))
         for lineage in children:
-            lineage.insert(0, root_pipe["name"])
+            lineage.insert(0, pipe["name"])
         return children
-
-    def list_lineages(self, pipes: list[dict]) -> list[list]:
-        """List pipeline lineage."""
-        lineages = []
-        for pipe in pipes:
-            pipe_children = self.get_lineage(pipe)
-            lineages.extend(pipe_children)
-        return lineages
