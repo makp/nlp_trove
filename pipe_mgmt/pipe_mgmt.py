@@ -7,17 +7,19 @@ class PipeMgmt:
 
     def __init__(self):
         self.pipe_template = {
-            "pipe_name": None,
+            "name": None,
+            "shortname": None,
+            "description": None,
             "creation_date": None,
             "path": None,
-            "parent_pipe": None,
+            "parent": None,
             "children": [],
         }
 
-    def create_pipe(self, pipe_name: str, **kwargs) -> dict:
+    def create_pipe(self, name: str, **kwargs) -> dict:
         """Create a pipeline."""
         pipe = self.pipe_template.copy()
-        pipe.update(pipe_name=pipe_name, **kwargs)
+        pipe.update(name=name, **kwargs)
         return pipe
 
     def find_pipe(self, pipes: list[dict], conditions: dict) -> list[dict]:
@@ -33,10 +35,10 @@ class PipeMgmt:
         """List children from root pipe recursively."""
         children: list[list] = []
         for child in root_pipe.get("children", []):
-            children.append([child["pipe_name"]])
+            children.append([child["name"]])
             children.extend(self.get_lineage(child))
         for lineage in children:
-            lineage.insert(0, root_pipe["pipe_name"])
+            lineage.insert(0, root_pipe["name"])
         return children
 
     def list_lineages(self, pipes: list[dict]) -> list[list]:
