@@ -43,13 +43,15 @@ class PipeMgmt:
         pipe.update(name=name, **kwargs)
         return pipe
 
-    def find_pipe(self, pipes: list[dict], conditions: dict) -> list[dict]:
-        """Search pipeline recursively for a condition."""
+    def search_pipe(self, pipe_tree: list[dict], conditions: dict) -> list[dict]:
+        """Search for a pipe that matches conditions."""
         matches = []
-        for pipe in pipes:
-            if all(pipe.get(key) == value for key, value in conditions.items()):
+        for pipe in pipe_tree:
+            if all(pipe.get(key, None) == value for key, value in conditions.items()):
                 matches.append(pipe)
-            matches.extend(self.find_pipe(pipe.get("children", []), conditions))
+            else:
+                if pipe.get("children"):
+                    matches.extend(self.search_pipe(pipe["children"], conditions))
         return matches
 
     def get_lineage(self, root_pipe: dict) -> list[list]:
