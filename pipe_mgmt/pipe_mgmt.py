@@ -14,9 +14,11 @@ class PipeMgmt:
             "children": [],
         }
 
-    def create_root_pipes(self, root_pipes: list) -> list[dict]:
-        """Create root pipelines."""
-        return [{**self.pipe_template, "pipe_name": pipe} for pipe in root_pipes]
+    def create_pipe(self, pipe_name: str, **kwargs) -> dict:
+        """Create a pipeline."""
+        pipe = self.pipe_template.copy()
+        pipe.update(pipe_name=pipe_name, **kwargs)
+        return pipe
 
     def find_pipe(self, pipes: list[dict], conditions: dict) -> list[dict]:
         """Search pipeline recursively for a condition."""
