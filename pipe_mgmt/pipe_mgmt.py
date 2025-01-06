@@ -5,16 +5,37 @@ class PipeMgmt:
     Provides methods for creating, searching and analyzing pipelines.
     """
 
+    pipe_key_types = {
+        "name": str,
+        "shortname": None | str,
+        "description": None | str,
+        "creation_date": None | str,
+        "path": str,
+        "parent": None | str,
+        "children": None | list,
+    }
+
     def __init__(self):
-        self.pipe_template = {
-            "name": None,
-            "shortname": None,
-            "description": None,
-            "creation_date": None,
-            "path": None,
-            "parent": None,
-            "children": [],
-        }
+        self.pipe_template = dict.fromkeys(self.pipe_key_types.keys())
+
+    def validate_pipe(self, pipe: dict) -> bool:
+        """
+        Validate pipeline structure and types.
+
+        - TODO: Use `TypedDict` for type checking.
+        """
+        for key, expected_type in self.pipe_key_types.items():
+            if key not in pipe:
+                print("Key missing:", key)
+                return False
+            if not isinstance(pipe[key], expected_type):
+                print("Key type mismatch:", key)
+                return False
+            if pipe["children"] is not None:
+                for child in pipe["children"]:
+                    if not self.validate_pipe(child):
+                        return False
+        return True
 
     def create_pipe(self, name: str, **kwargs) -> dict:
         """Create a pipeline."""
