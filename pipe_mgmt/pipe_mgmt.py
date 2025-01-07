@@ -26,6 +26,38 @@ class PipeMgmt:
             if not is_valid:
                 raise ValueError("Invalid pipeline tree structure")
 
+    def _filter_pipe(self, pipe: dict, attrib="name") -> list[list]:
+        """Filter a pipeline based on an attribute key."""
+        neted_list = [pipe[attrib]]
+        if pipe.get("children"):
+            for child in pipe["children"]:
+                neted_list.append(self._filter_pipe(child, attrib))
+        return neted_list
+
+    def _append_head_to_sublists(self, head: str, sublist: list[list]) -> list[list]:
+        return [[head] + sublist for sublist in sublist]
+
+    def _flatten_nested_list(self, nested_list: list[list]):
+        """List all paths in a nested list."""
+        if len(nested_list) == 1:
+            return [nested_list]
+        elif len(nested_list) > 1:
+            head, *tail = nested_list
+            path = []
+            for member in tail:
+                path.extend(
+                    self._append_head_to_sublists(
+                        head,  # type: ignore
+                        self._flatten_nested_list(member),  # type: ignore
+                    )
+                )
+            return path
+
+    def list_paths(self, pipe: dict) -> list[list]:
+        """List all paths within a pipeline from root to terminal nodes."""
+        nested_list = self._filter_pipe(pipe)
+        return self._flatten_nested_list(nested_list) or []
+
     def validate_pipe(self, pipe: dict) -> bool:
         """
         Validate pipeline structure and types.
