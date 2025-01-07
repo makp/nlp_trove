@@ -73,11 +73,9 @@ class PipeMgmt:
         return matches
 
     def get_descendants(self, pipe: dict) -> list:
-        """List the descendants of a pipe recursively."""
-        children = []
-        for child in pipe.get("children", []):
-            children.append([child["name"]])
-            children.extend(self.get_descendants(child))
-        for lineage in children:
-            lineage.insert(0, pipe["name"])
-        return children
+        """List the descendant names of a pipe recursively."""
+        descendants = [pipe["name"]]
+        if children := pipe.get("children"):
+            for child in children:
+                descendants.extend(self.get_descendants(child))
+        return descendants
