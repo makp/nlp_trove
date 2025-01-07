@@ -18,8 +18,13 @@ class PipeMgmt:
         "children": None | list,
     }
 
-    def __init__(self):
+    def __init__(self, pipe_tree=None):
         self.pipe_template = dict.fromkeys(self.pipe_key_types.keys())
+        self.pipe_tree = pipe_tree
+        if pipe_tree is not None:
+            is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
+            if not is_valid:
+                raise ValueError("Invalid pipeline tree structure")
 
     def validate_pipe(self, pipe: dict) -> bool:
         """
