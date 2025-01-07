@@ -3,6 +3,9 @@ class PipeMgmt:
     Class for managing pipelines and their relationships.
 
     Provides methods for creating, searching and analyzing pipelines.
+
+    The term "pipeline tree" refers a list of dictionaries object, where each
+    dictionary represents a pipeline with its attributes and children.
     """
 
     pipe_key_types = {
@@ -42,6 +45,16 @@ class PipeMgmt:
         pipe = self.pipe_template.copy()
         pipe.update(name=name, **kwargs)
         return pipe
+
+    def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
+        """Get terminal pipelines from a pipeline tree."""
+        terminals = []
+        for pipe in pipe_tree:
+            if pipe.get("children"):
+                terminals.extend(self.get_terminal_pipes(pipe["children"]))
+            else:
+                terminals.append(pipe)
+        return terminals
 
     def search_pipe(self, pipe_tree: list[dict], conditions: dict) -> list[dict]:
         """Search for a pipe that matches conditions."""
