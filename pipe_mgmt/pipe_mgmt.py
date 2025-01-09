@@ -138,6 +138,28 @@ class PipeTree(Pipe):
             (pipe for pipe in self.search_pipe(pipe_tree, {"id": pipe_id})), None
         )
 
+    def create_id_pipe_map(self, pipe_tree: list[dict]) -> dict:
+        """Create a dictionary mapping IDs to pipelines."""
+        id_map = {}
+        for pipe in pipe_tree:
+            if "id" not in pipe:
+                raise ValueError("Pipeline missing ID")
+            id_map[pipe["id"]] = pipe
+            if pipe.get("children"):
+                id_map.update(self.create_id_pipe_map(pipe["children"]))
+        return id_map
+
+    def create_id_path_map(self, pipe_tree: list[dict]) -> dict:
+        """Create a dictionary mapping IDs to pipeline paths."""
+        id_map = {}
+        for pipe in pipe_tree:
+            if "id" not in pipe:
+                raise ValueError("Pipeline missing ID")
+            id_map[pipe["id"]] = self.get_descendants(pipe)
+            if pipe.get("children"):
+                id_map.update(self.create_id_path_map(pipe["children"]))
+        return id_map
+
     def get_descendants(self, pipe: dict) -> list:
         """List the descendant names of a pipe recursively."""
         descendants = [pipe["name"]]
