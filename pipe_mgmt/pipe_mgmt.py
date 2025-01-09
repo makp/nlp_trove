@@ -1,5 +1,7 @@
 import uuid
 
+import yaml
+
 
 class Pipe:
     """
@@ -177,3 +179,8 @@ class PipeTree(Pipe):
             if pipe.get("children"):
                 id_map.update(self.create_id_path_map(pipe["children"]))
         return id_map
+
+    def write_pipeline(self, pipe_tree: list[dict], path: str):
+        """Write pipeline tree to a YAML file."""
+        with open(path, "w") as f:
+            yaml.dump(pipe_tree, f, sort_keys=False)
