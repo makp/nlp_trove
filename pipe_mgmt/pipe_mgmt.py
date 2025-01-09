@@ -75,7 +75,7 @@ class PipeTree(Pipe):
     def __init__(self, pipe_tree=None):
         super().__init__()  # Initialize parent class
         self.pipe_tree = pipe_tree
-        if pipe_tree is not None:
+        if pipe_tree:
             # Validate pipeline tree structure
             is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
             if not is_valid:
@@ -84,8 +84,11 @@ class PipeTree(Pipe):
             # Create map from IDs to paths
             self.id_path_map = self.create_id_path_map(pipe_tree)
 
-    def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
+    def get_terminal_pipes(self, pipe_tree: list[dict] | None = None) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
+        # Use instance variable if `pipe_tree` not provided
+        pipe_tree = pipe_tree or self.pipe_tree or []
+
         terminals = []
         for pipe in pipe_tree:
             if pipe.get("children"):
@@ -94,15 +97,20 @@ class PipeTree(Pipe):
                 terminals.append(pipe)
         return terminals
 
-    def search_pipe(self, pipe_tree: list[dict], conditions: dict) -> list[dict]:
+    def search_pipe(
+        self, conditions: dict, pipe_tree: list[dict] | None = None
+    ) -> list[dict]:
         """Search for a pipe that matches conditions."""
+        pipe_tree = pipe_tree or self.pipe_tree or []
+
         matches = []
+
         for pipe in pipe_tree:
             if all(pipe.get(key, None) == value for key, value in conditions.items()):
                 matches.append(pipe)
             else:
                 if pipe.get("children"):
-                    matches.extend(self.search_pipe(pipe["children"], conditions))
+                    matches.extend(self.search_pipe(conditions, pipe["children"]))
         return matches
 
     def add_unique_ids(self, pipe_tree: list[dict]) -> None:
@@ -116,7 +124,7 @@ class PipeTree(Pipe):
     def get_pipe_by_id(self, pipe_tree: list[dict], pipe_id: str) -> dict | None:
         """Get a pipeline by its ID."""
         return next(
-            (pipe for pipe in self.search_pipe(pipe_tree, {"id": pipe_id})), None
+            (pipe for pipe in self.search_pipe({"id": pipe_id}, pipe_tree)), None
         )
 
     def create_id_pipe_map(self, pipe_tree: list[dict]) -> dict:
@@ -189,7 +197,12 @@ class PipeTree(Pipe):
         filtered_tree = self._filter_pipetree(pipe_tree, attrib)
         return self._flatten_filtered_pipetree(filtered_tree)
 
-    def write_pipeline(self, pipe_tree: list[dict], path: str):
+    def write_pipeline(
+        self,
+        pipe_tree: list[dict] | None = None,
+        path: str = "pipelines.yaml",
+    ) -> None:
         """Write pipeline tree to a YAML file."""
+        pipe_tree = pipe_tree or self.pipe_tree
         with open(path, "w") as f:
             yaml.dump(pipe_tree, f, sort_keys=False)
