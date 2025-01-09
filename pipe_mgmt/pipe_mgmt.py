@@ -1,4 +1,4 @@
-class PipeMgmt:
+class PipeTree:
     """
     Class for managing pipelines and their relationships.
 
