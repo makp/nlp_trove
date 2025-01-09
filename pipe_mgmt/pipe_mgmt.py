@@ -1,3 +1,6 @@
+import uuid
+
+
 class PipeTree:
     """
     Class for managing pipelines and their relationships.
@@ -13,6 +16,7 @@ class PipeTree:
     """
 
     pipe_key_types = {
+        "id": str,
         "name": str,
         "shortname": None | str,
         "description": None | str,
@@ -82,9 +86,9 @@ class PipeTree:
         return True
 
     def create_pipe(self, name: str, **kwargs) -> dict:
-        """Create a pipeline."""
+        """Create a pipeline from `kwargs`."""
         pipe = self.pipe_template.copy()
-        pipe.update(name=name, **kwargs)
+        pipe.update(id=str(uuid.uuid4()), name=name, **kwargs)
         return pipe
 
     def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
@@ -97,6 +101,15 @@ class PipeTree:
                 terminals.append(pipe)
         return terminals
 
+    def add_unique_ids(self, pipe_tree: list[dict]) -> list[dict]:
+        """Add unique IDs to each pipeline in a pipeline tree."""
+        for pipe in pipe_tree:
+            if not pipe.get("id"):
+                pipe["id"] = str(uuid.uuid4())
+            if pipe.get("children"):
+                self.add_unique_ids(pipe["children"])
+        return pipe_tree
+
     def search_pipe(self, pipe_tree: list[dict], conditions: dict) -> list[dict]:
         """Search for a pipe that matches conditions."""
         matches = []
@@ -107,6 +120,12 @@ class PipeTree:
                 if pipe.get("children"):
                     matches.extend(self.search_pipe(pipe["children"], conditions))
         return matches
+
+    def get_pipe_by_id(self, pipe_tree: list[dict], pipe_id: str) -> dict | None:
+        """Get a pipeline by its ID."""
+        return next(
+            (pipe for pipe in self.search_pipe(pipe_tree, {"id": pipe_id})), None
+        )
 
     def get_descendants(self, pipe: dict) -> list:
         """List the descendant names of a pipe recursively."""
