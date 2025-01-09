@@ -120,14 +120,13 @@ class PipeTree(Pipe):
                 terminals.append(pipe)
         return terminals
 
-    def add_unique_ids(self, pipe_tree: list[dict]) -> list[dict]:
+    def add_unique_ids(self, pipe_tree: list[dict]) -> None:
         """Add unique IDs to each pipeline in a pipeline tree."""
         for pipe in pipe_tree:
             if not pipe.get("id"):
                 pipe["id"] = str(uuid.uuid4())
             if pipe.get("children"):
                 self.add_unique_ids(pipe["children"])
-        return pipe_tree
 
     def search_pipe(self, pipe_tree: list[dict], conditions: dict) -> list[dict]:
         """Search for a pipe that matches conditions."""
