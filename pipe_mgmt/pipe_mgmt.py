@@ -126,26 +126,31 @@ class PipeTree(Pipe):
                 id_map.update(self.create_id_pipe_map(pipe["children"]))
         return id_map
 
-    def create_id_path_map(self, pipe_tree: list[dict]) -> dict:
+    def create_id_path_map(self, pipe_tree: list[dict], ancestors_path=None) -> dict:
         """Create a dictionary mapping IDs to pipeline paths."""
-        id_map = {}
+        id_map: dict[str, list] = {}
 
         for pipe in pipe_tree:
             # Prevent chaos
             if "id" not in pipe:
-                raise ValueError("Pipeline missing ID")
+                raise KeyError("Pipeline missing ID")
 
-            current_path = []
-            if pipe.get("parent"):
-                if pipe["parent"] not in id_map:
-                    raise ValueError(f"Parent ID for {pipe["parent"]} not found")
-                current_path.extend(id_map[pipe["parent"]])
+            path = []
 
-            current_path.append(pipe["name"])
-            id_map[pipe["id"]] = current_path
+            # Add ancestors' path if it exists
+            if ancestors_path:
+                path.extend(ancestors_path)
 
+            # Add current pipeline to `id_map`
+            path.append(pipe["name"])
+            id_map[pipe["id"]] = path
+
+            # Recursively run routine on children
             if pipe.get("children"):
-                id_map.update(self.create_id_path_map(pipe["children"]))
+                id_map.update(
+                    self.create_id_path_map(pipe["children"], ancestors_path=path)
+                )
+
         return id_map
 
     def _filter_pipetree(self, pipe_tree: list[dict], attrib="name"):
