@@ -4,10 +4,12 @@ class PipeTree:
 
     Provides methods for creating, searching and analyzing pipelines.
 
-    The term "pipeline tree" refers a list of dictionaries object, where each
-    dictionary represents a pipeline with its attributes and children. Note
-    that the pipeline children has the same structure as a pipeline tree (i.e.,
-    `list[dict]`).
+    "Pipeline trees" refer to a list of dictionaries, where each dictionary
+    represents a pipeline with its attributes and children.
+
+    The children of a pipeline has the same representation as a a pipeline tree
+    (i.e., `list[dict]`). This is a handy feature as it allows functions to
+    apply recursively.
     """
 
     pipe_key_types = {
@@ -32,9 +34,9 @@ class PipeTree:
         """
         Filter pipeline tree based on an attribute key.
 
-        The dictionary representing a pipeline with children has the following
-        structure: `{kwargs, children: list}`. The output of this function will
-        return `[[val_parent, [[val_child1, [[val_grandchild1, ...]], ...]]]]`.
+        The dictionary representing a pipeline with children has the structure
+        `{kwargs, children: list}`. The output of this function will return
+        `[[val_parent, [[val_child1, [[val_grandchild1, ...]], ...]]]]`.
         """
         out_lst = []
         for pipe in pipe_tree:
