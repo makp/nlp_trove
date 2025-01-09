@@ -1,18 +1,11 @@
 import uuid
 
 
-class PipeTree:
+class Pipe:
     """
-    Class for managing pipelines and their relationships.
+    Class for managing individual pipelines.
 
-    Provides methods for creating, searching and analyzing pipelines.
-
-    "Pipeline trees" refer to a list of dictionaries, where each dictionary
-    represents a pipeline with its attributes and children.
-
-    The children of a pipeline has the same representation as a a pipeline tree
-    (i.e., `list[dict]`). This is a handy feature as it allows functions to
-    apply recursively.
+    Individual pipelines are represented as dictionaries.
     """
 
     pipe_key_types = {
@@ -26,8 +19,26 @@ class PipeTree:
         "children": None | list,
     }
 
-    def __init__(self, pipe_tree=None):
+    def __init__(self):
         self.pipe_template = dict.fromkeys(self.pipe_key_types.keys())
+
+
+class PipeTree(Pipe):
+    """
+    Class for managing pipeline trees.
+
+    Provides methods for creating, searching and analyzing pipeline trees.
+
+    "Pipeline trees" refer to a list of dictionaries, where each dictionary
+    represents a pipeline with its attributes and children.
+
+    The children of a pipeline has the same representation as a a pipeline tree
+    (i.e., `list[dict]`). This is a handy feature as it allows functions to
+    apply recursively.
+    """
+
+    def __init__(self, pipe_tree=None):
+        super().__init__()  # Initialize parent class
         self.pipe_tree = pipe_tree
         if pipe_tree is not None:
             is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
