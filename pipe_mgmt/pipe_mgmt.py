@@ -22,6 +22,39 @@ class Pipe:
     def __init__(self):
         self.pipe_template = dict.fromkeys(self.pipe_key_types.keys())
 
+    def get_descendants(self, pipe: dict) -> list:
+        """List the descendant names of a pipe."""
+        descendants = [pipe["name"]]
+        if children := pipe.get("children"):
+            for child in children:
+                descendants.extend(self.get_descendants(child))
+        return descendants
+
+    def validate_pipe(self, pipe: dict) -> bool:
+        """
+        Validate pipeline structure and types.
+
+        - NOTE: Consider using `TypedDict` for type checking instead.
+        """
+        for key, expected_type in self.pipe_key_types.items():
+            if key not in pipe:
+                print("Key missing:", key)
+                return False
+            if not isinstance(pipe[key], expected_type):
+                print("Key type mismatch:", key)
+                return False
+            if pipe["children"] is not None:
+                for child in pipe["children"]:
+                    if not self.validate_pipe(child):
+                        return False
+        return True
+
+    def create_pipe(self, name: str, **kwargs) -> dict:
+        """Create a pipeline from `kwargs`."""
+        pipe = self.pipe_template.copy()
+        pipe.update(id=str(uuid.uuid4()), name=name, **kwargs)
+        return pipe
+
 
 class PipeTree(Pipe):
     """
@@ -77,31 +110,6 @@ class PipeTree(Pipe):
         filtered_tree = self._filter_pipetree(pipe_tree, attrib)
         return self._flatten_filtered_pipetree(filtered_tree)
 
-    def validate_pipe(self, pipe: dict) -> bool:
-        """
-        Validate pipeline structure and types.
-
-        - TODO: Use `TypedDict` for type checking.
-        """
-        for key, expected_type in self.pipe_key_types.items():
-            if key not in pipe:
-                print("Key missing:", key)
-                return False
-            if not isinstance(pipe[key], expected_type):
-                print("Key type mismatch:", key)
-                return False
-            if pipe["children"] is not None:
-                for child in pipe["children"]:
-                    if not self.validate_pipe(child):
-                        return False
-        return True
-
-    def create_pipe(self, name: str, **kwargs) -> dict:
-        """Create a pipeline from `kwargs`."""
-        pipe = self.pipe_template.copy()
-        pipe.update(id=str(uuid.uuid4()), name=name, **kwargs)
-        return pipe
-
     def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
         terminals = []
@@ -151,19 +159,3 @@ class PipeTree(Pipe):
 
     def create_id_path_map(self, pipe_tree: list[dict]) -> dict:
         """Create a dictionary mapping IDs to pipeline paths."""
-        id_map = {}
-        for pipe in pipe_tree:
-            if "id" not in pipe:
-                raise ValueError("Pipeline missing ID")
-            id_map[pipe["id"]] = self.get_descendants(pipe)
-            if pipe.get("children"):
-                id_map.update(self.create_id_path_map(pipe["children"]))
-        return id_map
-
-    def get_descendants(self, pipe: dict) -> list:
-        """List the descendant names of a pipe recursively."""
-        descendants = [pipe["name"]]
-        if children := pipe.get("children"):
-            for child in children:
-                descendants.extend(self.get_descendants(child))
-        return descendants
