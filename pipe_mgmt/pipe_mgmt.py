@@ -76,9 +76,13 @@ class PipeTree(Pipe):
         super().__init__()  # Initialize parent class
         self.pipe_tree = pipe_tree
         if pipe_tree is not None:
+            # Validate pipeline tree structure
             is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
             if not is_valid:
                 raise ValueError("Invalid pipeline tree structure")
+
+            # Create map from IDs to paths
+            self.id_path_map = self.create_id_path_map(pipe_tree)
 
     def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
