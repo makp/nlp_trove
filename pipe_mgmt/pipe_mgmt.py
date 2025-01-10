@@ -154,7 +154,7 @@ class PipeTree(Pipe):
                 path.extend(ancestors_path)
 
             # Add current pipeline to `id_map`
-            path.append(pipe["name"])
+            path.append(pipe["shortname"] or pipe["name"])
             id_map[pipe["id"]] = path
 
             # Recursively run routine on children
