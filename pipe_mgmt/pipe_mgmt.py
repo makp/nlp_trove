@@ -84,9 +84,13 @@ class PipeTree(Pipe):
             # Create map from IDs to paths
             self.id_path_map = "_".join(self.create_id_path_map(pipe_tree))
 
-    def create_pipe_tree(self, lst_args: list[dict]) -> list[dict]:
+    def create_pipe_tree(self, lst_args: list[dict], validate=True) -> list[dict]:
         """Create a pipeline tree from a list of dictionaries containing the pipeline attributes."""
-        return [self.create_pipe(**kwargs) for kwargs in lst_args]
+        pipe_tree = [self.create_pipe(**kwargs) for kwargs in lst_args]
+        if validate:
+            if not all(self.validate_pipe(pipe) for pipe in pipe_tree):
+                raise ValueError("Invalid pipeline tree structure")
+        return pipe_tree
 
     def get_terminal_pipes(self, pipe_tree: list[dict] | None = None) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
