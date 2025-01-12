@@ -94,7 +94,7 @@ class PipeTree(Pipe):
                 raise ValueError("Invalid pipeline tree structure")
         return pipe_tree
 
-    def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
+    def get_terminal_pipes(self, pipe_tree=None) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
         # Use instance variable if `pipe_tree` not provided
         pipe_tree = pipe_tree or self.pipe_tree
@@ -107,7 +107,7 @@ class PipeTree(Pipe):
                 terminals.append(pipe)
         return terminals
 
-    def search_pipe(self, conditions: dict, pipe_tree: list[dict]) -> list[dict]:
+    def search_pipe(self, conditions: dict, pipe_tree=None) -> list[dict]:
         """Search for a pipe that matches conditions."""
         pipe_tree = pipe_tree or self.pipe_tree
 
@@ -136,7 +136,7 @@ class PipeTree(Pipe):
         )
 
     def create_id_pipe_map(self, pipe_tree: list[dict]) -> dict:
-        """Create a dictionary mapping IDs to pipelines."""
+        """Create a dictionary that maps IDs to pipelines."""
         id_map = {}
         for pipe in pipe_tree:
             if "id" not in pipe:
@@ -200,7 +200,7 @@ class PipeTree(Pipe):
                     paths.append([node[0]] + member)
         return paths
 
-    def list_paths(self, pipe_tree, attrib="name"):
+    def list_paths(self, pipe_tree: list[dict], attrib="name"):
         """List all pipeline paths."""
         filtered_tree = self._filter_pipetree(pipe_tree, attrib)
         return self._flatten_filtered_pipetree(filtered_tree)
@@ -208,7 +208,7 @@ class PipeTree(Pipe):
     def assign_children(
         self,
         lst_kwargs: list[dict],
-        pipe_tree: list[dict],
+        pipe_tree=None,
         file_extension=".pkl",
     ) -> None:
         """Write children to a pipeline tree."""
@@ -228,7 +228,7 @@ class PipeTree(Pipe):
 
     def write_pipe_tree(
         self,
-        pipe_tree: list[dict],
+        pipe_tree=None,
         path: str = "pipelines.yaml",
     ) -> None:
         """Write pipeline tree to a YAML file."""
