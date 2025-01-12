@@ -201,7 +201,7 @@ class PipeTree(Pipe):
         filtered_tree = self._filter_pipetree(pipe_tree, attrib)
         return self._flatten_filtered_pipetree(filtered_tree)
 
-    def write_pipeline(
+    def write_pipe_tree(
         self,
         pipe_tree: list[dict] | None = None,
         path: str = "pipelines.yaml",
