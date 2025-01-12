@@ -82,7 +82,7 @@ class PipeTree(Pipe):
                 raise ValueError("Invalid pipeline tree structure")
 
             # Create map from IDs to paths
-            self.id_path_map = self.create_id_path_map(pipe_tree)
+            self.id_path_map = "_".join(self.create_id_path_map(pipe_tree))
 
     def get_terminal_pipes(self, pipe_tree: list[dict] | None = None) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
