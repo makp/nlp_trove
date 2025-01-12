@@ -74,7 +74,7 @@ class PipeTree(Pipe):
 
     def __init__(self, pipe_tree=None):
         super().__init__()  # Initialize parent class
-        self.pipe_tree = pipe_tree
+        self.pipe_tree = pipe_tree or []
         if pipe_tree:
             # Validate pipeline tree structure
             is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
@@ -97,7 +97,7 @@ class PipeTree(Pipe):
     def get_terminal_pipes(self, pipe_tree: list[dict] | None = None) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
         # Use instance variable if `pipe_tree` not provided
-        pipe_tree = pipe_tree or self.pipe_tree or []
+        pipe_tree = pipe_tree or self.pipe_tree
 
         terminals = []
         for pipe in pipe_tree:
@@ -111,7 +111,7 @@ class PipeTree(Pipe):
         self, conditions: dict, pipe_tree: list[dict] | None = None
     ) -> list[dict]:
         """Search for a pipe that matches conditions."""
-        pipe_tree = pipe_tree or self.pipe_tree or []
+        pipe_tree = pipe_tree or self.pipe_tree
 
         matches = []
 
@@ -214,7 +214,7 @@ class PipeTree(Pipe):
         file_extension=".pkl",
     ) -> None:
         """Write children to a pipeline tree."""
-        pipe_tree = pipe_tree or self.pipe_tree or []
+        pipe_tree = pipe_tree or self.pipe_tree
 
         for pipe in pipe_tree:
             # Get path to the current pipeline
