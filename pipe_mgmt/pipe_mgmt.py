@@ -207,6 +207,27 @@ class PipeTree(Pipe):
         filtered_tree = self._filter_pipetree(pipe_tree, attrib)
         return self._flatten_filtered_pipetree(filtered_tree)
 
+    def assign_children(
+        self,
+        lst_kwargs: list[dict],
+        pipe_tree=None,
+        file_extension=".pkl",
+    ) -> None:
+        """Write children to a pipeline tree."""
+        pipe_tree = pipe_tree or self.pipe_tree or []
+
+        for pipe in pipe_tree:
+            # Get path to the current pipeline
+            path = self.id_path_map[pipe["id"]]
+
+            # Update `lst_kwargs` for pipe-specific attrbs
+            for child_kwargs in lst_kwargs:
+                child_kwargs.update(
+                    path=path + "_" + child_kwargs["shortname"] + file_extension,
+                    parent=pipe["name"],
+                )
+            pipe["children"] = self.create_pipe_tree(lst_kwargs)
+
     def write_pipe_tree(
         self,
         pipe_tree: list[dict] | None = None,
