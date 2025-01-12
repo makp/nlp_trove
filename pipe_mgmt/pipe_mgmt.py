@@ -51,10 +51,10 @@ class Pipe:
                         return False
         return True
 
-    def create_pipe(self, name: str, **kwargs) -> dict:
+    def create_pipe(self, **kwargs) -> dict:
         """Create a pipeline from `kwargs`."""
         pipe = self.pipe_template.copy()
-        pipe.update(id=str(uuid.uuid4()), name=name, **kwargs)
+        pipe.update(id=str(uuid.uuid4()), **kwargs)
         return pipe
 
 
@@ -83,6 +83,10 @@ class PipeTree(Pipe):
 
             # Create map from IDs to paths
             self.id_path_map = "_".join(self.create_id_path_map(pipe_tree))
+
+    def create_pipe_tree(self, lst_args: list[dict]) -> list[dict]:
+        """Create a pipeline tree from a list of dictionaries containing the pipeline attributes."""
+        return [self.create_pipe(**kwargs) for kwargs in lst_args]
 
     def get_terminal_pipes(self, pipe_tree: list[dict] | None = None) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
