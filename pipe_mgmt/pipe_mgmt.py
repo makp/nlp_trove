@@ -82,7 +82,9 @@ class PipeTree(Pipe):
                 raise ValueError("Invalid pipeline tree structure")
 
             # Create map from IDs to paths
-            self.id_path_map = "_".join(self.create_id_path_map(pipe_tree))
+            self.id_path_map = {}
+            for id, lst in self.create_id_path_map(pipe_tree).items():
+                self.id_path_map[id] = "_".join(lst)
 
     def create_pipe_tree(self, lst_args: list[dict], validate=True) -> list[dict]:
         """Create a pipeline tree from a list of dictionaries containing the pipeline attributes."""
