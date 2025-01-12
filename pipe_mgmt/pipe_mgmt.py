@@ -94,7 +94,7 @@ class PipeTree(Pipe):
                 raise ValueError("Invalid pipeline tree structure")
         return pipe_tree
 
-    def get_terminal_pipes(self, pipe_tree: list[dict] | None = None) -> list[dict]:
+    def get_terminal_pipes(self, pipe_tree: list[dict]) -> list[dict]:
         """Get terminal pipelines from a pipeline tree."""
         # Use instance variable if `pipe_tree` not provided
         pipe_tree = pipe_tree or self.pipe_tree
@@ -107,9 +107,7 @@ class PipeTree(Pipe):
                 terminals.append(pipe)
         return terminals
 
-    def search_pipe(
-        self, conditions: dict, pipe_tree: list[dict] | None = None
-    ) -> list[dict]:
+    def search_pipe(self, conditions: dict, pipe_tree: list[dict]) -> list[dict]:
         """Search for a pipe that matches conditions."""
         pipe_tree = pipe_tree or self.pipe_tree
 
@@ -210,7 +208,7 @@ class PipeTree(Pipe):
     def assign_children(
         self,
         lst_kwargs: list[dict],
-        pipe_tree=None,
+        pipe_tree: list[dict],
         file_extension=".pkl",
     ) -> None:
         """Write children to a pipeline tree."""
@@ -230,7 +228,7 @@ class PipeTree(Pipe):
 
     def write_pipe_tree(
         self,
-        pipe_tree: list[dict] | None = None,
+        pipe_tree: list[dict],
         path: str = "pipelines.yaml",
     ) -> None:
         """Write pipeline tree to a YAML file."""
