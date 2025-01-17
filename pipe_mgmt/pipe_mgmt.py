@@ -211,7 +211,8 @@ class PipeTree(Pipe):
         pipe_tree=None,
         file_extension=".pkl",
     ) -> None:
-        """Write children to a pipeline tree."""
+        """Write children to a pipeline tree, and automatically populate their
+        path and parent attrbs."""
         pipe_tree = pipe_tree or self.pipe_tree
 
         for pipe in pipe_tree:
