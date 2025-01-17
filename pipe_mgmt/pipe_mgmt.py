@@ -81,7 +81,7 @@ class PipeTree(Pipe):
             if not is_valid:
                 raise ValueError("Invalid pipeline tree structure")
 
-            # Create map from IDs to paths
+            # Create map from IDs to paths. Useful for filenames.
             self.id_path_map = {}
             for id, lst in self.create_id_path_map(pipe_tree).items():
                 self.id_path_map[id] = "_".join(lst)
@@ -106,6 +106,36 @@ class PipeTree(Pipe):
             else:
                 terminals.append(pipe)
         return terminals
+
+    def _map_levels_to_ids(self) -> dict:
+        """
+        Map pipeline paths to their nested level.
+
+        The root pipelines are at level 0, their children at level 1, and so on.
+        """
+        id_level_map = {k: len(v.split("_")) - 1 for k, v in self.id_path_map.items()}
+
+        level_id_map = {k: [] for k in set(id_level_map.values())}
+        for k, v in id_level_map.items():
+            level_id_map[v].append(k)
+
+        return level_id_map
+
+    def get_pipes_from_level(self, level: int) -> list[dict]:
+        """Get pipelines from a specific level."""
+        # Map levels to list of IDs
+        level_id_map = self._map_levels_to_ids()
+
+        # Allow for negative indexing
+        selected_level = tuple(level_id_map.keys())[level]
+
+        # Search for pipelines with the selected level
+        lst_ids = level_id_map[selected_level]
+        lst_out = []
+        for id in lst_ids:
+            lst_out.append(self.get_pipe_by_id(self.pipe_tree, id))
+
+        return lst_out
 
     def search_pipe(self, conditions: dict, pipe_tree=None) -> list[dict]:
         """Search for a pipe that matches conditions."""
