@@ -36,7 +36,11 @@ class SeriesToDocs:
         mem_log=False,
     ):
         """Initialize spaCy pipeline and parameters."""
-        self.nlp = spacy.load(model, disable=disable_pipes or [])
+        self.nlp = (
+            spacy.blank("en")
+            if model is None
+            else spacy.load(model, disable=disable_pipes or [])
+        )
         if enable_pipe:
             self.nlp.add_pipe(enable_pipe)
         self.batch_size = batch_size
@@ -55,7 +59,7 @@ class SeriesToDocs:
         )
         logging.info("Memory usage log during serialization")
 
-    def stream_docs(self, series):
+    def _stream_docs(self, series):
         """Stream Series containing text data as spaCy Doc objects."""
         # Format Series in a way that spaCy can process
         text_tuples = [(text, {"idx": str(idx)}) for idx, text in series.items()]
@@ -68,7 +72,7 @@ class SeriesToDocs:
         ):
             yield context["idx"], doc
 
-    def serialize_series_as_docs(self, text):
+    def serialize_series_as_docs(self, series: pd.Series) -> tuple[list, bytes]:
         """
         Serialize a container of texts into a DocBin object.
 
@@ -86,7 +90,7 @@ class SeriesToDocs:
 
         # Serialize the text data
         idx_list = []
-        for idx, doc in self.stream_docs(text):
+        for idx, doc in self._stream_docs(series):
             doc_bin.add(doc)
             idx_list.append(idx)
 
@@ -104,7 +108,7 @@ class SeriesToDocs:
         top_stats = snapshot2.compare_to(snapshot_base, "lineno")  # type: ignore
         logging.info(
             f"Object length ({type(object_name)}): {len(object_name)};\n"
-            f"Total memory usage in MB: {process.memory_info().rss / (1024 ** 2):.2f}\n"
+            f"Total memory usage in MB: {process.memory_info().rss / (1024**2):.2f}\n"
             f"Tracemalloc top stats: {top_stats[:5]}\n"
             # current, peak = tracemalloc.get_traced_memory()
             "---------------------------------------------"
