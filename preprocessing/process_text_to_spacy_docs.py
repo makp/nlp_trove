@@ -4,6 +4,7 @@ import logging
 import os
 import subprocess
 import tracemalloc
+from collections.abc import Hashable
 
 import pandas as pd
 import psutil
@@ -28,7 +29,7 @@ class SeriesToDocs:
 
     def __init__(
         self,
-        model="en_core_web_trf",
+        model: str | None = "en_core_web_trf",
         disable_pipes=None,
         enable_pipe=None,
         batch_size=25,
@@ -114,12 +115,14 @@ class SeriesToDocs:
             "---------------------------------------------"
         )
 
-    def deserialize_docbin(self, bytes_data):
+    def deserialize_docbin(self, bytes_data: bytes) -> list[Doc]:
         """Deserialize Doc objects and return them as a list."""
         doc_bin = DocBin().from_bytes(bytes_data)
         return list(doc_bin.get_docs(self.nlp.vocab))
 
-    def deserialize_docbin_as_series(self, bytes_data, idx_list):
+    def deserialize_docbin_as_series(
+        self, bytes_data: bytes, idx_list: list[Hashable]
+    ) -> pd.Series:
         """Deserialize Doc objects and return them as a Pandas Series."""
         docs = self.deserialize_docbin(bytes_data)
         return pd.Series({idx: doc for idx, doc in zip(idx_list, docs)})
