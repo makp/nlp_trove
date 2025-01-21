@@ -4,7 +4,7 @@ import logging
 import os
 import subprocess
 import tracemalloc
-from collections.abc import Hashable
+from collections.abc import Generator, Hashable
 
 import pandas as pd
 import psutil
@@ -60,10 +60,10 @@ class SeriesToDocs:
         )
         logging.info("Memory usage log during serialization")
 
-    def _stream_docs(self, series):
+    def _stream_docs(self, series: pd.Series) -> Generator[tuple[Hashable, Doc]]:
         """Stream Series containing text data as spaCy Doc objects."""
         # Format Series in a way that spaCy can process
-        text_tuples = [(text, {"idx": str(idx)}) for idx, text in series.items()]
+        text_tuples = [(text, {"idx": idx}) for idx, text in series.items()]
 
         for doc, context in self.nlp.pipe(
             text_tuples,
@@ -73,7 +73,9 @@ class SeriesToDocs:
         ):
             yield context["idx"], doc
 
-    def serialize_series_as_docs(self, series: pd.Series) -> tuple[list, bytes]:
+    def serialize_series_as_docs(
+        self, series: pd.Series
+    ) -> tuple[list[Hashable], bytes]:
         """
         Serialize a container of texts into a DocBin object.
 
