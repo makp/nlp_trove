@@ -14,15 +14,13 @@ def map_tokens_to_integer_ids(tokenized_docs,
     When building a dictionary, filter out frequent and infrequent
     tokens. The keyword argument `no_below` is an absolute number and
     `no_above` is a fraction of the total corpus size. Keep `keep_n`
-    most frequent tokens after the above filtering.
+    most frequent tokens after the above filtering. Keep all if `None`.
     """
     # Create a dictionary
     id2word = Dictionary(tokenized_docs)
 
     # Filter out certain tokens
-    id2word.filter_extremes(no_below=no_below,
-                            no_above=no_above,
-                            keep_n=keep_n)
+    id2word.filter_extremes(no_below=no_below, no_above=no_above, keep_n=keep_n)  # type: ignore
 
     return id2word
 
