@@ -27,7 +27,7 @@ class SparseVec:
         """
         Build bag-of-words (BoW) vectors from tokenized documents.
 
-        BoW vectors are tuples of token IDs and their counts.
+        BoW vectors are tuples of token IDs and their counts in the document.
         """
         return [self.tk_id_map.doc2bow(doc) for doc in self.docs]
 
@@ -37,6 +37,6 @@ class SparseVec:
 
         The returned vectors are tuples of token IDs and TF-IDF weights.
         """
+        tfidf = TfidfModel(dictionary=self.tk_id_map)
         bow_vecs = self.build_bow_vectors()
-        tfidf = TfidfModel(bow_vecs)
         return [tfidf[vec] for vec in bow_vecs]
