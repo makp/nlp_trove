@@ -16,7 +16,7 @@ def get_lda_topics_without_prob(lda_model):
 
 
 def get_nmf_topics_without_prob(nmf_model):
-    """Return the `num_topics` topics of an NMF model without probabilities."""
+    """Return NMF topics without their probabilities."""
     num_topics = nmf_model.num_topics
     nmf_topics = []
     for topic_id in range(num_topics):
@@ -27,34 +27,27 @@ def get_nmf_topics_without_prob(nmf_model):
     return nmf_topics
 
 
-def compute_coherence(topics,
-                      tokenized_docs,
-                      dictionary):
+def compute_coherence(topics, tokenized_docs, dictionary):
     """
     Compute the coherence of a topic model using c_v and u_mass.
 
-    Sliding window methods (e.g., 'c_v') do not require the corpus
-    but they require tokenized texts. 'u_mass' requires a corpus but
-    not tokenized texts. However, Gensim uses the dictionary and the
-    tokenized docs to generate the corpus if it is not provided.
-    Moreover, not having 'corpus' as an argument avoids the risk of
-    calculating the coherence score with TF-IDF vectors (TF-IDF
-    vectors might distort the co-occurrence information that u_mass
-    relies upon).
+    While c_v favors topics that are distinct but maybe not very specific,
+    u_mass favors topics that are tightly focused but possibly overlapping.
 
-    Roughly, while c_v favors topics that are distinct but maybe not
-    very specific, u_mass favors topics that are tightly focused but
-    possibly overlapping.
+    Sliding window methods (e.g., 'c_v') do not require the corpus but they
+    require tokenized texts. 'u_mass' requires a corpus but not tokenized
+    texts. However, Gensim uses the dictionary and the tokenized docs to
+    generate the vectorized corpus if it is not provided. Information about
+    whether the topic model was trained using word frequency or TF-IDF weights
+    is not used in the coherence calculations.
     """
-    cm_cv = CoherenceModel(topics=topics,
-                           texts=tokenized_docs,
-                           dictionary=dictionary,
-                           coherence='c_v')
+    cm_cv = CoherenceModel(
+        topics=topics, texts=tokenized_docs, dictionary=dictionary, coherence="c_v"
+    )
 
-    cm_umass = CoherenceModel(topics=topics,
-                              texts=tokenized_docs,
-                              dictionary=dictionary,
-                              coherence='u_mass')
+    cm_umass = CoherenceModel(
+        topics=topics, texts=tokenized_docs, dictionary=dictionary, coherence="u_mass"
+    )
 
     return cm_cv.get_coherence(), cm_umass.get_coherence()
 
@@ -65,15 +58,11 @@ def list_topics_for_bow_sorted(lda_model, bow):
 
     The list is sorted by the probability of each topic.
     """
-    topic_dist = lda_model.get_document_topics(bow,
-                                               minimum_probability=None)
+    topic_dist = lda_model.get_document_topics(bow, minimum_probability=None)
     return sorted(topic_dist, key=lambda x: x[1], reverse=True)
 
 
-def get_top_n_docs_for_topic(series_bow,
-                             lda_model,
-                             topic_id,
-                             num_docs=1):
+def get_top_n_docs_for_topic(series_bow, lda_model, topic_id, num_docs=1):
     """Get the indexes of the top `num_docs` documents for a given topic."""
     lst = []
     for idx, bow in series_bow.items():
