@@ -10,10 +10,10 @@ from gensim.models.nmf import Nmf
 
 
 class EvalHyper:
-    def __init__(self, ids, corpus_tk, corpus_vecs, hyperspace):
+    def __init__(self, ids, corpus_tk, corpus_vec, hyperspace):
         self.ids = ids
         self.corpus_tk = corpus_tk
-        self.corpus_vecs = corpus_vecs
+        self.corpus_vecs = corpus_vec
         self.hyperspace: dict[str, list] = hyperspace
 
     def _sample_hyperparams(self, sample_size: int | None) -> list[dict]:
