@@ -3,18 +3,6 @@
 from gensim.models.coherencemodel import CoherenceModel
 
 
-def get_lda_topics_without_prob(lda_model):
-    """Return the `num_topics` topics of an LDA model without probabilities."""
-    num_topics = lda_model.num_topics
-    lda_topics = []
-    for topic_id in range(num_topics):
-        topic = lda_model.show_topic(topic_id)
-        topic_words = [word for (word, _) in topic]
-        lda_topics.append(topic_words)
-
-    return lda_topics
-
-
 def get_nmf_topics_without_prob(nmf_model):
     """Return NMF topics without their probabilities."""
     num_topics = nmf_model.num_topics
