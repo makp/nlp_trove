@@ -5,10 +5,11 @@ import random
 from itertools import product
 
 from gensim.models.coherencemodel import CoherenceModel
+from gensim.models.ldamodel import LdaModel
 from gensim.models.nmf import Nmf
 
 
-class ScoreHyperNMF:
+class EvalHyper:
     def __init__(self, ids, corpus_tk, corpus_vecs, hyperspace):
         self.ids = ids
         self.corpus_tk = corpus_tk
@@ -28,22 +29,22 @@ class ScoreHyperNMF:
         sample = random.sample(combinations, sample_size)
         return [dict(zip(keys, param)) for param in sample]
 
-    def _get_nmf_topics_sans_prob(self, nmf_model):
+    def _get_topics_sans_prob(self, model):
         """
-        Return NMF topics without their probabilities.
+        Return topics without their probabilities.
 
         This functions' output is needed to calculate coherence.
         """
-        num_topics = nmf_model.num_topics
-        nmf_topics = []
+        num_topics = model.num_topics
+        lst_topics = []
         for topic_id in range(num_topics):
-            topic = nmf_model.show_topic(topic_id)
+            topic = model.show_topic(topic_id)
             topic_words = [word for word, _ in topic]
-            nmf_topics.append(topic_words)
+            lst_topics.append(topic_words)
 
-        return nmf_topics
+        return lst_topics
 
-    def compute_coherence(self, nmf_model):
+    def compute_coherence(self, model):
         """
         Compute the coherence of a topic model using c_v and u_mass.
 
@@ -57,7 +58,7 @@ class ScoreHyperNMF:
         whether the topic model was trained using word frequency or TF-IDF weights
         is not used to calculate the coherence scores.
         """
-        topics = self._get_nmf_topics_sans_prob(nmf_model)
+        topics = self._get_topics_sans_prob(model)
 
         kwargs = {
             "topics": topics,
@@ -71,13 +72,24 @@ class ScoreHyperNMF:
         return {"c_v": cv.get_coherence(), "u_mass": umass.get_coherence()}
 
     def score_hyper(
-        self, sample_size: int | None = None, write_to: str | None = None
+        self,
+        sample_size: int | None = None,
+        model_type: str = "nmf",
+        write_to: str | None = None,
     ) -> list[dict]:
+        func_map = {
+            "nmf": lambda **kwargs: Nmf(
+                corpus=self.corpus_vecs, id2word=self.ids, **kwargs
+            ),
+            "lda": lambda **kwargs: LdaModel(
+                corpus=self.corpus_vecs, id2word=self.ids, **kwargs
+            ),
+        }
         scores = []
         hyper_sample = self._sample_hyperparams(sample_size)
         for sample in hyper_sample:
-            nmf_model = Nmf(corpus=self.corpus_vecs, id2word=self.ids, **sample)
-            dct_out = {**sample, **self.compute_coherence(nmf_model)}
+            model = func_map[model_type](**sample)
+            dct_out = {**sample, **self.compute_coherence(model)}
             if write_to:
                 with open(write_to, "a") as f:
                     f.write(json.dumps(dct_out) + "\n")  # Use jsonl format
