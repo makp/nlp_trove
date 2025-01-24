@@ -16,7 +16,7 @@ class Pipe:
         "shortname": None | str,
         "description": None | str,
         "creation_date": None | str,
-        "path": str,
+        "files": list[dict],
         "parent": None | str,
         "children": None | list,
     }
