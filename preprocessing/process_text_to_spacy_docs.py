@@ -31,11 +31,11 @@ class SeriesToDocs:
     def __init__(
         self,
         model: str | None = "en_core_web_trf",
-        disable_pipes=None,
-        enable_pipe=None,
-        batch_size=25,
-        n_process=1,
-        mem_log=False,
+        disable_pipes: str | None = None,
+        enable_pipe: str | None = None,
+        batch_size: int = 25,
+        n_process: int = 1,
+        mem_log: bool = False,
     ):
         """Initialize spaCy pipeline and parameters."""
         self.nlp = (
@@ -44,7 +44,10 @@ class SeriesToDocs:
             else spacy.load(model, disable=disable_pipes or [])
         )
         if enable_pipe:
-            self.nlp.add_pipe(enable_pipe)
+            if enable_pipe not in self.nlp.pipe_names:
+                self.nlp.add_pipe(enable_pipe)
+            else:
+                print(f"Pipe '{enable_pipe}' already exists. Skipping.")
         self.batch_size = batch_size
         self.n_process = n_process
         self.mem_log = mem_log
@@ -64,7 +67,7 @@ class SeriesToDocs:
     def _stream_docs(self, series: pd.Series) -> Generator[tuple[Hashable, Doc]]:
         """Stream Series containing text data as spaCy Doc objects."""
         # Format Series in a way that spaCy can process
-        text_tuples = [(text, {"idx": idx}) for idx, text in series.items()]
+        text_tuples = ((text, {"idx": idx}) for idx, text in series.items())
 
         for doc, context in self.nlp.pipe(
             text_tuples,
@@ -175,7 +178,7 @@ class SeriesToDocsWithAttrib(SeriesToDocs):
 
         Source: <https://spacy.io/usage/processing-pipelines#processing>
         """
-        text_tuples = [(text, {"idx": str(idx)}) for idx, text in series.items()]
+        text_tuples = ((text, {"idx": str(idx)}) for idx, text in series.items())
         for doc, context in self.nlp.pipe(
             text_tuples,
             batch_size=self.batch_size,
