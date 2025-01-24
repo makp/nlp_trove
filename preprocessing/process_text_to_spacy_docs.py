@@ -2,6 +2,7 @@
 
 import logging
 import os
+import pickle
 import subprocess
 import tracemalloc
 from collections.abc import Generator, Hashable
@@ -90,19 +91,35 @@ class SeriesToDocs:
         # Create a `DocBin` to store the `Doc` objects
         doc_bin = DocBin()
 
-        # Serialize the text data
+        # Convert texts to Docs
         idx_list = []
+        count = 0
         for idx, doc in self._stream_docs(series):
             doc_bin.add(doc)
             idx_list.append(idx)
 
-            if self.mem_log:
+            # Log memory usage once every batch
+            count += 1
+            if self.mem_log and count % self.batch_size == 0:
                 self._log_memory_usage(doc_bin, snapshot1)  # type: ignore
 
         if self.mem_log:
             tracemalloc.stop()
 
+        assert len(idx_list) == len(doc_bin)
+
         return idx_list, doc_bin
+
+    def convert_series_to_docs_and_serialize(
+        self, series: pd.Series, path_idx: str, path_docbin: str
+    ) -> None:
+        """Convert a Series of texts to spaCy Doc objects and serialize them."""
+        idx_list, doc_bin = self.convert_series_to_docs(series)
+        doc_bin.to_disk(path_docbin)
+        print(f"Serialized DocBin to {path_docbin}")
+        with open(path_idx, "wb") as f:
+            pickle.dump(idx_list, f)
+        print(f"Serialized index list to {path_idx}")
 
     def _log_memory_usage(self, object_name, snapshot_base):
         process = psutil.Process()
@@ -116,17 +133,13 @@ class SeriesToDocs:
             "---------------------------------------------"
         )
 
-    def deserialize_docbin(self, bytes_data: bytes) -> list[Doc]:
-        """Deserialize Doc objects and return them as a list."""
-        doc_bin = DocBin().from_bytes(bytes_data)
-        return list(doc_bin.get_docs(self.nlp.vocab))
-
     def deserialize_docbin_as_series(
-        self, bytes_data: bytes, idx_list: list[Hashable]
+        self, path_idx: str, path_docbin: str
     ) -> pd.Series:
         """Deserialize Doc objects and return them as a Pandas Series."""
-        docs = self.deserialize_docbin(bytes_data)
-        return pd.Series({idx: doc for idx, doc in zip(idx_list, docs)})
+        doc_bin = DocBin().from_disk(path_docbin)
+        idx = pd.read_pickle(path_idx)
+        return pd.Series(doc_bin.get_docs(self.nlp.vocab), index=idx)
 
 
 class SeriesToDocsWithAttrib(SeriesToDocs):
