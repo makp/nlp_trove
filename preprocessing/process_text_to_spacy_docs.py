@@ -73,16 +73,15 @@ class SeriesToDocs:
         ):
             yield context["idx"], doc
 
-    def serialize_series_as_docs(
+    def convert_series_to_docs(
         self, series: pd.Series
-    ) -> tuple[list[Hashable], bytes]:
+    ) -> tuple[list[Hashable], DocBin]:
         """
-        Serialize a container of texts into a DocBin object.
+        Convert a Series containing texts to spaCy Doc, and bundle them in a
+        DocBin.
 
-        Although Doc objects have a `to_bytes` method that serializes the Doc
-        object to a binary format, the `DocBin` class is more efficient for
-        serializing multiple `Doc` objects. Source:
-        <https://spacy.io/usage/saving-loading#docs>
+        The `DocBin` class is more efficient for storing multiple `Doc`
+        objects. Source: <https://spacy.io/usage/saving-loading#docs>
         """
         if self.mem_log:
             tracemalloc.start()
@@ -103,7 +102,7 @@ class SeriesToDocs:
         if self.mem_log:
             tracemalloc.stop()
 
-        return idx_list, doc_bin.to_bytes()
+        return idx_list, doc_bin
 
     def _log_memory_usage(self, object_name, snapshot_base):
         process = psutil.Process()
