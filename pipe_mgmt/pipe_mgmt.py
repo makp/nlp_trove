@@ -72,19 +72,19 @@ class PipeTree(Pipe):
     apply recursively.
     """
 
-    def __init__(self, pipe_tree=None):
+    def __init__(self, pipe_tree=None, validate=True):
         super().__init__()  # Initialize parent class
         self.pipe_tree = pipe_tree or []
         if pipe_tree:
-            # Validate pipeline tree structure
-            is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
-            if not is_valid:
-                raise ValueError("Invalid pipeline tree structure")
-
             # Create map from IDs to paths. Useful for filenames.
             self.id_path_map = {}
             for id, lst in self.create_id_path_map(pipe_tree).items():
                 self.id_path_map[id] = "_".join(lst)
+
+            if validate:
+                is_valid = all(self.validate_pipe(pipe) for pipe in pipe_tree)
+                if not is_valid:
+                    raise ValueError("Invalid pipeline tree structure")
 
     def create_pipe_tree(self, lst_args: list[dict], validate=True) -> list[dict]:
         """Create a pipeline tree from a list of dictionaries containing the pipeline attributes."""
