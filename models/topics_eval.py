@@ -48,8 +48,11 @@ class EvalHyper:
         """
         Compute the coherence of a topic model using c_v and u_mass.
 
-        While c_v favors topics that are distinct but maybe not very specific,
-        u_mass favors topics that are tightly focused but possibly overlapping.
+        While c_v favors topics that are distinct but sometimes not very
+        specific, u_mass favors topics that are tightly focused but possibly
+        overlapping. Accordingly, higher c_v scores tend to capture more
+        general but well-separated topics, while higher u_mass scores tend to
+        capture more specific but overlapping topics.
 
         Sliding window methods (e.g., 'c_v') do not require the corpus but they
         require tokenized texts. 'u_mass' requires a corpus but not tokenized
