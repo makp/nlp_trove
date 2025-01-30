@@ -41,7 +41,7 @@ class EvalHyper:
         """
         Return topics without their probabilities.
 
-        This functions' output is needed to calculate coherence.
+        This function is needed to calculate coherence for NMF models.
         """
         num_topics = model.num_topics
         lst_topics = []
@@ -82,13 +82,8 @@ class EvalHyper:
 
         return {"c_v": cv.get_coherence(), "u_mass": umass.get_coherence()}
 
-    def score_hyper(
-        self,
-        pipe_name: str,
-        sample_size: int | None = None,
-        model_type: str = "nmf",
-        write_to: str | None = None,
-    ) -> list[dict]:
+    def train_model(self, model_type, **kwargs):
+        """Train a topic model (NMF or LDA)."""
         func_map = {
             "nmf": lambda **kwargs: Nmf(
                 corpus=self.corpus_vecs, id2word=self.ids, **kwargs
@@ -97,10 +92,20 @@ class EvalHyper:
                 corpus=self.corpus_vecs, id2word=self.ids, **kwargs
             ),
         }
+        return func_map[model_type](**kwargs)
+
+    def score_hyper(
+        self,
+        pipe_name: str,
+        sample_size: int | None = None,
+        model_type: str = "nmf",
+        write_to: str | None = None,
+    ) -> list[dict]:
+        """Calculate `c_v` and `u_mass` for a sample of the hyperparameters."""
         scores = []
         hyper_sample = self._sample_hyperparams(sample_size)
         for sample in hyper_sample:
-            model = func_map[model_type](**sample)
+            model = self.train_model(model_type, **sample)
             dct_out = {"pipeline": pipe_name, **sample, **self.compute_coherence(model)}
             if write_to:
                 with open(write_to, "a") as f:
