@@ -10,11 +10,19 @@ from gensim.models.nmf import Nmf
 
 
 class EvalHyper:
-    def __init__(self, ids, corpus_tk, corpus_vec, hyperspace):
+    DEFAULT_SEED = {"random_state": [42]}
+
+    def __init__(self, ids, corpus_tk, corpus_vec=None, hyperspace=None):
         self.ids = ids
         self.corpus_tk = corpus_tk
         self.corpus_vecs = corpus_vec
-        self.hyperspace: dict[str, list] = hyperspace
+        if hyperspace is None:
+            self.hyperspace = self.DEFAULT_SEED.copy()
+        else:
+            if "random_state" not in hyperspace:
+                print("WARNING: Adding `random_state` to hyperspace.")
+                hyperspace.update(self.DEFAULT_SEED)
+            self.hyperspace = hyperspace
 
     def _sample_hyperparams(self, sample_size: int | None) -> list[dict]:
         """Select a sample of the hyperparameter space."""
