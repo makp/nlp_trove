@@ -76,6 +76,7 @@ class EvalHyper:
 
     def score_hyper(
         self,
+        pipe_name: str,
         sample_size: int | None = None,
         model_type: str = "nmf",
         write_to: str | None = None,
@@ -92,7 +93,7 @@ class EvalHyper:
         hyper_sample = self._sample_hyperparams(sample_size)
         for sample in hyper_sample:
             model = func_map[model_type](**sample)
-            dct_out = {**sample, **self.compute_coherence(model)}
+            dct_out = {"pipeline": pipe_name, **sample, **self.compute_coherence(model)}
             if write_to:
                 with open(write_to, "a") as f:
                     f.write(json.dumps(dct_out) + "\n")  # Use jsonl format
