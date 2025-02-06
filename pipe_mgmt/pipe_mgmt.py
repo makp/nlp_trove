@@ -87,7 +87,7 @@ class PipeTree(Pipe):
                 if not is_valid:
                     raise ValueError("Invalid pipeline tree structure")
 
-    def create_pipe_tree(self, lst_args: list[dict], validate=True) -> list[dict]:
+    def create_pipe_tree(self, lst_args: list[dict], validate: bool) -> list[dict]:
         """Create a pipeline tree from a list of dictionaries containing the pipeline attributes."""
         pipe_tree = [self.create_pipe(**kwargs) for kwargs in lst_args]
         if validate:
@@ -240,6 +240,7 @@ class PipeTree(Pipe):
         self,
         lst_kwargs: list[dict],
         pipe_tree=None,
+        validate=True,
     ) -> None:
         """Write children to a pipeline tree, and automatically populate their
         tree_path and parent attrbs."""
@@ -255,7 +256,7 @@ class PipeTree(Pipe):
                     tree_path=tree_path + "_" + child_kwargs["shortname"],
                     parent=pipe["name"],
                 )
-            pipe["children"] = self.create_pipe_tree(lst_kwargs)
+            pipe["children"] = self.create_pipe_tree(lst_kwargs, validate)
 
     def write_pipe_tree(
         self,
