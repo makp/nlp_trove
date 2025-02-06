@@ -4,6 +4,7 @@ import json
 import random
 from itertools import product
 
+import pandas as pd
 from gensim.models.coherencemodel import CoherenceModel
 from gensim.models.ldamodel import LdaModel
 from gensim.models.nmf import Nmf
@@ -112,6 +113,34 @@ class EvalHyper:
                     f.write(json.dumps(dct_out) + "\n")  # Use jsonl format
             scores.append(dct_out)
         return scores
+
+
+class ProcessScores:
+    def __init__(self, path: str):
+        self.path = path
+
+    def read_scores(self) -> pd.DataFrame:
+        """Read the scores from a file as a DataFrame."""
+        with open(self.path, "r") as f:
+            data = [json.loads(line) for line in f]
+        return pd.DataFrame(data)
+
+    def normalize_scores(self, scores: pd.Series) -> pd.Series:
+        """Normalize the scores."""
+        return (scores - scores.min()) / (scores.max() - scores.min())
+
+    def combine_scores(
+        self,
+        scores,
+        weight=0.5,
+        columns=("c_v", "u_mass"),
+    ):
+        """Combine two scores using a weighted average."""
+        cv_normalized, umass_normalized = (
+            self.normalize_scores(scores[columns[0]]),
+            self.normalize_scores(scores[columns[1]]),
+        )
+        return (weight * cv_normalized) + (1 - weight) * umass_normalized
 
 
 # NOTE: Misc functions for topic modeling that need to be reviewed
