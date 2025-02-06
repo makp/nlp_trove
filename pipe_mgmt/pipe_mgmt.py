@@ -16,6 +16,7 @@ class Pipe:
         "shortname": None | str,
         "description": None | str,
         "creation_date": None | str,
+        "tree_path": None | str,
         "files": list[dict],
         "parent": None | str,
         "children": None | list,
@@ -239,20 +240,19 @@ class PipeTree(Pipe):
         self,
         lst_kwargs: list[dict],
         pipe_tree=None,
-        file_extension=".pkl",
     ) -> None:
         """Write children to a pipeline tree, and automatically populate their
-        path and parent attrbs."""
+        tree_path and parent attrbs."""
         pipe_tree = pipe_tree or self.pipe_tree
 
         for pipe in pipe_tree:
             # Get path to the current pipeline
-            path = self.id_path_map[pipe["id"]]
+            tree_path = self.id_path_map[pipe["id"]]
 
             # Update `lst_kwargs` for pipe-specific attrbs
             for child_kwargs in lst_kwargs:
                 child_kwargs.update(
-                    path=path + "_" + child_kwargs["shortname"] + file_extension,
+                    tree_path=tree_path + "_" + child_kwargs["shortname"],
                     parent=pipe["name"],
                 )
             pipe["children"] = self.create_pipe_tree(lst_kwargs)
