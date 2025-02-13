@@ -5,9 +5,10 @@ from gensim.models import TfidfModel
 
 
 class SparseVec:
-    def __init__(self, docs):
-        self.docs = docs
-        self.tk_id_map = Dictionary(self.docs)
+    def __init__(self, docs=None):
+        if docs:
+            self.docs = docs
+            self.tk_id_map = Dictionary(self.docs)
 
     def filter_tokens(self, no_below_n=1, no_above_f=1, keep_n=None):
         """
