@@ -64,4 +64,4 @@ class SparseVec:
 
     def load_dictionary(self, path="sparse_vecs.dict"):
         """Load the dictionary from a file."""
-        self.tk_id_map = Dictionary.load(path)
+        return Dictionary.load(path)
