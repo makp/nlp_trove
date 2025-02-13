@@ -1,6 +1,6 @@
 """Filter tokens."""
 
-from ..vectorization.sparse_vectorization import build_tfidf_vectors
+from ..vectorization.sparse_vectorization import SparseVec as sv
 
 
 class FilterTokens:
@@ -95,7 +95,7 @@ class FilterTokensWithTFIDF:
     def __init__(self, tokenized_docs, threshold=0.1):
         """Initialize the FilterTokensWithTFIDF class."""
         self.tokenized_docs = tokenized_docs
-        self.dictionary, self.tfidf_vecs = build_tfidf_vectors(tokenized_docs)
+        self.dictionary, self.tfidf_vecs = sv.build_tfidf_vectors(tokenized_docs)
         self.threshold = threshold
         self.tokens_to_keep = self.get_tokens_above_tfidf_score()
 
