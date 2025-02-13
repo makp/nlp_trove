@@ -1,6 +1,6 @@
 """Transform text into sparse vectors using Gensim."""
 
-from gensim.corpora import Dictionary
+from gensim.corpora import Dictionary, MmCorpus
 from gensim.models import TfidfModel
 
 
@@ -40,3 +40,27 @@ class SparseVec:
         tfidf = TfidfModel(dictionary=self.tk_id_map)
         bow_vecs = self.build_bow_vectors()
         return [tfidf[vec] for vec in bow_vecs]
+
+    def serialize_vectors(self, vecs, path="sparse_vecs.mm"):
+        """
+        Serialize vectors to a file.
+
+        The vectors are serialized in the Matrix Market format.
+        """
+        MmCorpus.serialize(path, vecs)
+
+    def deserialize_vectors(self, path="sparse_vecs.mm"):
+        """
+        Deserialize vectors from a file.
+
+        The vectors are deserialized from the Matrix Market format.
+        """
+        return MmCorpus(path)
+
+    def save_dictionary(self, path="sparse_vecs.dict"):
+        """Save the dictionary to a file."""
+        self.tk_id_map.save(path)
+
+    def load_dictionary(self, path="sparse_vecs.dict"):
+        """Load the dictionary from a file."""
+        self.tk_id_map = Dictionary.load(path)
