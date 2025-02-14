@@ -1,3 +1,4 @@
+import os
 import uuid
 
 import yaml
@@ -77,7 +78,13 @@ class PipeTree(Pipe):
         super().__init__()  # Initialize parent class
         self.pipe_tree = pipe_tree or []
         if pipe_tree:
-            # Create map from IDs to paths. Useful for filenames.
+            # Check if `pipe_tree` is a file path
+            if not isinstance(pipe_tree, list):
+                if os.path.exists(pipe_tree) and pipe_tree.endswith(".yaml"):
+                    with open(pipe_tree, "r") as f:
+                        pipe_tree = yaml.safe_load(f)
+
+            # Create map from IDs to tree paths
             self.id_path_map = {}
             for id, lst in self.create_id_path_map(pipe_tree).items():
                 self.id_path_map[id] = "_".join(lst)
