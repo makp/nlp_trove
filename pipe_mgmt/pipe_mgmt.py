@@ -17,7 +17,7 @@ class Pipe:
         "description": None | str,
         "creation_date": None | str,
         "tree_path": None | str,
-        "files": list[dict],
+        "files": None | dict,
         "parent": None | str,
         "children": None | list,
     }
