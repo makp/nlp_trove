@@ -168,8 +168,13 @@ class PipeTree(Pipe):
             if pipe.get("children"):
                 self.add_unique_ids(pipe["children"])
 
-    def get_pipe_by_id(self, pipe_tree: list[dict], pipe_id: str) -> dict | None:
+    def get_pipe_by_id(
+        self,
+        pipe_id: str,
+        pipe_tree: list[dict] | None = None,
+    ) -> dict | None:
         """Get a pipeline by its ID."""
+        pipe_tree = pipe_tree or self.pipe_tree
         return next(
             (pipe for pipe in self.search_pipe({"id": pipe_id}, pipe_tree)), None
         )
