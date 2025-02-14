@@ -76,14 +76,15 @@ class PipeTree(Pipe):
 
     def __init__(self, pipe_tree=None, validate=True):
         super().__init__()  # Initialize parent class
-        self.pipe_tree = pipe_tree or []
-        if pipe_tree:
-            # Check if `pipe_tree` is a file path
-            if not isinstance(pipe_tree, list):
-                if os.path.exists(pipe_tree) and pipe_tree.endswith(".yaml"):
-                    with open(pipe_tree, "r") as f:
-                        pipe_tree = yaml.safe_load(f)
+        # Check if `pipe_tree` is a file path
+        if pipe_tree and not isinstance(pipe_tree, list):
+            if os.path.exists(pipe_tree) and pipe_tree.endswith(".yaml"):
+                with open(pipe_tree, "r") as f:
+                    pipe_tree = yaml.safe_load(f)
 
+        self.pipe_tree = pipe_tree or []
+
+        if pipe_tree:
             # Create map from IDs to tree paths
             self.id_path_map = {}
             for id, lst in self.create_id_path_map(pipe_tree).items():
