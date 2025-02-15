@@ -58,9 +58,10 @@ class SparseVec:
         """
         return MmCorpus(path)
 
-    def save_dictionary(self, path="sparse_vecs.dict"):
+    def save_dictionary(self, dictionary=None, path="sparse_vecs.dict"):
         """Save the dictionary to a file."""
-        self.tk_id_map.save(path)
+        dictionary = dictionary or self.tk_id_map
+        dictionary.save(path)
 
     def load_dictionary(self, path="sparse_vecs.dict"):
         """Load the dictionary from a file."""
