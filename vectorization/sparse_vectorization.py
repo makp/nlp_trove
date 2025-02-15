@@ -6,7 +6,7 @@ from gensim.models import TfidfModel
 
 class SparseVec:
     def __init__(self, docs=None):
-        if docs:
+        if docs is not None:
             self.docs = docs
             self.tk_id_map = Dictionary(self.docs)
 
