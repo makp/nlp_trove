@@ -142,7 +142,7 @@ class PipeTree(Pipe):
         lst_ids = level_id_map[selected_level]
         lst_out = []
         for id in lst_ids:
-            lst_out.append(self.get_pipe_by_id(self.pipe_tree, id))
+            lst_out.append(self.get_pipe_by_id(pipe_id=id, pipe_tree=self.pipe_tree))
 
         return lst_out
 
