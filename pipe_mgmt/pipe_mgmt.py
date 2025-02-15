@@ -251,34 +251,16 @@ class PipeTree(Pipe):
 
     def assign_children(
         self,
-        children_kwargs: list | dict,
+        func,
         pipe_tree=None,
         validate=True,
-    ) -> dict:
-        """Write children to a pipeline tree, and automatically populate their
-        tree_path and parent attrbs."""
+    ) -> None:
+        """Write children to a pipeline tree and populate their ids."""
         pipe_tree = pipe_tree or self.pipe_tree
 
-        if isinstance(children_kwargs, dict):
-            children_kwargs = [children_kwargs]
-
-        id_map = {}
         for pipe in pipe_tree:
-            pipe_id = pipe["id"]
-
-            # Get path to the current pipeline
-            tree_path = self.id_path_map[pipe_id]
-
-            # Update `lst_kwargs` for pipe-specific attrbs
-            for child_kwargs in children_kwargs:
-                child_kwargs.update(
-                    tree_path=tree_path + "_" + child_kwargs["shortname"],
-                    parent=pipe["name"],
-                )
-            pipe["children"] = self.create_pipe_tree(children_kwargs, validate)
-            children_ids = [child["id"] for child in pipe["children"]]
-            id_map[pipe_id] = children_ids
-        return id_map
+            children_kwargs = func(pipe)
+            pipe["children"] = self.create_pipe_tree([children_kwargs], validate)
 
     def write_pipe_tree(
         self,
