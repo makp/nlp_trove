@@ -38,16 +38,16 @@ class EvalHyper:
         sample = random.sample(combinations, sample_size)
         return [dict(zip(keys, param)) for param in sample]
 
-    def _get_topics_sans_prob(self, model):
+    def _get_nmf_topics_sans_prob(self, model):
         """
-        Return topics without their probabilities.
+        Return NMF topics without their probabilities.
 
         This function is needed to calculate coherence for NMF models.
         """
         num_topics = model.num_topics
         lst_topics = []
         for topic_id in range(num_topics):
-            topic = model.show_topic(topic_id)
+            topic = model.show_topic(topicid=topic_id, topn=100000, normalize=True)
             topic_words = [word for word, _ in topic]
             lst_topics.append(topic_words)
 
@@ -70,13 +70,17 @@ class EvalHyper:
         whether the topic model was trained using word frequency or TF-IDF weights
         is not used to calculate the coherence scores.
         """
-        topics = self._get_topics_sans_prob(model)
 
         kwargs = {
-            "topics": topics,
             "texts": self.corpus_tk,
             "dictionary": self.ids,
         }
+
+        if isinstance(model, LdaModel):
+            kwargs.update({"model": model})
+        elif isinstance(model, Nmf):
+            topics = self._get_nmf_topics_sans_prob(model)
+            kwargs.update({"topics": topics})
 
         cv = CoherenceModel(**kwargs, coherence="c_v")
         umass = CoherenceModel(**kwargs, coherence="u_mass")
