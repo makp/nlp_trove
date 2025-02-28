@@ -116,6 +116,24 @@ class EvalHyper:
 
         return model, params
 
+    def score_hyper_single(
+        self,
+        pipe_name: str,
+        params: dict,
+        model_type: str = "nmf",
+        write_to: str | None = None,
+    ):
+        model, all_params = self.train_model(model_type, **params)
+        score = {
+            "pipeline": pipe_name,
+            **all_params,
+            **self.compute_coherence(model),
+        }
+        if write_to:
+            with open(write_to, "a") as f:
+                f.write(json.dumps(score) + "\n")  # Use jsonl format
+        return score
+
     def score_hyper(
         self,
         pipe_name: str,
@@ -127,12 +145,13 @@ class EvalHyper:
         scores = []
         hyper_sample = self._sample_hyperparams(sample_size)
         for sample in hyper_sample:
-            model, params = self.train_model(model_type, **sample)
-            dct_out = {"pipeline": pipe_name, **params, **self.compute_coherence(model)}
-            if write_to:
-                with open(write_to, "a") as f:
-                    f.write(json.dumps(dct_out) + "\n")  # Use jsonl format
-            scores.append(dct_out)
+            single_score = self.score_hyper_single(
+                pipe_name=pipe_name,
+                params=sample,
+                model_type=model_type,
+                write_to=write_to,
+            )
+            scores.append(single_score)
         return scores
 
 
