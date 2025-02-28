@@ -1,5 +1,6 @@
 """Search for reasonable hyperparameters in a topic model."""
 
+import inspect
 import json
 import random
 from itertools import product
@@ -87,17 +88,33 @@ class EvalHyper:
 
         return {"c_v": cv.get_coherence(), "u_mass": umass.get_coherence()}
 
+    def _return_default_params(self, function):
+        signature = inspect.signature(function.__init__)
+        pars_to_exclude = ("self", "corpus", "id2word")
+        return {
+            k: v.default
+            for k, v in signature.parameters.items()
+            if v.default is not inspect.Parameter.empty and k not in pars_to_exclude
+        }
+
     def train_model(self, model_type, **kwargs):
         """Train a topic model (NMF or LDA)."""
         func_map = {
-            "nmf": lambda **kwargs: Nmf(
-                corpus=self.corpus_vecs, id2word=self.ids, **kwargs
-            ),
-            "lda": lambda **kwargs: LdaModel(
-                corpus=self.corpus_vecs, id2word=self.ids, **kwargs
-            ),
+            "nmf": Nmf,
+            "lda": LdaModel,
         }
-        return func_map[model_type](**kwargs)
+
+        training_func = func_map[model_type]
+
+        model = training_func(
+            corpus=self.corpus_vecs,
+            id2word=self.ids,
+            **kwargs,
+        )
+
+        params = {**self._return_default_params(training_func), **kwargs}
+
+        return model, params
 
     def score_hyper(
         self,
@@ -110,8 +127,8 @@ class EvalHyper:
         scores = []
         hyper_sample = self._sample_hyperparams(sample_size)
         for sample in hyper_sample:
-            model = self.train_model(model_type, **sample)
-            dct_out = {"pipeline": pipe_name, **sample, **self.compute_coherence(model)}
+            model, params = self.train_model(model_type, **sample)
+            dct_out = {"pipeline": pipe_name, **params, **self.compute_coherence(model)}
             if write_to:
                 with open(write_to, "a") as f:
                     f.write(json.dumps(dct_out) + "\n")  # Use jsonl format
