@@ -265,8 +265,8 @@ class PipeTree(Pipe):
 
     def write_pipe_tree(
         self,
-        pipe_tree=None,
         path: str = "pipelines.yaml",
+        pipe_tree=None,
     ) -> None:
         """Write pipeline tree to a YAML file."""
         pipe_tree = pipe_tree or self.pipe_tree
