@@ -249,7 +249,7 @@ class PipeTree(Pipe):
         filtered_tree = self._filter_pipetree(pipe_tree, attrib)
         return self._flatten_filtered_pipetree(filtered_tree)
 
-    def assign_children(
+    def append_children(
         self,
         func,
         pipe_tree=None,
