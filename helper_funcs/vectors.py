@@ -10,7 +10,7 @@ def calculate_dist_matrix(lst_vecs, distance_func):
     dists_matrix = np.zeros((num_vecs, num_vecs))
 
     for i in range(num_vecs):
-        for j in range(i+1, num_vecs):
+        for j in range(i + 1, num_vecs):
             dists_matrix[i, j] = distance_func(lst_vecs[i], lst_vecs[j])
             dists_matrix[j, i] = dists_matrix[i, j]
     return dists_matrix
@@ -26,7 +26,11 @@ def calculate_avg_distance_every_vec(lst_vecs, distance_func):
 
 def cosine_similarity(a, b):
     """Compute the cosine similarity between two vectors."""
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return np.dot(a, b) / (norm_a * norm_b)
 
 
 def calculate_jensen_shannon_div(vec1, vec2):
@@ -45,8 +49,7 @@ def calculate_jensen_shannon_div(vec1, vec2):
     m = 0.5 * (vec1 + vec2)
 
     # Calculate Jensen-Shannon divergence
-    return 0.5 * (kullback_leibler(vec1, m) +
-                  kullback_leibler(vec2, m))
+    return 0.5 * (kullback_leibler(vec1, m) + kullback_leibler(vec2, m))
 
 
 # def convert_to_gensim_sparse(lst_vecs):
