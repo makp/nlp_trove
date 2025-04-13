@@ -1,11 +1,17 @@
+import os
+
 from gensim.models.nmf import Nmf
 
 
 class WriteTopics:
     """Write topics from an NMF model to a markdown file for inspection."""
 
-    def __init__(self, model: Nmf):
-        self.model = model
+    def __init__(self, model: Nmf | str):
+        if isinstance(model, str):
+            assert os.path.exists(model), f"File not found: {model}"
+            self.model = Nmf.load(model)
+        else:
+            self.model = model
 
     def _get_topics(self, num_words: int) -> list[tuple]:
         """Get topics from an NMF model."""
