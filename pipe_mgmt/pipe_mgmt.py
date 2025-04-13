@@ -261,6 +261,8 @@ class PipeTree(Pipe):
         for pipe in pipe_tree:
             children_kwargs = func(pipe)
             children = self.create_pipe_tree([children_kwargs], validate)
+            if pipe["children"] is None:
+                pipe["children"] = []
             pipe["children"].extend(children)
 
     def write_pipe_tree(
