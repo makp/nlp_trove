@@ -3,12 +3,7 @@ from collections.abc import Generator
 import lxml.etree as ET
 
 
-class InspectXML:
-    """
-    First-order inspection of XML files, including root tags, lengths, and
-    namespaces.
-    """
-
+class LoadXML:
     def __init__(self, file_paths):
         self.file_paths = file_paths
 
@@ -21,6 +16,18 @@ class InspectXML:
         """Return the root element of the XML file with the given path."""
         with open(path, "r") as f:
             return ET.parse(f).getroot()
+
+
+class InspectXML:
+    """
+    First-order inspection of XML files, including root tags, lengths, and
+    namespaces.
+    """
+
+    def __init__(self, file_paths):
+        intializer = LoadXML(file_paths)
+        self.file_paths = file_paths
+        self.filepath_to_root = intializer.filepath_to_root
 
     def _return_root_tags(self):
         """
