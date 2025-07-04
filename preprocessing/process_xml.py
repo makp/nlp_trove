@@ -1,3 +1,5 @@
+from collections.abc import Generator
+
 import lxml.etree as ET
 
 
@@ -7,8 +9,13 @@ class InspectXML:
     namespaces.
     """
 
-    def __init__(self, file_paths: list[str]):
+    def __init__(self, file_paths):
         self.file_paths = file_paths
+
+        # Parse XML files and store their root elements in a dictionary
+        self.filepath_to_root: dict[str, ET.Element] = {
+            fp: self._return_root(fp) for fp in file_paths
+        }
 
     def _return_root(self, path: str) -> ET.Element:
         """Return the root element of the XML file with the given path."""
@@ -19,109 +26,71 @@ class InspectXML:
         """
         Return the tags of the root elements of the XML files.
         """
-        root_tags = {self._return_root(filename).tag for filename in self.file_paths}
-        return root_tags
+        return {root.tag for root in self.filepath_to_root.values()}
 
     def _return_root_lengths(self):
         """
         Return the lengths of the root elements of the XML files.
         """
-        root_lengths = {
-            len(self._return_root(filename)) for filename in self.file_paths
-        }
-        return root_lengths
+        return {len(root) for root in self.filepath_to_root.values()}
 
-    def _return_shared_root_children(self):
+    def _return_root_common_children(self):
         """
         Return the children of the root elements that are shared across all XML files.
         """
-        shared_children = set()
-        for filename in self.file_paths:
-            root = self._return_root(filename)
-            root_children = {child.tag for child in root}
-            if not shared_children:
-                shared_children = root_children
-            else:
-                shared_children.intersection_update(root_children)
-        return shared_children
+        root_children = (
+            {child.tag for child in root} for root in self.filepath_to_root.values()
+        )
+        return set.intersection(*root_children)
 
     def check_root(self):
         """
         Check the root elements of the XML files.
         """
-        print(f"Root tags: {self._return_root_tags()}")
+        print("\nINFO ABOUT THE ROOT ELEMENTS")
+        print("=" * 30)
+        print(f"Tags: {self._return_root_tags()}")
         print("-" * 50)
-        print(f"Root lengths: {self._return_root_lengths()}")
+        print(f"Number of children: {self._return_root_lengths()}")
         print("-" * 50)
-        print(f"Shared root children: {self._return_shared_root_children()}")
+        print(f"Shared children: {self._return_root_common_children()}")
 
-    def _return_root_namespaces(self):
-        """
-        Return the namespaces of the root element of the XML files.
-        """
-        all_namespaces = set()
-        for filename in self.file_paths:
-            root = self._return_root(filename)
-            all_namespaces.update(set(root.nsmap.items()))
-        return all_namespaces
+    def _return_namespaces_from_element(self, element: ET.Element) -> set[tuple]:
+        "Return the namespaces within an Element."
+        # `.nsmap` returns a dictionary mapping prefixes to URIs.
+        # `tuple` is used to transform the ns into hashable tuples.
+        return set(ns for el in element.iter("{*}*") for ns in tuple(el.nsmap.items()))
 
-    def _return_namespaces_from_file(self, filename: str):
-        """
-        Return the namespaces of the root element of the XML file with the given
-        filename.
-        """
-        file_namespaces = set()
-        root = self._return_root(filename)
-        for el in root.iter("{*}*"):
-            file_namespaces.update(set(el.nsmap.items()))
-        return file_namespaces
+    def _return_namespaces_per_root(self) -> Generator[set[tuple]]:
+        "Return generator containing the namespaces for each root element."
+        return (
+            self._return_namespaces_from_element(root)
+            for root in self.filepath_to_root.values()
+        )
 
-    def _return_all_namespaces(self):
-        """
-        Search for all namespaces in the XML files and return a set of their
-        keys and values.
-        """
-        all_namespaces = set()
-        for filename in self.file_paths:
-            file_namespaces = self._return_namespaces_from_file(filename)
-            all_namespaces.update(file_namespaces)
-        return all_namespaces
+    def _return_namespaces_all(self) -> set:
+        "Return all namespaces."
+        return set.union(*self._return_namespaces_per_root())
 
-    def _return_elements_sans_namespace(self):
-        """
-        Return elements in the XML files without namespace.
-        """
-        elements_sans_namespace = set()
-        for filename in self.file_paths:
-            root = self._return_root(filename)
-            tags_sans_namespace = {el.tag for el in root.iter("{}*")}
-            elements_sans_namespace.update(tags_sans_namespace)
-        return elements_sans_namespace
+    def _return_namespaces_shared(self) -> set:
+        "Return shared namespaces."
+        return set.intersection(*self._return_namespaces_per_root())
 
-    def _return_shared_namespaces(self):
-        """
-        Return namespaces shared across all XML files.
-        """
-        shared_namespaces = set()
-        for filename in self.file_paths:
-            namespaces = self._return_namespaces_from_file(filename)
-            if not shared_namespaces:
-                shared_namespaces = namespaces
-            else:
-                shared_namespaces.intersection_update(namespaces)
-        return shared_namespaces
+    def _return_tags_sans_namespace(self) -> set:
+        "Return tags not associated with a namespace."
+        return set(
+            el.tag for root in self.filepath_to_root.values() for el in root.iter("{}*")
+        )
 
     def check_namespaces(self):
-        """
-        Print information about namespaces in the XML files.
-        """
-        print(f"Root namespaces: {self._return_root_namespaces()}")
+        "Print information about namespaces of the XML files."
+        print("\nINFO ABOUT NAMESPACES")
+        print("=" * 30)
+        print(f"All namespaces: {self._return_namespaces_all()}")
         print("-" * 50)
-        print(f"All namespaces: {self._return_all_namespaces()}")
+        print(f"Shared namespaces: {self._return_namespaces_shared()}")
         print("-" * 50)
-        print(f"Shared namespaces: {self._return_shared_namespaces()}")
-        print("-" * 50)
-        print(f"Tags without namespace: {self._return_elements_sans_namespace()}")
+        print(f"Tags without namespace: {self._return_tags_sans_namespace()}")
 
 
 # class ProcessXML:
