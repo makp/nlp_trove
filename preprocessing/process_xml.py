@@ -4,13 +4,30 @@ import lxml.etree as ET
 
 
 class LoadXML:
-    def __init__(self, file_paths):
+    def __init__(self, file_paths, id_attrib: None | str = None):
         self.file_paths = file_paths
 
         # Parse XML files and store their root elements in a dictionary
         self.filepath_to_root: dict[str, ET.Element] = {
             fp: self._return_root(fp) for fp in file_paths
         }
+
+        if id_attrib:
+            # Check if the id_attrib is present in all root elements
+            elements_sans_id = [
+                root
+                for root in self.filepath_to_root.values()
+                if id_attrib not in root.attrib
+            ]
+            if elements_sans_id:
+                raise ValueError(
+                    f"Attribute '{id_attrib}' not found in some root elements"
+                )
+
+            # Create a mapping from id to root element
+            self.id_to_root = {
+                root.attrib[id_attrib]: root for root in self.filepath_to_root.values()
+            }
 
     def _return_root(self, path: str) -> ET.Element:
         """Return the root element of the XML file with the given path."""
