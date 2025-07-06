@@ -119,7 +119,49 @@ class InspectXML:
         print(f"Tags without namespace: {self._return_tags_sans_namespace()}")
 
 
-# class ProcessXML:
+class SearchXML:
+    """
+    Search for specific tags and attributes in XML.
+    """
+
+    def __init__(
+        self,
+        file_paths,
+        ns: dict | None,
+        id_attrib: None | str = None,
+    ):
+        self.file_paths = file_paths
+        loaded_xml = LoadXML(file_paths, id_attrib)
+        self.filepath_to_root = loaded_xml.filepath_to_root
+        self.id_to_root = loaded_xml.id_to_root
+        self.ns = ns if ns else {}
+
+    def search_element(self, search_string: str) -> dict:
+        """
+        Map IDs to elements matching the search string.
+        """
+        return {
+            id: el.xpath(f".//{search_string}", namespaces=self.ns)
+            for id, el in self.id_to_root.items()
+        }
+
+    def group_ids_by_length(self, mapping: dict) -> dict:
+        output = {}
+        for id, elements in mapping.items():
+            key = len(elements)
+            if key not in output:
+                output[key] = list()
+            output[key].append(id)
+        return output
+
+    def search_and_get_value_counts(self, search_string: str) -> dict:
+        """
+        Count occurrences of elements matching the search string.
+        """
+        return self.group_ids_by_length(self.search_element(search_string))
+
+
+# class EditXML:
 #     def __init__(self):
 #         self.map_tags_to_text = {}
 #
