@@ -170,7 +170,7 @@ class SearchXML:
             main_text = f"{main_text} {element.tail.strip()}"
         return main_text
 
-    def search_and_get_text(self, search_str, with_tail=True) -> dict:
+    def search_and_get_text(self, search_str: str, with_tail=True) -> dict:
         """
         Search for elements matching the search string and return their text.
 
@@ -182,7 +182,7 @@ class SearchXML:
             result[id] = " ".join(texts).strip()
         return result
 
-    def print_tails(self, search_str):
+    def print_tails(self, search_str: str):
         """Search for tail text in elements matching the search string."""
         for id, elements in self._find_elements_by_xpath(search_str).items():
             tails = [el.tail.strip() for el in elements if el.tail and el.tail.strip()]
