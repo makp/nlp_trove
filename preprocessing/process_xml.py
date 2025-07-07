@@ -140,7 +140,7 @@ class SearchXML:
     def _find_elements_by_xpath(self, search_string: str) -> dict:
         """Map IDs to elements matching the XPath search string."""
         return {
-            id: el.xpath(f".//{search_string}", namespaces=self.ns)
+            id: el.xpath(search_string, namespaces=self.ns)
             for id, el in self.id_to_root.items()
         }
 
