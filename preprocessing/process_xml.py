@@ -1,15 +1,16 @@
+import os
 from collections.abc import Generator
 
 import lxml.etree as ET
 
 
 class LoadXML:
-    def __init__(self, file_paths, id_attrib: None | str = None):
-        self.file_paths = file_paths
+    def __init__(self, filepaths, id_attrib: None | str = None):
+        self.filepaths = filepaths
 
         # Parse XML files and store their root elements in a dictionary
         self.filepath_to_root: dict[str, ET.Element] = {
-            fp: self._return_root(fp) for fp in file_paths
+            fp: self._return_root(fp) for fp in filepaths
         }
 
         if id_attrib:
@@ -28,7 +29,7 @@ class LoadXML:
         else:
             # Use filenames as identifiers if no `id_attrib` is provided
             self.id_to_root = {
-                fp.split("/")[-1]: root for fp, root in self.filepath_to_root.items()
+                os.path.basename(fp): root for fp, root in self.filepath_to_root.items()
             }
 
     def _return_root(self, path: str) -> ET.Element:
@@ -43,26 +44,26 @@ class InspectXML:
     namespaces.
     """
 
-    def __init__(self, file_paths):
-        intializer = LoadXML(file_paths)
-        self.file_paths = file_paths
-        self.filepath_to_root = intializer.filepath_to_root
+    def __init__(self, filepaths):
+        initializer = LoadXML(filepaths)
+        self.filepaths = filepaths
+        self.filepath_to_root = initializer.filepath_to_root
 
-    def _return_root_tags(self):
+    def _get_root_tags(self):
         """
         Return the tags of the root elements of the XML files.
         """
         return {root.tag for root in self.filepath_to_root.values()}
 
-    def _return_root_lengths(self):
+    def _get_root_child_counts(self):
         """
-        Return the lengths of the root elements of the XML files.
+        Return the number of direct children for each root element.
         """
         return {len(root) for root in self.filepath_to_root.values()}
 
-    def _return_root_common_children(self):
+    def _get_common_child_tags(self):
         """
-        Return the children of the root elements that are shared across all XML files.
+        Return the child tags that are shared across all root elements.
         """
         root_children = (
             {child.tag for child in root} for root in self.filepath_to_root.values()
@@ -75,35 +76,35 @@ class InspectXML:
         """
         print("\nINFO ABOUT THE ROOT ELEMENTS")
         print("=" * 30)
-        print(f"Tags: {self._return_root_tags()}")
+        print(f"Tags: {self._get_root_tags()}")
         print("-" * 50)
-        print(f"Number of children: {self._return_root_lengths()}")
+        print(f"Number of children: {self._get_root_child_counts()}")
         print("-" * 50)
-        print(f"Shared children: {self._return_root_common_children()}")
+        print(f"Shared children: {self._get_common_child_tags()}")
 
-    def _return_namespaces_from_element(self, element: ET.Element) -> set[tuple]:
-        "Return the namespaces within an Element."
+    def _get_namespaces_from_element(self, element: ET.Element) -> set[tuple]:
+        "Extract all namespaces from an Element and its descendants."
         # `.nsmap` returns a dictionary mapping prefixes to URIs.
         # `tuple` is used to transform the ns into hashable tuples.
         return set(ns for el in element.iter("{*}*") for ns in tuple(el.nsmap.items()))
 
-    def _return_namespaces_per_root(self) -> Generator[set[tuple]]:
-        "Return generator containing the namespaces for each root element."
+    def _get_namespaces_per_root(self) -> Generator[set[tuple]]:
+        "Generate namespace sets for each root element."
         return (
-            self._return_namespaces_from_element(root)
+            self._get_namespaces_from_element(root)
             for root in self.filepath_to_root.values()
         )
 
-    def _return_namespaces_all(self) -> set:
-        "Return all namespaces."
-        return set.union(*self._return_namespaces_per_root())
+    def _get_all_namespaces(self) -> set:
+        "Return all unique namespaces found across all XML files."
+        return set.union(*self._get_namespaces_per_root())
 
-    def _return_namespaces_shared(self) -> set:
-        "Return shared namespaces."
-        return set.intersection(*self._return_namespaces_per_root())
+    def _get_shared_namespaces(self) -> set:
+        "Return namespaces that are common to all XML files."
+        return set.intersection(*self._get_namespaces_per_root())
 
-    def _return_tags_sans_namespace(self) -> set:
-        "Return tags not associated with a namespace."
+    def _get_unnamespaced_tags(self) -> set:
+        "Return all tags that are not associated with any namespace."
         return set(
             el.tag for root in self.filepath_to_root.values() for el in root.iter("{}*")
         )
@@ -112,11 +113,11 @@ class InspectXML:
         "Print information about namespaces of the XML files."
         print("\nINFO ABOUT NAMESPACES")
         print("=" * 30)
-        print(f"All namespaces: {self._return_namespaces_all()}")
+        print(f"All namespaces: {self._get_all_namespaces()}")
         print("-" * 50)
-        print(f"Shared namespaces: {self._return_namespaces_shared()}")
+        print(f"Shared namespaces: {self._get_shared_namespaces()}")
         print("-" * 50)
-        print(f"Tags without namespace: {self._return_tags_sans_namespace()}")
+        print(f"Tags without namespace: {self._get_unnamespaced_tags()}")
 
 
 class SearchXML:
@@ -126,24 +127,24 @@ class SearchXML:
 
     def __init__(
         self,
-        file_paths,
+        filepaths,
         ns: dict | None,
         id_attrib: None | str = None,
     ):
-        self.file_paths = file_paths
-        loaded_xml = LoadXML(file_paths, id_attrib)
+        self.filepaths = filepaths
+        loaded_xml = LoadXML(filepaths, id_attrib)
         self.filepath_to_root = loaded_xml.filepath_to_root
         self.id_to_root = loaded_xml.id_to_root
         self.ns = ns if ns else {}
 
-    def search_element(self, search_string: str) -> dict:
-        """Map IDs to elements matching the search string."""
+    def _find_elements_by_xpath(self, search_string: str) -> dict:
+        """Map IDs to elements matching the XPath search string."""
         return {
             id: el.xpath(f".//{search_string}", namespaces=self.ns)
             for id, el in self.id_to_root.items()
         }
 
-    def group_ids_by_length(self, mapping: dict) -> dict:
+    def _group_ids_by_length(self, mapping: dict) -> dict:
         output = {}
         for id, elements in mapping.items():
             key = len(elements)
@@ -154,26 +155,36 @@ class SearchXML:
 
     def search_and_get_value_counts(self, search_string: str) -> dict:
         """Count occurrences of elements matching the search string."""
-        return self.group_ids_by_length(self.search_element(search_string))
+        return self._group_ids_by_length(self._find_elements_by_xpath(search_string))
 
-    def get_text_from_element(self, element, with_tail=True):
-        """Get text from an XML element, including nested tags."""
+    def _get_text_from_element(self, element, with_tail=True):
+        """
+        Get text from an XML element, including nested tags.
+
+        If `with_tail` is True, include the tail text of the element (text that
+        appears after the element's closing tag but before the next sibling
+        element)
+        """
         main_text = " ".join(element.itertext()).strip()
         if with_tail and element.tail:
             main_text = f"{main_text} {element.tail.strip()}"
         return main_text
 
     def search_and_get_text(self, search_str, with_tail=True) -> dict:
-        """Search for elements matching the search string and return their text."""
+        """
+        Search for elements matching the search string and return their text.
+
+        If `with_tail` is True, include tail text from matched elements.
+        """
         result = dict()
-        for id, elements in self.search_element(search_str).items():
-            texts = [self.get_text_from_element(el, with_tail) for el in elements]
+        for id, elements in self._find_elements_by_xpath(search_str).items():
+            texts = [self._get_text_from_element(el, with_tail) for el in elements]
             result[id] = " ".join(texts).strip()
         return result
 
     def print_tails(self, search_str):
         """Search for tail text in elements matching the search string."""
-        for id, elements in self.search_element(search_str).items():
+        for id, elements in self._find_elements_by_xpath(search_str).items():
             tails = [el.tail.strip() for el in elements if el.tail and el.tail.strip()]
             if tails:
                 print(f"Element with id {id} has tail text: {', '.join(tails)}")
