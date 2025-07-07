@@ -121,7 +121,7 @@ class InspectXML:
 
 class SearchXML:
     """
-    Search for specific tags and attributes in XML.
+    Search for specific tags and attributes in XML, and return their text.
     """
 
     def __init__(
@@ -137,9 +137,7 @@ class SearchXML:
         self.ns = ns if ns else {}
 
     def search_element(self, search_string: str) -> dict:
-        """
-        Map IDs to elements matching the search string.
-        """
+        """Map IDs to elements matching the search string."""
         return {
             id: el.xpath(f".//{search_string}", namespaces=self.ns)
             for id, el in self.id_to_root.items()
@@ -155,10 +153,30 @@ class SearchXML:
         return output
 
     def search_and_get_value_counts(self, search_string: str) -> dict:
-        """
-        Count occurrences of elements matching the search string.
-        """
+        """Count occurrences of elements matching the search string."""
         return self.group_ids_by_length(self.search_element(search_string))
+
+    def get_text_from_element(self, element, with_tail=True):
+        """Get text from an XML element, including nested tags."""
+        main_text = " ".join(element.itertext()).strip()
+        if with_tail and element.tail:
+            main_text = f"{main_text} {element.tail.strip()}"
+        return main_text
+
+    def search_and_get_text(self, search_str, with_tail=True) -> dict:
+        """Search for elements matching the search string and return their text."""
+        result = dict()
+        for id, elements in self.search_element(search_str).items():
+            texts = [self.get_text_from_element(el, with_tail) for el in elements]
+            result[id] = " ".join(texts).strip()
+        return result
+
+    def print_tails(self, search_str):
+        """Search for tail text in elements matching the search string."""
+        for id, elements in self.search_element(search_str).items():
+            tails = [el.tail.strip() for el in elements if el.tail and el.tail.strip()]
+            if tails:
+                print(f"Element with id {id} has tail text: {', '.join(tails)}")
 
 
 # class EditXML:
