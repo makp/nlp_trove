@@ -58,18 +58,23 @@ class EvalHyper:
         """
         Compute the coherence of a topic model using c_v and u_mass.
 
-        While c_v favors topics that are distinct but sometimes not very
-        specific, u_mass favors topics that are tightly focused but possibly
-        overlapping. Accordingly, higher c_v scores tend to capture more
-        general but well-separated topics, while higher u_mass scores tend to
-        capture more specific but overlapping topics.
+        While the dictionary (token to ID mapping) is required for calculating
+        coherence scores, the coherence scores differ in whether they need the
+        (vectorized) corpus or the tokenized texts. Sliding window methods
+        (e.g., 'c_v') do not require the vectorized corpus but require
+        tokenized texts---info about the token order is needed to define the
+        sliding windows. 'u_mass' requires a vectorized corpus but not
+        tokenized texts. Information about the token order is not needed
+        because 'u_mass' uses the whole document as its context window.
+        However, if the vectorized corpus is not provided, Gensim can still
+        calculate the 'u_mass' by using the dictionary and the tokenized docs
+        to vectorize the documents.
 
-        Sliding window methods (e.g., 'c_v') do not require the corpus but they
-        require tokenized texts. 'u_mass' requires a corpus but not tokenized
-        texts. However, Gensim uses the dictionary and the tokenized docs to
-        generate the vectorized corpus if it is not provided. Information about
-        whether the topic model was trained using word frequency or TF-IDF weights
-        is not used to calculate the coherence scores.
+
+        Information about whether the topic model was trained using word
+        frequency or TF-IDF weights is not used to calculate the coherence
+        scores. Coherence scores solely rely on the word co-occurrence stats
+        and the topic-word lists.
         """
 
         kwargs = {
