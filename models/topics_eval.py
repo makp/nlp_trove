@@ -17,7 +17,7 @@ class EvalHyper:
     def __init__(self, ids, corpus_tk, corpus_vec=None, hyperspace=None):
         self.ids = ids
         self.corpus_tk = corpus_tk
-        self.corpus_vecs = corpus_vec
+        self.corpus_vec = corpus_vec
         if hyperspace is None:
             self.hyperspace = self.DEFAULT_SEED.copy()
         else:
@@ -112,7 +112,7 @@ class EvalHyper:
         training_func = func_map[model_type]
 
         model = training_func(
-            corpus=self.corpus_vecs,
+            corpus=self.corpus_vec,
             id2word=self.ids,
             **kwargs,
         )
