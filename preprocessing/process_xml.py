@@ -170,16 +170,43 @@ class SearchXML:
             main_text = f"{main_text} {element.tail.strip()}"
         return main_text
 
-    def search_and_get_text(self, search_str: str, with_tail=True) -> dict:
+    def search_and_get_text(
+        self,
+        search_str: str,
+        join_str: str | None = None,
+        with_tail: bool = True,
+    ) -> dict[str, str | list[str]]:
         """
         Search for elements matching the search string and return their text.
 
-        If `with_tail` is True, include tail text from matched elements.
+        Args:
+            search_str: XPath expression to search for elements
+            join_str: String to join matched element texts. If None, returns list of texts
+            with_tail: Whether to include tail text from matched elements
+
+        Returns:
+            Dictionary mapping element IDs to either joined text (if join_str provided)
+            or list of text strings (if join_str is None)
         """
-        result = dict()
-        for id, elements in self._find_elements_by_xpath(search_str).items():
+        assert join_str is None or isinstance(join_str, str), (
+            "join_str must be a string or None"
+        )
+
+        result = {}
+        elements_by_id = self._find_elements_by_xpath(search_str)
+
+        for element_id, elements in elements_by_id.items():
+            if not elements:  # Handle empty element lists
+                result[element_id] = "" if join_str is not None else []
+                continue
+
             texts = [self._get_text_from_element(el, with_tail) for el in elements]
-            result[id] = " ".join(texts).strip()
+
+            if join_str is None:
+                result[element_id] = texts
+            else:
+                result[element_id] = join_str.join(texts).strip()
+
         return result
 
     def print_tails(self, search_str: str):
