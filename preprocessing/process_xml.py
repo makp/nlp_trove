@@ -219,6 +219,29 @@ class SearchXML:
 
         return result
 
+    def search_and_get_attrib_and_text(
+        self,
+        search_str: str,
+        attrib: str,
+    ) -> dict[str, list[tuple]]:
+        """
+        Search for elements matching the search string and return their attributes
+        and text as a list of tuples.
+        """
+        result = {}
+
+        # XPath search results
+        id_to_elements: dict[str, list] = self.find_elements_by_xpath(search_str)
+
+        for id, elements in id_to_elements.items():
+            if not elements:  # Handle empty search results
+                result[id] = []
+                continue
+
+            result[id] = [
+                (el.attrib.get(attrib, ""), el.text.strip()) for el in elements
+            ]
+
         return result
 
     def print_tails(self, search_str: str):
