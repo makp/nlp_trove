@@ -1,3 +1,8 @@
+"""
+Classes for inspecting the general structure of XML files (`InspectXML`), and
+to search for tags using XPath expressions and text extraction (`SearchXML`).
+"""
+
 import os
 from collections.abc import Generator
 
@@ -137,7 +142,10 @@ class SearchXML:
         self.id_to_root = loaded_xml.id_to_root
         self.ns = ns if ns else {}
 
-    def _find_elements_by_xpath(self, search_string: str) -> dict:
+    def find_elements_by_xpath(
+        self,
+        search_string: str,
+    ) -> dict[str, list[ET.Element]]:
         """Map IDs to elements matching the XPath search string."""
         return {
             id: el.xpath(search_string, namespaces=self.ns)
@@ -155,7 +163,7 @@ class SearchXML:
 
     def search_and_get_value_counts(self, search_string: str) -> dict:
         """Count occurrences of elements matching the search string."""
-        return self._group_ids_by_length(self._find_elements_by_xpath(search_string))
+        return self._group_ids_by_length(self.find_elements_by_xpath(search_string))
 
     def _get_text_from_element(self, element, with_tail=True):
         """
@@ -193,25 +201,29 @@ class SearchXML:
         )
 
         result = {}
-        elements_by_id = self._find_elements_by_xpath(search_str)
 
-        for element_id, elements in elements_by_id.items():
-            if not elements:  # Handle empty element lists
-                result[element_id] = "" if join_str is not None else []
+        # XPath search results
+        id_to_elements: dict[str, list] = self.find_elements_by_xpath(search_str)
+
+        for id, elements in id_to_elements.items():
+            if not elements:  # Handle empty search results
+                result[id] = "" if join_str is not None else []
                 continue
 
             texts = [self._get_text_from_element(el, with_tail) for el in elements]
 
             if join_str is None:
-                result[element_id] = texts
+                result[id] = texts
             else:
-                result[element_id] = join_str.join(texts).strip()
+                result[id] = join_str.join(texts).strip()
+
+        return result
 
         return result
 
     def print_tails(self, search_str: str):
         """Search for tail text in elements matching the search string."""
-        for id, elements in self._find_elements_by_xpath(search_str).items():
+        for id, elements in self.find_elements_by_xpath(search_str).items():
             tails = [el.tail.strip() for el in elements if el.tail and el.tail.strip()]
             if tails:
                 print(f"Element with id {id} has tail text: {', '.join(tails)}")
