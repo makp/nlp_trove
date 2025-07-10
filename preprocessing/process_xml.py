@@ -165,9 +165,9 @@ class SearchXML:
         """Count occurrences of elements matching the search string."""
         return self._group_ids_by_length(self.find_elements_by_xpath(search_string))
 
-    def _get_text_from_element(self, element, with_tail=True):
+    def _get_text_from_element_recursive(self, element, with_tail=True):
         """
-        Get text from an XML element, including nested tags.
+        Get text from an XML element recursively.
 
         If `with_tail` is True, include the tail text of the element (text that
         appears after the element's closing tag but before the next sibling
@@ -210,7 +210,9 @@ class SearchXML:
                 result[id] = "" if join_str is not None else []
                 continue
 
-            texts = [self._get_text_from_element(el, with_tail) for el in elements]
+            texts = [
+                self._get_text_from_element_recursive(el, with_tail) for el in elements
+            ]
 
             if join_str is None:
                 result[id] = texts
