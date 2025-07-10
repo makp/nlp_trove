@@ -159,7 +159,7 @@ class SearchXML:
             if key not in output:
                 output[key] = list()
             output[key].append(id)
-        return output
+        return dict(sorted(output.items()))
 
     def search_and_get_value_counts(self, search_string: str) -> dict:
         """Count occurrences of elements matching the search string."""
