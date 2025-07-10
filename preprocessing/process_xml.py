@@ -178,7 +178,7 @@ class SearchXML:
             main_text = f"{main_text} {element.tail.strip()}"
         return main_text
 
-    def search_and_get_text(
+    def search_and_get_text_recursive(
         self,
         search_str: str,
         join_str: str | None = None,
